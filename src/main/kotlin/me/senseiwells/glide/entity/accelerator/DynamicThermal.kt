@@ -3,9 +3,11 @@ package me.senseiwells.glide.entity.accelerator
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
+import net.casual.arcade.utils.impl.Sound
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -26,14 +28,18 @@ open class DynamicThermal(
         return AABB.ofSize(position, size.x, size.y, size.z)
     }
 
-    override fun accelerate(entity: Entity) {
-        val delta = entity.deltaMovement
+    override fun accelerate(player: ServerPlayer) {
+        val delta = player.deltaMovement
         if (delta.y < this.targetVelocity) {
-            entity.addVelocityAndMark(0.0, (this.targetVelocity - 1) / 4.0, 0.0)
+            player.addVelocityAndMark(0.0, (this.targetVelocity - 1) / 4.0, 0.0)
         } else if (delta.y == this.targetVelocity) {
             // TODO: Why?
-            entity.addVelocityAndMark(0.0, -1.0, 0.0)
+            player.addVelocityAndMark(0.0, -1.0, 0.0)
         }
+    }
+
+    override fun getSound(): Sound {
+        return Sound(GlideSounds.THERMAL_BOOST)
     }
 
     override fun getModelScale(): Vector3f {

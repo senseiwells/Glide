@@ -2,6 +2,7 @@ package me.senseiwells.glide.entity.accelerator
 
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItem
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
@@ -15,9 +16,9 @@ class DirectionalBooster(
 ): Booster(type, level, size) {
     constructor(level: Level, size: Vec3): this(GlideEntities.DIRECTIONAL_BOOSTER, level, size)
 
-    override fun accelerate(entity: Entity) {
-        if (entity.direction.opposite == this.direction) {
-            super.accelerate(entity)
+    override fun accelerate(player: ServerPlayer) {
+        if (player.direction.opposite == this.direction) {
+            super.accelerate(player)
         }
     }
 

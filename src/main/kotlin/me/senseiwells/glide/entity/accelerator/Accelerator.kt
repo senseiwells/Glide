@@ -2,13 +2,18 @@ package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
+import me.senseiwells.glide.entity.GlideCollider
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TagUtils.getVec3OrNull
 import net.casual.arcade.utils.TagUtils.getVector3fOrNull
 import net.casual.arcade.utils.TagUtils.putVec3
 import net.casual.arcade.utils.TagUtils.putVector3f
+import net.casual.arcade.utils.impl.Sound
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -18,7 +23,6 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
@@ -29,7 +33,8 @@ abstract class Accelerator(
     type: EntityType<*>,
     level: Level,
     size: Vec3 = DEFAULT_SIZE
-): Entity(type, level), PolymerEntity {
+): Entity(type, level), PolymerEntity, GlideCollider {
+    private val accelerating = ObjectLinkedOpenHashSet<ServerPlayer>()
     // Leaking `this` causes this to be nullable
     private var size: Vec3? = size
 
@@ -91,11 +96,24 @@ abstract class Accelerator(
         return AABB.ofSize(position, size.x, size.y, size.z)
     }
 
+    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+        player.sendSound(this.getSound())
+        this.accelerating.add(player)
+    }
+
     override fun tick() {
-        super.tick()
-        for (entity in this.getPlayersToAccelerate()) {
-            this.accelerate(entity)
+        val previous = this.accelerating.iterator()
+        for (player in previous) {
+            if (this.shouldKeepAccelerating(player)) {
+                this.accelerate(player)
+            } else {
+                previous.remove()
+            }
         }
+
+        // val intersecting = this.level().getEntitiesOfClass(ServerPlayer::class.java, this.boundingBox) {
+        //     !this.accelerating.contains(it)
+        // }
     }
 
     override fun modifyRawTrackedData(
@@ -113,11 +131,13 @@ abstract class Accelerator(
         }
     }
 
-    protected open fun getPlayersToAccelerate(): Collection<ServerPlayer> {
-        return this.level().getEntitiesOfClass(ServerPlayer::class.java, this.boundingBox)
+    protected open fun shouldKeepAccelerating(player: ServerPlayer): Boolean {
+        return this.boundingBox.intersects(player.boundingBox)
     }
 
-    protected abstract fun accelerate(entity: Entity)
+    protected abstract fun accelerate(player: ServerPlayer)
+
+    protected abstract fun getSound(): Sound
 
     protected abstract fun getModelScale(): Vector3f
 

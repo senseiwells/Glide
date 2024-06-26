@@ -2,6 +2,7 @@ package me.senseiwells.glide.entity.checkpoint
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
+import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import me.senseiwells.glide.utils.ExtraEntityDataSerializers
@@ -15,7 +16,6 @@ import net.minecraft.util.Brightness
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
@@ -23,7 +23,7 @@ abstract class Checkpoint(
     type: EntityType<*>,
     level: Level,
     size: Vec3 = DEFAULT_SIZE
-): Entity(type, level), PolymerEntity {
+): Entity(type, level), PolymerEntity, GlideCollider {
     init {
         this.setSize(size)
     }
@@ -63,10 +63,7 @@ abstract class Checkpoint(
     }
 
     override fun tick() {
-        val intersecting = this.level().getEntitiesOfClass(ServerPlayer::class.java, this.boundingBox)
-        for (entity in intersecting) {
-            this.pass(entity)
-        }
+
     }
 
     override fun modifyRawTrackedData(
@@ -84,8 +81,6 @@ abstract class Checkpoint(
             data.add(DisplayTrackedData.BRIGHTNESS.createValue(Brightness.FULL_BRIGHT.pack()))
         }
     }
-
-    protected abstract fun pass(player: ServerPlayer)
 
     companion object {
         val DEFAULT_SIZE = Vec3(5.0, 5.0, 5.0)

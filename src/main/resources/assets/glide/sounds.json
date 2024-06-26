@@ -1,0 +1,26 @@
+{
+  "block.fire.ambient": {
+    "replace": true,
+    "sounds": []
+  },
+  "entity.generic.explode": {
+    "replace": true,
+    "sounds": []
+  },
+  "entity.creeper.hurt": {
+    "replace": true,
+    "sounds": []
+  },
+  "music.creative": {
+    "replace": true,
+    "sounds": []
+  },
+  "music.game": {
+    "replace": true,
+    "sounds": []
+  },
+  "music.under_water": {
+    "replace": true,
+    "sounds": []
+  }
+}

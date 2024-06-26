@@ -67,6 +67,10 @@ class BeaconBeam(
         builder.define(LENGTH, 0.0F)
     }
 
+    override fun tick() {
+
+    }
+
     override fun readAdditionalSaveData(compound: CompoundTag) {
         if (compound.contains("BeamLength", 99)) {
             this.setLength(compound.getFloat("BeamLength"))

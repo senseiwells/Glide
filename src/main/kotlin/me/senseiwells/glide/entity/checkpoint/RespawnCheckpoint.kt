@@ -58,10 +58,7 @@ class RespawnCheckpoint(
         compound.putVec2("RespawnRotation", this.respawnRotation)
     }
 
-    override fun pass(player: ServerPlayer) {
-        val minigame = player.getMinigame()
-        if (minigame is GlideMinigame) {
-            minigame.onPlayerCheckpoint(player, this)
-        }
+    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+        glide.onPlayerCheckpoint(player, this)
     }
 }

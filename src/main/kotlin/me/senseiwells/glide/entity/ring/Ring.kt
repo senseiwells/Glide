@@ -2,7 +2,9 @@ package me.senseiwells.glide.entity.ring
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
+import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.GlideEntities
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import net.casual.arcade.utils.TagUtils.contains
@@ -24,7 +26,7 @@ class Ring(
     type: EntityType<*>,
     level: Level,
     private var ringType: RingType = RingType.Blue
-): Entity(type, level), PolymerEntity {
+): Entity(type, level), PolymerEntity, GlideCollider {
     constructor(level: Level, type: RingType): this(GlideEntities.RING, level, type)
 
     init {
@@ -57,6 +59,10 @@ class Ring(
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         compound.putByte("RingType", this.ringType.ordinal.toByte())
+    }
+
+    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+        // TODO:
     }
 
     override fun modifyRawTrackedData(

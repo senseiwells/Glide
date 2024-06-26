@@ -3,7 +3,6 @@ package me.senseiwells.glide.entity.ring
 import me.senseiwells.glide.item.GlideItem
 import net.minecraft.world.item.ItemStack
 
-// TODO: What are the actual point values...?
 enum class RingType(val points: Int, private val model: () -> ItemStack) {
     Blue(7, GlideItem::BLUE_RING),
     Yellow(5, GlideItem::YELLOW_RING),

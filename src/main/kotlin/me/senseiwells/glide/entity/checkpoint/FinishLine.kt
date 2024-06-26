@@ -15,10 +15,7 @@ class FinishLine(
 ): Checkpoint(type, level, size) {
     constructor(level: Level, size: Vec3): this(GlideEntities.FINISH_LINE, level, size)
 
-    override fun pass(player: ServerPlayer) {
-        val minigame = player.getMinigame()
-        if (minigame is GlideMinigame) {
-            minigame.onPlayerFinish(player)
-        }
+    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+        glide.onPlayerFinish(player)
     }
 }
