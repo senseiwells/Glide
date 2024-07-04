@@ -1,8 +1,8 @@
 package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
 import me.senseiwells.glide.entity.GlideEntities
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.item.GlideItem
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import org.apache.commons.lang3.mutable.MutableInt
 
 class StaticThermal(
     type: EntityType<*>,
@@ -38,20 +39,43 @@ class StaticThermal(
         compound.putDouble("TargetHeight", this.targetHeight)
     }
 
-    override fun shouldKeepAccelerating(player: ServerPlayer): Boolean {
-        return player.y < this.targetY && !player.isRemoved || super.shouldKeepAccelerating(player)
-    }
+    override fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean {
+        player.glide.setLiftForceModifier(this.liftForceModifier)
+        val currentVelocityY = player.deltaMovement.y
 
-    override fun accelerate(player: ServerPlayer) {
-        val delta = player.deltaMovement
-        if (delta.y < this.targetVelocity) {
-            player.addVelocityAndMark(0.0, this.targetVelocity / 3, 0.0)
+        player.isNoGravity = true
+        if (player.y > this.targetY) {
+            if (ticks.incrementAndGet() <= 20) {
+                if (currentVelocityY > this.targetVelocity) {
+                    player.isNoGravity = false
+                }
+
+                player.addVelocityAndMark(
+                    0.0,
+                    -0.008,
+                    0.0
+                )
+                return true
+            } else {
+                player.isNoGravity = false
+                return false
+            }
         } else {
-            player.setVelocityAndMark(delta.x, this.targetVelocity, delta.z)
+            ticks.setValue(0)
+            if (currentVelocityY < this.targetVelocity) {
+                player.addVelocityAndMark(
+                    0.0,
+                    (this.targetVelocity - currentVelocityY) / this.targetVelocity * 0.1,
+                    0.0
+                )
+            } else {
+                player.isNoGravity = false
+            }
+            return true
         }
     }
 
     override fun getModelItem(): ItemStack {
-        return GlideItem.WEAK_THERMAL
+        return GlideItem.STATIC_THERMAL
     }
 }

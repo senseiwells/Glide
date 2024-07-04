@@ -6,9 +6,11 @@ import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import me.senseiwells.glide.utils.ExtraEntityDataSerializers
+import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TagUtils.getVec3OrNull
 import net.casual.arcade.utils.TagUtils.putVec3
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerPlayer
@@ -24,6 +26,8 @@ abstract class Checkpoint(
     level: Level,
     size: Vec3 = DEFAULT_SIZE
 ): Entity(type, level), PolymerEntity, GlideCollider {
+    var index: Int = 0
+
     init {
         this.setSize(size)
     }
@@ -50,10 +54,14 @@ abstract class Checkpoint(
         if (size != null) {
             this.setSize(size)
         }
+        if (compound.contains("Index", Tag.TAG_ANY_NUMERIC)) {
+            this.index = compound.getInt("Index")
+        }
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         compound.putVec3("Size", this.getSize())
+        compound.putInt("Index", this.index)
     }
 
     override fun makeBoundingBox(): AABB {

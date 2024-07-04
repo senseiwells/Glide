@@ -1,9 +1,12 @@
 package me.senseiwells.glide.entity.checkpoint
 
 import me.senseiwells.glide.entity.GlideEntities
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
+import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.ExtraEntityDataSerializers
 import net.casual.arcade.utils.MinigameUtils.getMinigame
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TagUtils.getVec2OrNull
 import net.casual.arcade.utils.TagUtils.getVec3OrNull
@@ -27,7 +30,6 @@ class RespawnCheckpoint(
     level: Level,
     size: Vec3 = DEFAULT_SIZE
 ): Checkpoint(type, level, size) {
-    var index: Int = 0
     var respawnOffset: Vec3 = Vec3.ZERO
     var respawnRotation: Vec2 = Vec2.ZERO
 
@@ -38,9 +40,6 @@ class RespawnCheckpoint(
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
         super.readAdditionalSaveData(compound)
-        if (compound.contains("Index", Tag.TAG_ANY_NUMERIC)) {
-            this.index = compound.getInt("Index")
-        }
         val respawnOffset = compound.getVec3OrNull("RespawnOffset")
         if (respawnOffset != null) {
             this.respawnOffset = respawnOffset
@@ -53,12 +52,15 @@ class RespawnCheckpoint(
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
-        compound.putInt("Index", this.index)
         compound.putVec3("RespawnOffset", this.respawnOffset)
         compound.putVec2("RespawnRotation", this.respawnRotation)
     }
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
-        glide.onPlayerCheckpoint(player, this)
+        if (player.glide.collideWithCheckpoint(this)) {
+            player.sendSound(GlideSounds.CHECKPOINT)
+            glide.displayCheckpointNotificationTo(player)
+            player.glide.respawnLocation = this.respawnLocation
+        }
     }
 }

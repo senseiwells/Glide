@@ -1,0 +1,3442 @@
+{
+  "name": "__ROOT__",
+  "parameters": {},
+  "children": [
+    {
+      "name": "MapOptions",
+      "parameters": {
+        "seed": "134212187442214197",
+        "spawnX": "-62",
+        "spawnY": "212",
+        "spawnZ": "208",
+        "flatworld": "false",
+        "worldName": "IDS_TEMPLE_WORLD_NAME",
+        "worldDescription": "IDS_TEMPLE_DESCRIPTION",
+        "worldPreviewImage": "WorldSave/Temple.png",
+        "baseSaveName": "Temple_MG03.mcs",
+        "mapSize": "0",
+        "themeId": "3"
+      },
+      "children": []
+    },
+    {
+      "name": "LevelRules",
+      "parameters": {
+        "ruleType": "3"
+      },
+      "children": [
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "2",
+            "z0": "-14",
+            "x1": "6",
+            "z1": "-12"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "1",
+            "z0": "-11",
+            "x1": "6",
+            "z1": "-10"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "2",
+            "z0": "-12",
+            "x1": "6",
+            "z1": "1"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "1",
+            "z0": "-9",
+            "x1": "1",
+            "z1": "-6"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "1",
+            "z0": "2",
+            "x1": "7",
+            "z1": "5"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "2",
+            "z0": "6",
+            "x1": "7",
+            "z1": "6"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "3",
+            "z0": "7",
+            "x1": "7",
+            "z1": "7"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "2",
+            "z0": "8",
+            "x1": "7",
+            "z1": "15"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "3",
+            "z0": "16",
+            "x1": "7",
+            "z1": "16"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "4",
+            "z0": "17",
+            "x1": "11",
+            "z1": "17"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "8",
+            "z0": "13",
+            "x1": "11",
+            "z1": "16"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "9",
+            "z0": "11",
+            "x1": "11",
+            "z1": "12"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "12",
+            "z0": "10",
+            "x1": "18",
+            "z1": "15"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "13",
+            "z0": "16",
+            "x1": "18",
+            "z1": "16"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "19",
+            "z0": "11",
+            "x1": "19",
+            "z1": "15"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "20",
+            "z0": "11",
+            "x1": "20",
+            "z1": "14"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "13",
+            "z0": "-8",
+            "x1": "17",
+            "z1": "9"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "12",
+            "z0": "1",
+            "x1": "12",
+            "z1": "5"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "18",
+            "z0": "1",
+            "x1": "18",
+            "z1": "5"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "15",
+            "z0": "17",
+            "x1": "17",
+            "z1": "18"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "14",
+            "z0": "19",
+            "x1": "18",
+            "z1": "23"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveChunkArea",
+          "parameters": {
+            "x0": "1",
+            "z0": "1",
+            "x1": "1",
+            "z1": "1"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveViewArea",
+          "parameters": {
+            "x0": "1",
+            "z0": "-14",
+            "x1": "8",
+            "z1": "13"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveViewArea",
+          "parameters": {
+            "x0": "2",
+            "z0": "7",
+            "x1": "21",
+            "z1": "24"
+          },
+          "children": []
+        },
+        {
+          "name": "ActiveViewArea",
+          "parameters": {
+            "x0": "12",
+            "z0": "-8",
+            "x1": "21",
+            "z1": "24"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "16",
+            "y0": "186",
+            "z0": "-176",
+            "x1": "32",
+            "y1": "247",
+            "z1": "-160"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "32",
+            "y0": "189",
+            "z0": "-224",
+            "x1": "112",
+            "y1": "256",
+            "z1": "-144"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "32",
+            "y0": "189",
+            "z0": "-192",
+            "x1": "112",
+            "y1": "254",
+            "z1": "-64"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "16",
+            "y0": "186",
+            "z0": "-144",
+            "x1": "32",
+            "y1": "245",
+            "z1": "-80"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "32",
+            "y0": "181",
+            "z0": "-64",
+            "x1": "112",
+            "y1": "234",
+            "z1": "-48"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "32",
+            "y0": "117",
+            "z0": "-48",
+            "x1": "112",
+            "y1": "234",
+            "z1": "32"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "16",
+            "y0": "117",
+            "z0": "16",
+            "x1": "128",
+            "y1": "231",
+            "z1": "112"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "32",
+            "y0": "128",
+            "z0": "112",
+            "x1": "128",
+            "y1": "191",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "128",
+            "y0": "128",
+            "z0": "176",
+            "x1": "192",
+            "y1": "188",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "192",
+            "y0": "109",
+            "z0": "160",
+            "x1": "320",
+            "y1": "202",
+            "z1": "272"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "320",
+            "y0": "123",
+            "z0": "176",
+            "x1": "336",
+            "y1": "179",
+            "z1": "240"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "208",
+            "y0": "13",
+            "z0": "-128",
+            "x1": "288",
+            "y1": "183",
+            "z1": "160"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "224",
+            "y0": "13",
+            "z0": "160",
+            "x1": "288",
+            "y1": "84",
+            "z1": "208"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "240",
+            "y0": "5",
+            "z0": "208",
+            "x1": "288",
+            "y1": "63",
+            "z1": "304"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "224",
+            "y0": "2",
+            "z0": "304",
+            "x1": "304",
+            "y1": "61",
+            "z1": "384"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "288",
+            "y0": "27",
+            "z0": "16",
+            "x1": "304",
+            "y1": "70",
+            "z1": "96"
+          },
+          "children": []
+        },
+        {
+          "name": "PlayerBoundsVolume",
+          "parameters": {
+            "x0": "192",
+            "y0": "25",
+            "z0": "16",
+            "x1": "208",
+            "y1": "78",
+            "z1": "96"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "0",
+            "x0": "49",
+            "y0": "219",
+            "z0": "-216",
+            "x1": "80",
+            "y1": "244",
+            "z1": "-208"
+          },
+          "children": [
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "66",
+                "spawnY": "236",
+                "spawnZ": "-215",
+                "yRot": "0",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "1",
+            "x0": "16",
+            "y0": "195",
+            "z0": "-148",
+            "x1": "112",
+            "y1": "251",
+            "z1": "-147"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "2",
+            "x0": "19",
+            "y0": "193",
+            "z0": "-115",
+            "x1": "112",
+            "y1": "251",
+            "z1": "-114"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "3",
+            "x0": "32",
+            "y0": "188",
+            "z0": "-76",
+            "x1": "112",
+            "y1": "251",
+            "z1": "-75"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "4",
+            "x0": "32",
+            "y0": "184",
+            "z0": "-35",
+            "x1": "112",
+            "y1": "251",
+            "z1": "-34"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "5",
+            "x0": "32",
+            "y0": "179",
+            "z0": "-9",
+            "x1": "112",
+            "y1": "251",
+            "z1": "-8"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "6",
+            "x0": "16",
+            "y0": "178",
+            "z0": "24",
+            "x1": "112",
+            "y1": "251",
+            "z1": "25"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "7",
+            "x0": "16",
+            "y0": "173",
+            "z0": "47",
+            "x1": "119",
+            "y1": "251",
+            "z1": "48"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "95",
+                "spawnY": "184",
+                "spawnZ": "47",
+                "beam_length": "36",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "42",
+                "spawnY": "186",
+                "spawnZ": "47",
+                "beam_length": "32",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "75",
+                "spawnY": "201",
+                "spawnZ": "33",
+                "yRot": "0",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "8",
+            "x0": "53",
+            "y0": "164",
+            "z0": "97",
+            "x1": "54",
+            "y1": "180",
+            "z1": "115"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "8",
+            "x0": "98",
+            "y0": "161",
+            "z0": "98",
+            "x1": "99",
+            "y1": "181",
+            "z1": "118"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "8",
+            "x0": "68",
+            "y0": "180",
+            "z0": "79",
+            "x1": "83",
+            "y1": "181",
+            "z1": "96"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "9",
+            "x0": "67",
+            "y0": "157",
+            "z0": "66",
+            "x1": "87",
+            "y1": "177",
+            "z1": "67"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "10",
+            "x0": "52",
+            "y0": "150",
+            "z0": "31",
+            "x1": "99",
+            "y1": "169",
+            "z1": "32"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "11",
+            "x0": "60",
+            "y0": "149",
+            "z0": "-9",
+            "x1": "88",
+            "y1": "166",
+            "z1": "-8"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "12",
+            "x0": "89",
+            "y0": "148",
+            "z0": "-47",
+            "x1": "90",
+            "y1": "166",
+            "z1": "-29"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "12",
+            "x0": "51",
+            "y0": "147",
+            "z0": "-45",
+            "x1": "52",
+            "y1": "168",
+            "z1": "-26"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "13",
+            "x0": "32",
+            "y0": "141",
+            "z0": "-9",
+            "x1": "50",
+            "y1": "155",
+            "z1": "-8"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "13",
+            "x0": "97",
+            "y0": "138",
+            "z0": "-9",
+            "x1": "111",
+            "y1": "158",
+            "z1": "-8"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "14",
+            "x0": "66",
+            "y0": "132",
+            "z0": "31",
+            "x1": "94",
+            "y1": "150",
+            "z1": "32"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "15",
+            "x0": "42",
+            "y0": "130",
+            "z0": "64",
+            "x1": "107",
+            "y1": "156",
+            "z1": "65"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "16",
+            "x0": "55",
+            "y0": "126",
+            "z0": "105",
+            "x1": "93",
+            "y1": "158",
+            "z1": "106"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "88",
+                "spawnY": "133",
+                "spawnZ": "105",
+                "beam_length": "9",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "59",
+                "spawnY": "134",
+                "spawnZ": "105",
+                "beam_length": "10",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "75",
+                "spawnY": "147",
+                "spawnZ": "96",
+                "yRot": "0",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "17",
+            "x0": "44",
+            "y0": "129",
+            "z0": "134",
+            "x1": "112",
+            "y1": "196",
+            "z1": "135"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "18",
+            "x0": "38",
+            "y0": "142",
+            "z0": "181",
+            "x1": "118",
+            "y1": "196",
+            "z1": "182"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "19",
+            "x0": "44",
+            "y0": "135",
+            "z0": "229",
+            "x1": "120",
+            "y1": "196",
+            "z1": "230"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "20",
+            "x0": "95",
+            "y0": "132",
+            "z0": "239",
+            "x1": "96",
+            "y1": "196",
+            "z1": "288"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "95",
+                "spawnY": "139",
+                "spawnZ": "258",
+                "beam_length": "9",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "95",
+                "spawnY": "139",
+                "spawnZ": "271",
+                "beam_length": "9",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "78",
+                "spawnY": "144",
+                "spawnZ": "265",
+                "yRot": "-90",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "21",
+            "x0": "118",
+            "y0": "132",
+            "z0": "240",
+            "x1": "119",
+            "y1": "196",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "22",
+            "x0": "142",
+            "y0": "134",
+            "z0": "253",
+            "x1": "143",
+            "y1": "196",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "23",
+            "x0": "140",
+            "y0": "138",
+            "z0": "253",
+            "x1": "187",
+            "y1": "196",
+            "z1": "254"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "24",
+            "x0": "140",
+            "y0": "146",
+            "z0": "231",
+            "x1": "141",
+            "y1": "196",
+            "z1": "253"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "24",
+            "x0": "165",
+            "y0": "165",
+            "z0": "233",
+            "x1": "170",
+            "y1": "170",
+            "z1": "234"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "25",
+            "x0": "119",
+            "y0": "145",
+            "z0": "230",
+            "x1": "142",
+            "y1": "196",
+            "z1": "231"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "25",
+            "x0": "165",
+            "y0": "165",
+            "z0": "231",
+            "x1": "170",
+            "y1": "171",
+            "z1": "232"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "26",
+            "x0": "186",
+            "y0": "139",
+            "z0": "188",
+            "x1": "187",
+            "y1": "196",
+            "z1": "230"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "186",
+                "spawnY": "144",
+                "spawnZ": "199",
+                "beam_length": "16",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "186",
+                "spawnY": "144",
+                "spawnZ": "217",
+                "beam_length": "16",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "157",
+                "spawnY": "163",
+                "spawnZ": "208",
+                "yRot": "-90",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "27",
+            "x0": "217",
+            "y0": "137",
+            "z0": "153",
+            "x1": "218",
+            "y1": "210",
+            "z1": "262"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "28",
+            "x0": "246",
+            "y0": "137",
+            "z0": "154",
+            "x1": "247",
+            "y1": "210",
+            "z1": "271"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "29",
+            "x0": "295",
+            "y0": "138",
+            "z0": "164",
+            "x1": "296",
+            "y1": "210",
+            "z1": "268"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "295",
+                "spawnY": "142",
+                "spawnZ": "180",
+                "beam_length": "28",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "295",
+                "spawnY": "142",
+                "spawnZ": "192",
+                "beam_length": "28",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "295",
+                "spawnY": "142",
+                "spawnZ": "224",
+                "beam_length": "28",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "295",
+                "spawnY": "142",
+                "spawnZ": "236",
+                "beam_length": "28",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "268",
+                "spawnY": "166",
+                "spawnZ": "208",
+                "yRot": "-90",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "30",
+            "x0": "307",
+            "y0": "121",
+            "z0": "181",
+            "x1": "308",
+            "y1": "136",
+            "z1": "194"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "30",
+            "x0": "307",
+            "y0": "117",
+            "z0": "225",
+            "x1": "308",
+            "y1": "138",
+            "z1": "240"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "30",
+            "x0": "301",
+            "y0": "133",
+            "z0": "206",
+            "x1": "302",
+            "y1": "139",
+            "z1": "211"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "31",
+            "x0": "298",
+            "y0": "112",
+            "z0": "182",
+            "x1": "299",
+            "y1": "137",
+            "z1": "239"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "32",
+            "x0": "272",
+            "y0": "112",
+            "z0": "205",
+            "x1": "273",
+            "y1": "136",
+            "z1": "239"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "33",
+            "x0": "224",
+            "y0": "111",
+            "z0": "206",
+            "x1": "261",
+            "y1": "134",
+            "z1": "207"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "34",
+            "x0": "238",
+            "y0": "111",
+            "z0": "187",
+            "x1": "256",
+            "y1": "135",
+            "z1": "188"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "240",
+                "spawnY": "115",
+                "spawnZ": "187",
+                "beam_length": "6",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "252",
+                "spawnY": "115",
+                "spawnZ": "187",
+                "beam_length": "6",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "246",
+                "spawnY": "125",
+                "spawnZ": "204",
+                "yRot": "180",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "35",
+            "x0": "224",
+            "y0": "99",
+            "z0": "145",
+            "x1": "271",
+            "y1": "140",
+            "z1": "146"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "36",
+            "x0": "210",
+            "y0": "94",
+            "z0": "104",
+            "x1": "280",
+            "y1": "185",
+            "z1": "105"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "37",
+            "x0": "213",
+            "y0": "91",
+            "z0": "67",
+            "x1": "286",
+            "y1": "185",
+            "z1": "68"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "38",
+            "x0": "215",
+            "y0": "88",
+            "z0": "25",
+            "x1": "285",
+            "y1": "185",
+            "z1": "26"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "39",
+            "x0": "214",
+            "y0": "80",
+            "z0": "-23",
+            "x1": "287",
+            "y1": "185",
+            "z1": "-22"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "40",
+            "x0": "232",
+            "y0": "99",
+            "z0": "-67",
+            "x1": "258",
+            "y1": "126",
+            "z1": "-66"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "237",
+                "spawnY": "105",
+                "spawnZ": "-67",
+                "beam_length": "11",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "254",
+                "spawnY": "105",
+                "spawnZ": "-67",
+                "beam_length": "10",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "245",
+                "spawnY": "116",
+                "spawnZ": "-44",
+                "yRot": "180",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "41",
+            "x0": "209",
+            "y0": "91",
+            "z0": "-96",
+            "x1": "275",
+            "y1": "114",
+            "z1": "-95"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "42",
+            "x0": "260",
+            "y0": "89",
+            "z0": "-123",
+            "x1": "261",
+            "y1": "108",
+            "z1": "-101"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "42",
+            "x0": "235",
+            "y0": "83",
+            "z0": "-128",
+            "x1": "236",
+            "y1": "102",
+            "z1": "-109"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "43",
+            "x0": "231",
+            "y0": "64",
+            "z0": "-123",
+            "x1": "232",
+            "y1": "84",
+            "z1": "-102"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "43",
+            "x0": "261",
+            "y0": "62",
+            "z0": "-122",
+            "x1": "262",
+            "y1": "89",
+            "z1": "-81"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "44",
+            "x0": "215",
+            "y0": "51",
+            "z0": "-89",
+            "x1": "277",
+            "y1": "84",
+            "z1": "-88"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "45",
+            "x0": "234",
+            "y0": "35",
+            "z0": "-54",
+            "x1": "277",
+            "y1": "79",
+            "z1": "-53"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "269",
+                "spawnY": "50",
+                "spawnZ": "-54",
+                "beam_length": "20",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "243",
+                "spawnY": "50",
+                "spawnZ": "-54",
+                "beam_length": "22",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "256",
+                "spawnY": "66",
+                "spawnZ": "-66",
+                "yRot": "0",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "46",
+            "x0": "226",
+            "y0": "25",
+            "z0": "-20",
+            "x1": "281",
+            "y1": "79",
+            "z1": "-19"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "47",
+            "x0": "230",
+            "y0": "27",
+            "z0": "7",
+            "x1": "281",
+            "y1": "77",
+            "z1": "8"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "48",
+            "x0": "192",
+            "y0": "19",
+            "z0": "58",
+            "x1": "304",
+            "y1": "80",
+            "z1": "59"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "49",
+            "x0": "225",
+            "y0": "12",
+            "z0": "104",
+            "x1": "283",
+            "y1": "78",
+            "z1": "105"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "50",
+            "x0": "225",
+            "y0": "12",
+            "z0": "138",
+            "x1": "281",
+            "y1": "77",
+            "z1": "139"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "51",
+            "x0": "234",
+            "y0": "22",
+            "z0": "185",
+            "x1": "277",
+            "y1": "77",
+            "z1": "186"
+          },
+          "children": [
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "269",
+                "spawnY": "38",
+                "spawnZ": "185",
+                "beam_length": "30",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "CustomBeacon",
+              "parameters": {
+                "spawnX": "240",
+                "spawnY": "38",
+                "spawnZ": "185",
+                "beam_length": "29",
+                "beam_direction": "plus_y"
+              },
+              "children": []
+            },
+            {
+              "name": "UpdatePlayer",
+              "parameters": {
+                "spawnX": "257",
+                "spawnY": "58",
+                "spawnZ": "171",
+                "yRot": "0",
+                "xRot": "0"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "52",
+            "x0": "234",
+            "y0": "20",
+            "z0": "206",
+            "x1": "277",
+            "y1": "83",
+            "z1": "207"
+          },
+          "children": []
+        },
+        {
+          "name": "Checkpoint",
+          "parameters": {
+            "id": "53",
+            "x0": "241",
+            "y0": "14",
+            "z0": "234",
+            "x1": "281",
+            "y1": "58",
+            "z1": "235"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 0",
+            "staticLift": "-0.4",
+            "x0": "16",
+            "y0": "236",
+            "z0": "-178",
+            "x1": "112",
+            "y1": "250",
+            "z1": "-125"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 1",
+            "staticLift": "-0.4",
+            "x0": "16",
+            "y0": "225",
+            "z0": "-125",
+            "x1": "112",
+            "y1": "250",
+            "z1": "-10"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 2",
+            "staticLift": "-0.4",
+            "x0": "16",
+            "y0": "215",
+            "z0": "-10",
+            "x1": "128",
+            "y1": "250",
+            "z1": "112"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 3",
+            "staticLift": "-0.4",
+            "x0": "32",
+            "y0": "176",
+            "z0": "116",
+            "x1": "128",
+            "y1": "210",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 4",
+            "staticLift": "-0.4",
+            "x0": "128",
+            "y0": "193",
+            "z0": "185",
+            "x1": "192",
+            "y1": "210",
+            "z1": "288"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 5",
+            "staticLift": "-0.4",
+            "x0": "192",
+            "y0": "200",
+            "z0": "155",
+            "x1": "311",
+            "y1": "210",
+            "z1": "272"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 6",
+            "staticLift": "-0.4",
+            "x0": "312",
+            "y0": "173",
+            "z0": "178",
+            "x1": "336",
+            "y1": "185",
+            "z1": "240"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 7",
+            "staticLift": "-0.4",
+            "x0": "208",
+            "y0": "180",
+            "z0": "-64",
+            "x1": "288",
+            "y1": "200",
+            "z1": "150"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 8",
+            "staticLift": "-0.4",
+            "x0": "282",
+            "y0": "64",
+            "z0": "16",
+            "x1": "304",
+            "y1": "85",
+            "z1": "96"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 9",
+            "staticLift": "-0.4",
+            "x0": "192",
+            "y0": "66",
+            "z0": "16",
+            "x1": "222",
+            "y1": "85",
+            "z1": "96"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Downward thermal - 10",
+            "staticLift": "-0.4",
+            "x0": "224",
+            "y0": "60",
+            "z0": "304",
+            "x1": "304",
+            "y1": "75",
+            "z1": "384"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Start section-lift 1",
+            "staticLift": "0.6",
+            "targetHeight": "199",
+            "x0": "90",
+            "y0": "190",
+            "z0": "-45",
+            "x1": "95",
+            "y1": "199",
+            "z1": "-40"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Second section-Boost 1 ",
+            "speedBoost": "1.6",
+            "boostDirection": "omni_minus_z",
+            "x0": "74",
+            "y0": "159",
+            "z0": "62",
+            "x1": "81",
+            "y1": "167",
+            "z1": "72"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Second section-Boost 3 ",
+            "speedBoost": "1.6",
+            "boostDirection": "omni_plus_z",
+            "x0": "48",
+            "y0": "134",
+            "z0": "59",
+            "x1": "55",
+            "y1": "140",
+            "z1": "69"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Second section-Boost 4 ",
+            "speedBoost": "1.4",
+            "boostDirection": "omni_plus_z",
+            "x0": "95",
+            "y0": "134",
+            "z0": "55",
+            "x1": "102",
+            "y1": "140",
+            "z1": "65"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-boost 1",
+            "speedBoost": "1.4",
+            "boostDirection": "minus_x",
+            "x0": "84",
+            "y0": "138",
+            "z0": "221",
+            "x1": "94",
+            "y1": "144",
+            "z1": "228"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-boost 2",
+            "speedBoost": "1.6",
+            "boostDirection": "plus_x",
+            "x0": "89",
+            "y0": "135",
+            "z0": "262",
+            "x1": "99",
+            "y1": "142",
+            "z1": "269"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-boost 3",
+            "speedBoost": "1.3",
+            "boostDirection": "plus_x",
+            "x0": "172",
+            "y0": "143",
+            "z0": "205",
+            "x1": "182",
+            "y1": "149",
+            "z1": "212"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 2",
+            "staticLift": "0.57",
+            "targetHeight": "159",
+            "x0": "55",
+            "y0": "153",
+            "z0": "161",
+            "x1": "60",
+            "y1": "162",
+            "z1": "166"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 3",
+            "staticLift": "0.57",
+            "targetHeight": "166",
+            "x0": "50",
+            "y0": "158",
+            "z0": "183",
+            "x1": "55",
+            "y1": "164",
+            "z1": "188"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 4",
+            "staticLift": "0.9",
+            "targetHeight": "148",
+            "x0": "71",
+            "y0": "131",
+            "z0": "120",
+            "x1": "86",
+            "y1": "145",
+            "z1": "135"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 5",
+            "staticLift": "0.9",
+            "targetHeight": "146",
+            "x0": "86",
+            "y0": "132",
+            "z0": "123",
+            "x1": "96",
+            "y1": "145",
+            "z1": "134"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 6",
+            "staticLift": "0.9",
+            "targetHeight": "146",
+            "x0": "56",
+            "y0": "134",
+            "z0": "121",
+            "x1": "71",
+            "y1": "145",
+            "z1": "131"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 7",
+            "staticLift": "0.65",
+            "targetHeight": "145",
+            "x0": "152",
+            "y0": "137",
+            "z0": "263",
+            "x1": "157",
+            "y1": "145",
+            "z1": "268"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 8",
+            "staticLift": "0.65",
+            "targetHeight": "145",
+            "x0": "152",
+            "y0": "137",
+            "z0": "268",
+            "x1": "157",
+            "y1": "145",
+            "z1": "273"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 9",
+            "staticLift": "0.6",
+            "targetHeight": "153",
+            "x0": "162",
+            "y0": "139",
+            "z0": "261",
+            "x1": "167",
+            "y1": "153",
+            "z1": "266"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 10",
+            "staticLift": "0.6",
+            "targetHeight": "153",
+            "x0": "166",
+            "y0": "139",
+            "z0": "265",
+            "x1": "171",
+            "y1": "153",
+            "z1": "270"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 11",
+            "staticLift": "0.7",
+            "targetHeight": "162",
+            "x0": "163",
+            "y0": "144",
+            "z0": "250",
+            "x1": "168",
+            "y1": "160",
+            "z1": "255"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 12",
+            "staticLift": "0.7",
+            "targetHeight": "164",
+            "x0": "168",
+            "y0": "145",
+            "z0": "250",
+            "x1": "173",
+            "y1": "161",
+            "z1": "255"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 14",
+            "staticLift": "0.57",
+            "targetHeight": "165",
+            "x0": "106",
+            "y0": "151",
+            "z0": "174",
+            "x1": "111",
+            "y1": "159",
+            "z1": "179"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 15",
+            "staticLift": "0.5",
+            "targetHeight": "165",
+            "x0": "98",
+            "y0": "156",
+            "z0": "266",
+            "x1": "103",
+            "y1": "160",
+            "z1": "271"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Third section-lift 16",
+            "staticLift": "0.57",
+            "targetHeight": "143",
+            "x0": "59",
+            "y0": "137",
+            "z0": "235",
+            "x1": "64",
+            "y1": "144",
+            "z1": "240"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 1 ",
+            "staticLift": "0.8",
+            "targetHeight": "153",
+            "x0": "205",
+            "y0": "142",
+            "z0": "199",
+            "x1": "210",
+            "y1": "151",
+            "z1": "204"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 2",
+            "staticLift": "0.57",
+            "targetHeight": "151",
+            "x0": "205",
+            "y0": "142",
+            "z0": "213",
+            "x1": "210",
+            "y1": "150",
+            "z1": "218"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 3",
+            "staticLift": "0.7",
+            "targetHeight": "162",
+            "x0": "221",
+            "y0": "151",
+            "z0": "239",
+            "x1": "226",
+            "y1": "159",
+            "z1": "244"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 4",
+            "staticLift": "3",
+            "targetHeight": "159",
+            "x0": "244",
+            "y0": "146",
+            "z0": "206",
+            "x1": "249",
+            "y1": "154",
+            "z1": "211"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 5",
+            "staticLift": "0.57",
+            "targetHeight": "147",
+            "x0": "286",
+            "y0": "142",
+            "z0": "184",
+            "x1": "291",
+            "y1": "147",
+            "z1": "189"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Forth section-lift 6",
+            "staticLift": "0.57",
+            "targetHeight": "147",
+            "x0": "286",
+            "y0": "141",
+            "z0": "228",
+            "x1": "291",
+            "y1": "146",
+            "z1": "233"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Fifth section-Boost 1",
+            "speedBoost": "1.7",
+            "boostDirection": "minus_z",
+            "x0": "243",
+            "y0": "114",
+            "z0": "186",
+            "x1": "250",
+            "y1": "121",
+            "z1": "196"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Fifth section-Boost 2",
+            "speedBoost": "1.2",
+            "boostDirection": "minus_x",
+            "x0": "279",
+            "y0": "119",
+            "z0": "214",
+            "x1": "289",
+            "y1": "125",
+            "z1": "221"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 1",
+            "staticLift": "0.57",
+            "targetHeight": "123",
+            "x0": "234",
+            "y0": "106",
+            "z0": "114",
+            "x1": "239",
+            "y1": "116",
+            "z1": "119"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 2",
+            "staticLift": "0.57",
+            "targetHeight": "133",
+            "x0": "257",
+            "y0": "118",
+            "z0": "68",
+            "x1": "262",
+            "y1": "132",
+            "z1": "73"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 3",
+            "staticLift": "0.57",
+            "targetHeight": "140",
+            "x0": "228",
+            "y0": "130",
+            "z0": "21",
+            "x1": "233",
+            "y1": "139",
+            "z1": "26"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 4",
+            "staticLift": "0.57",
+            "targetHeight": "115",
+            "x0": "233",
+            "y0": "105",
+            "z0": "59",
+            "x1": "238",
+            "y1": "115",
+            "z1": "64"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 5",
+            "staticLift": "0.57",
+            "targetHeight": "114",
+            "x0": "256",
+            "y0": "104",
+            "z0": "-19",
+            "x1": "261",
+            "y1": "112",
+            "z1": "-14"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 6",
+            "staticLift": "0.57",
+            "targetHeight": "108",
+            "x0": "247",
+            "y0": "94",
+            "z0": "19",
+            "x1": "252",
+            "y1": "101",
+            "z1": "24"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Sixth section-lift 7",
+            "staticLift": "0.57",
+            "targetHeight": "106",
+            "x0": "247",
+            "y0": "85",
+            "z0": "-29",
+            "x1": "252",
+            "y1": "93",
+            "z1": "-24"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-Boost 1",
+            "speedBoost": "1.5",
+            "boostDirection": "plus_z",
+            "x0": "253",
+            "y0": "38",
+            "z0": "-27",
+            "x1": "260",
+            "y1": "44",
+            "z1": "-17"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-Boost 2",
+            "speedBoost": "1.6",
+            "boostDirection": "plus_z",
+            "x0": "253",
+            "y0": "24",
+            "z0": "98",
+            "x1": "260",
+            "y1": "31",
+            "z1": "108"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 3",
+            "staticLift": "0.57",
+            "targetHeight": "32",
+            "x0": "255",
+            "y0": "29",
+            "z0": "0",
+            "x1": "258",
+            "y1": "33",
+            "z1": "3"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 4",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "17",
+            "z0": "114",
+            "x1": "265",
+            "y1": "44",
+            "z1": "122"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 5",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "17",
+            "z0": "131",
+            "x1": "265",
+            "y1": "44",
+            "z1": "138"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 6",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "17",
+            "z0": "147",
+            "x1": "265",
+            "y1": "44",
+            "z1": "154"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 7",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "17",
+            "z0": "115",
+            "x1": "253",
+            "y1": "44",
+            "z1": "122"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 8",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "17",
+            "z0": "131",
+            "x1": "253",
+            "y1": "44",
+            "z1": "138"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 9",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "17",
+            "z0": "147",
+            "x1": "253",
+            "y1": "44",
+            "z1": "154"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 10",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "31",
+            "z0": "-26",
+            "x1": "253",
+            "y1": "46",
+            "z1": "-19"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 11",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "31",
+            "z0": "-10",
+            "x1": "253",
+            "y1": "46",
+            "z1": "-3"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 12",
+            "liftForceModifier": "1.8",
+            "x0": "248",
+            "y0": "31",
+            "z0": "6",
+            "x1": "253",
+            "y1": "46",
+            "z1": "13"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 13",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "31",
+            "z0": "-26",
+            "x1": "265",
+            "y1": "46",
+            "z1": "-19"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 14",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "31",
+            "z0": "-10",
+            "x1": "265",
+            "y1": "46",
+            "z1": "-3"
+          },
+          "children": []
+        },
+        {
+          "name": "ThermalArea",
+          "parameters": {
+            "name": "Seventh section-lift 15",
+            "liftForceModifier": "1.8",
+            "x0": "260",
+            "y0": "31",
+            "z0": "6",
+            "x1": "265",
+            "y1": "46",
+            "z1": "13"
+          },
+          "children": []
+        },
+        {
+          "name": "TargetArea",
+          "parameters": {
+            "name": "TargetVolume",
+            "primary": "true",
+            "x0": "256",
+            "y0": "6",
+            "z0": "304",
+            "x1": "271",
+            "y1": "27",
+            "z1": "305"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-1",
+            "x": "70",
+            "y": "212",
+            "z": "-69",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-2",
+            "x": "262",
+            "y": "63",
+            "z": "207",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-3",
+            "x": "272",
+            "y": "170",
+            "z": "208",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-4",
+            "x": "75",
+            "y": "188",
+            "z": "88",
+            "orientation": "y",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-5",
+            "x": "135",
+            "y": "164",
+            "z": "271",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-6",
+            "x": "57",
+            "y": "167",
+            "z": "215",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-7",
+            "x": "246",
+            "y": "169",
+            "z": "208",
+            "orientation": "y",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-8",
+            "x": "265",
+            "y": "130",
+            "z": "208",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-9",
+            "x": "245 ",
+            "y": "143",
+            "z": "-6",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-10",
+            "x": "50",
+            "y": "203",
+            "z": "-36",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-11",
+            "x": "83",
+            "y": "150",
+            "z": "93",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-12",
+            "x": "250",
+            "y": "66",
+            "z": "159",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-13",
+            "x": "256",
+            "y": "33",
+            "z": "-31",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-14",
+            "x": "248",
+            "y": "93",
+            "z": "-114",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-15",
+            "x": "138",
+            "y": "169",
+            "z": "233",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-16",
+            "x": "262",
+            "y": "118",
+            "z": "143",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-17",
+            "x": "256",
+            "y": "28",
+            "z": "63",
+            "orientation": "z",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Blue-18",
+            "x": "90",
+            "y": "157",
+            "z": "266",
+            "orientation": "x",
+            "size": "small"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-1",
+            "x": "71",
+            "y": "202",
+            "z": "-42",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-2",
+            "x": "95",
+            "y": "140",
+            "z": "72",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-3",
+            "x": "93",
+            "y": "158",
+            "z": "24",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-4",
+            "x": "36",
+            "y": "181",
+            "z": "80",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-5",
+            "x": "85",
+            "y": "193",
+            "z": "21",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-6",
+            "x": "305",
+            "y": "126",
+            "z": "188",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-7",
+            "x": "142",
+            "y": "170",
+            "z": "246",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-8",
+            "x": "246",
+            "y": "165",
+            "z": "223",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-9",
+            "x": "300",
+            "y": "149",
+            "z": "230",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-10",
+            "x": "266",
+            "y": "43",
+            "z": "134",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-11",
+            "x": "79",
+            "y": "204",
+            "z": "-114",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-12",
+            "x": "95",
+            "y": "158",
+            "z": "148",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-13",
+            "x": "133",
+            "y": "156",
+            "z": "269",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-14",
+            "x": "71",
+            "y": "163",
+            "z": "211",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-15",
+            "x": "273",
+            "y": "122",
+            "z": "217",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-16",
+            "x": "290",
+            "y": "42",
+            "z": "54",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-17",
+            "x": "221",
+            "y": "135",
+            "z": "99",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-18",
+            "x": "258",
+            "y": "113",
+            "z": "8",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-19",
+            "x": "256",
+            "y": "106",
+            "z": "-79",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-20",
+            "x": "236",
+            "y": "75",
+            "z": "-114",
+            "orientation": "x",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-21",
+            "x": "243",
+            "y": "33",
+            "z": "191",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Yellow-22",
+            "x": "241",
+            "y": "59",
+            "z": "-9",
+            "orientation": "z",
+            "size": "medium"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-1",
+            "x": "73",
+            "y": "199",
+            "z": "-63",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-2",
+            "x": "56",
+            "y": "139",
+            "z": "76",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-3",
+            "x": "58",
+            "y": "159",
+            "z": "20",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-4",
+            "x": "108",
+            "y": "179",
+            "z": "81",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-5",
+            "x": "63",
+            "y": "197",
+            "z": "-15",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-6",
+            "x": "300",
+            "y": "149",
+            "z": "186",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-7",
+            "x": "328",
+            "y": "139",
+            "z": "208",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-8",
+            "x": "255",
+            "y": "117",
+            "z": "130",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-9",
+            "x": "238",
+            "y": "117",
+            "z": "23",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-10",
+            "x": "239",
+            "y": "106",
+            "z": "-73",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-11",
+            "x": "263",
+            "y": "78",
+            "z": "-103",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-12",
+            "x": "259",
+            "y": "54",
+            "z": "-31",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-13",
+            "x": "254",
+            "y": "50",
+            "z": "9",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-14",
+            "x": "212",
+            "y": "41",
+            "z": "51",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-15",
+            "x": "256",
+            "y": "32",
+            "z": "126",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-16",
+            "x": "262",
+            "y": "42",
+            "z": "197",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-17",
+            "x": "263",
+            "y": "15",
+            "z": "264",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-18",
+            "x": "193",
+            "y": "146",
+            "z": "208",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-19",
+            "x": "246",
+            "y": "161",
+            "z": "184",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-20",
+            "x": "43",
+            "y": "211",
+            "z": "-118",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-21",
+            "x": "67",
+            "y": "188",
+            "z": "21",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-22",
+            "x": "98",
+            "y": "170",
+            "z": "107",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-23",
+            "x": "89",
+            "y": "156",
+            "z": "-37",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-24",
+            "x": "96",
+            "y": "142",
+            "z": "13",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-25",
+            "x": "83",
+            "y": "162",
+            "z": "148",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-26",
+            "x": "75",
+            "y": "152",
+            "z": "188",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-27",
+            "x": "76",
+            "y": "142",
+            "z": "224",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-28",
+            "x": "79",
+            "y": "143",
+            "z": "259",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-29",
+            "x": "137",
+            "y": "142",
+            "z": "267",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-30",
+            "x": "142",
+            "y": "161",
+            "z": "243",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-31",
+            "x": "293",
+            "y": "123",
+            "z": "231",
+            "orientation": "x",
+            "size": "large"
+          },
+          "children": []
+        },
+        {
+          "name": "ScoreRing",
+          "parameters": {
+            "name": "Green-32",
+            "x": "243",
+            "y": "103",
+            "z": "82",
+            "orientation": "z",
+            "size": "large"
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}

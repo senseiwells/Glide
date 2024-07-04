@@ -55,7 +55,7 @@ void main() {
         }
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
-        uv.y *= height / 256.0;
+        uv.y *= 0.65;
         uv.y += GameTime * 32.0;
 
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
@@ -77,19 +77,19 @@ void main() {
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
         uv.y *= height / 8;
-        uv.y += GameTime * 128.0;
+        uv.y -= GameTime * 128.0;
 
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
 
         if (color.r*255 == 0 && color.g*255 == 255 && color.b*255 == 0) {
             discard;
         }
-    } 
+    }
     else if (isBeaconShell > 0.5) {
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
         uv.y *= height / 8;
-        uv.y += GameTime * 128.0;
+        uv.y -= GameTime * 128.0;
 
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
 

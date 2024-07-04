@@ -6,10 +6,7 @@ import me.senseiwells.glide.entity.accelerator.Booster
 import me.senseiwells.glide.entity.accelerator.DirectionalBooster
 import me.senseiwells.glide.entity.accelerator.DynamicThermal
 import me.senseiwells.glide.entity.accelerator.StaticThermal
-import me.senseiwells.glide.entity.checkpoint.BeaconBeam
-import me.senseiwells.glide.entity.checkpoint.Checkpoint
-import me.senseiwells.glide.entity.checkpoint.FinishLine
-import me.senseiwells.glide.entity.checkpoint.RespawnCheckpoint
+import me.senseiwells.glide.entity.checkpoint.*
 import me.senseiwells.glide.entity.ring.Ring
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -45,6 +42,10 @@ object GlideEntities {
     val RESPAWN_CHECKPOINT = register(
         "checkpoint",
         EntityType.Builder.of(::RespawnCheckpoint, MobCategory.MISC)
+    )
+    val PROGRESS_CHECKPOINT = register(
+        "progress_checkpoint",
+        EntityType.Builder.of(::ProgressCheckpoint, MobCategory.MISC)
     )
     val FINISH_LINE = register(
         "finish_line",

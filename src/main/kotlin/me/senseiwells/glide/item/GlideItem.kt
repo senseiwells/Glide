@@ -21,8 +21,8 @@ class GlideItem private constructor(): Item(Properties()), ArcadeModelledItem {
 
     companion object {
         val MODELLER = ResourcePackItemModeller(GlideItem(), GlideMod.resourcePack.getCreator())
-        val WEAK_THERMAL by MODELLER.model(id("item/thermals/weak_thermal"))
-        val STRONG_THERMAL by MODELLER.model(id("item/thermals/strong_thermal"))
+        val STATIC_THERMAL by MODELLER.model(id("item/thermals/weak_thermal"))
+        val DYNAMIC_THERMAL by MODELLER.model(id("item/thermals/strong_thermal"))
         val BOOST by MODELLER.model(id("item/boosts/boost"))
         val OMNI_BOOST by MODELLER.model(id("item/boosts/omni_boost"))
         val FAKE_BEAM by MODELLER.model(id("item/checkpoint/fake_beam"))

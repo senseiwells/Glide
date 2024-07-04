@@ -14,7 +14,9 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Active("active") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.getPlayer().isNoGravity = false
+            for (player in minigame.players) {
+                player.isNoGravity = false
+            }
         }
     },
     Finish("finish") {

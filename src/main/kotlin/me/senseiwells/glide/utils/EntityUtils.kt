@@ -30,6 +30,7 @@ object EntityUtils {
         this.hurtMarked = true
     }
 
+    @JvmStatic
     fun Entity.setVelocityAndMark(deltaX: Double, deltaY: Double, deltaZ: Double) {
         this.setDeltaMovement(deltaX, deltaY, deltaZ)
         this.hurtMarked = true

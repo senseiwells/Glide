@@ -2,11 +2,12 @@ package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
 import me.senseiwells.glide.entity.GlideCollider
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
+import net.casual.arcade.utils.MinigameUtils.getMinigame
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TagUtils.getVec3OrNull
@@ -27,6 +28,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import org.apache.commons.lang3.mutable.MutableInt
 import org.joml.Vector3f
 
 abstract class Accelerator(
@@ -34,7 +36,6 @@ abstract class Accelerator(
     level: Level,
     size: Vec3 = DEFAULT_SIZE
 ): Entity(type, level), PolymerEntity, GlideCollider {
-    private val accelerating = ObjectLinkedOpenHashSet<ServerPlayer>()
     // Leaking `this` causes this to be nullable
     private var size: Vec3? = size
 
@@ -96,24 +97,14 @@ abstract class Accelerator(
         return AABB.ofSize(position, size.x, size.y, size.z)
     }
 
-    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
-        player.sendSound(this.getSound())
-        this.accelerating.add(player)
+    override fun tick() {
+
     }
 
-    override fun tick() {
-        val previous = this.accelerating.iterator()
-        for (player in previous) {
-            if (this.shouldKeepAccelerating(player)) {
-                this.accelerate(player)
-            } else {
-                previous.remove()
-            }
+    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+        if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
+            player.sendSound(this.getSound())
         }
-
-        // val intersecting = this.level().getEntitiesOfClass(ServerPlayer::class.java, this.boundingBox) {
-        //     !this.accelerating.contains(it)
-        // }
     }
 
     override fun modifyRawTrackedData(
@@ -131,11 +122,11 @@ abstract class Accelerator(
         }
     }
 
-    protected open fun shouldKeepAccelerating(player: ServerPlayer): Boolean {
-        return this.boundingBox.intersects(player.boundingBox)
+    open fun canStartAccelerating(player: ServerPlayer): Boolean {
+        return true
     }
 
-    protected abstract fun accelerate(player: ServerPlayer)
+    abstract fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean
 
     protected abstract fun getSound(): Sound
 

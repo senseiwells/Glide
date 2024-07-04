@@ -1,8 +1,8 @@
 package me.senseiwells.glide.entity.checkpoint
 
 import me.senseiwells.glide.entity.GlideEntities
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.utils.MinigameUtils.getMinigame
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -16,6 +16,9 @@ class FinishLine(
     constructor(level: Level, size: Vec3): this(GlideEntities.FINISH_LINE, level, size)
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
-        glide.onPlayerFinish(player)
+        if (player.glide.collideWithCheckpoint(this)) {
+            player.glide.collideWithFinishLine(this)
+            glide.markPlayerFinished(player)
+        }
     }
 }

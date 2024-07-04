@@ -1,13 +1,12 @@
 package me.senseiwells.glide.minigame
 
 import me.senseiwells.glide.GlideMod
-import me.senseiwells.glide.entity.GlideCollider
-import me.senseiwells.glide.entity.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
-import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
-import net.casual.arcade.events.minigame.MinigameAddPlayerEvent
+import net.casual.arcade.events.minigame.MinigameAddNewPlayerEvent
+import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
 import net.casual.arcade.events.player.PlayerDamageEvent
 import net.casual.arcade.events.player.PlayerPoseEvent
@@ -34,7 +33,6 @@ import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
 import net.casual.arcade.utils.PlayerUtils.resetHealth
-import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
 import net.casual.arcade.utils.PlayerUtils.teleportTo
@@ -60,9 +58,11 @@ import net.minecraft.world.level.GameType
 class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
 
-    private val startPos = Location.of(279.5, 205.5, 159.5, 180F, 0F)
-    private var lastCheckpoint: RespawnCheckpoint? = null
-    private var player: ServerPlayer? = null
+    // StartPos for body
+    // private val startPos = Location.of(279.5, 205.5, 159.5, 180F, 0F)
+
+    // StartPos for temple
+    private val startPos = Location.of(66.0, 236.0, -215.0)
 
     private var ticks = 0
 
@@ -70,18 +70,6 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
 
     init {
         this.checkpointBossbar.setTitle(ComponentElements.of("Checkpoint!".literal()))
-    }
-
-    fun getPlayer(): ServerPlayer {
-        return this.player!!
-    }
-
-    fun getRespawnLocation(): Location {
-        val lastCheckpoint = this.lastCheckpoint
-        if (lastCheckpoint != null) {
-            return lastCheckpoint.respawnLocation
-        }
-        return this.startPos
     }
 
     override fun getPhases(): Collection<Phase<GlideMinigame>> {
@@ -131,42 +119,28 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
         }
     }
 
-    fun onPlayerCheckpoint(player: ServerPlayer, checkpoint: RespawnCheckpoint) {
-        val lastCheckpoint = this.lastCheckpoint
-        if (lastCheckpoint != null && lastCheckpoint.index >= checkpoint.index) {
-            return
-        }
-
-        player.sendSound(GlideSounds.CHECKPOINT)
-        this.lastCheckpoint = checkpoint
+    fun displayCheckpointNotificationTo(player: ServerPlayer) {
         this.checkpointBossbar.addPlayer(player)
         this.scheduler.schedule(4.Seconds) {
             this.checkpointBossbar.removePlayer(player)
         }
     }
 
-    fun onPlayerFinish(player: ServerPlayer) {
-        if (this.phase == GlidePhase.Finish) {
-            return
-        }
-
-        player.sendSound(GlideSounds.FINISH, static = true)
-        this.setPhase(GlidePhase.Finish)
+    fun markPlayerFinished(player: ServerPlayer) {
+        this.players.setSpectating(player)
         player.sendSystemMessage("Finished! :)".literal())
     }
 
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerTick(event: PlayerTickEvent) {
-        val (player) = event
-        val intersecting = player.serverLevel().getEntities(player, player.boundingBox)
-        for (entity in intersecting) {
-            if (entity is GlideCollider) {
-                entity.collide(player, this)
-            }
+        event.player.glide.tick(this)
+
+        if (event.player.verticalCollision) {
+            event.player.hurt(event.player.damageSources().flyIntoWall(), 2.0F)
         }
     }
 
-    @Listener
+    @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerHorizontalFlyFallCollision(event: PlayerHorizontalFlyFallCollisionEvent) {
         val (player) = event
         player.hurt(player.damageSources().flyIntoWall(), 2.0F)
@@ -178,6 +152,11 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
     @Listener
     private fun onPlayerDamage(event: PlayerDamageEvent) {
         val (player, amount, source) = event
+        if (this.players.isSpectating(player)) {
+            event.cancel(0.0F)
+            return
+        }
+
         if (source.`is`(DamageTypes.FALL) || source.`is`(DamageTypes.FLY_INTO_WALL)) {
             if (player.health > 2.0F) {
                 event.cancel(2.0F)
@@ -202,7 +181,7 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
 
         this.scheduler.schedule(2.Seconds) {
             this.settings.freezeEntities.set(false)
-            this.respawnPlayer(event.player)
+            this.respawnPlayer(player)
         }
     }
 
@@ -212,36 +191,41 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
     }
 
     @Listener
-    private fun onMinigameAddPlayer(event: MinigameAddPlayerEvent) {
-        if (this.player != null) {
-            event.spectating = true
-        }
+    private fun onMinigameAddPlayer(event: MinigameAddNewPlayerEvent) {
+        event.player.glide.reset()
+    }
+
+    @Listener
+    private fun onMinigameRemovePlayer(event: MinigameRemovePlayerEvent) {
+        event.player.glide.reset()
     }
 
     @Listener
     private fun onMinigameSetPlaying(event: MinigameSetPlayingEvent) {
         val player = event.player
-        this.player = player
-        player.isNoGravity = true
+        player.glide.respawnLocation = this.startPos
         this.respawnPlayer(player)
+        player.isNoGravity = true
 
         this.start()
     }
 
-    @Listener
+    @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerPose(event: PlayerPoseEvent) {
-        if (event.updated != Pose.FALL_FLYING) {
-            event.player.kill()
+        val (player, _, updated) = event
+        if (updated != Pose.FALL_FLYING) {
+            player.kill()
         }
     }
 
     private fun respawnPlayer(player: ServerPlayer) {
+        player.glide.clearAccelerators()
         player.clearTitle()
         player.clearPlayerInventory()
         player.setGameMode(GameType.ADVENTURE)
         player.boostHealth(-0.7)
         player.resetHealth()
-        player.teleportTo(this.getRespawnLocation())
+        player.teleportTo(player.glide.respawnLocation)
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         val elytra = ItemStack(Items.ELYTRA)
         elytra.set(DataComponents.UNBREAKABLE, Unbreakable(true))
