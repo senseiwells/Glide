@@ -101,6 +101,10 @@ abstract class Accelerator(
 
     }
 
+    override fun intersects(box: AABB): Boolean {
+        return this.boundingBox.intersects(box)
+    }
+
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
             player.sendSound(this.getSound())

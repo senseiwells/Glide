@@ -12,12 +12,18 @@ import net.casual.arcade.utils.PlayerUtils.getExtension
 import net.casual.arcade.utils.location.Location
 import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.util.Mth
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
+import java.util.*
 
 class PlayerGlideExtension(
     player: ServerPlayer
 ): PlayerExtension(player), DataExtension {
     private val accelerators = Object2ObjectOpenHashMap<Accelerator, MutableInt>()
+
+    private var oldPosition: Vec3? = null
 
     private var lastCheckpoint = 0
     private var finished = false
@@ -59,13 +65,45 @@ class PlayerGlideExtension(
     }
 
     fun tick(minigame: GlideMinigame) {
+        val boundingBox = this.player.boundingBox
+
+        val current = this.player.position()
+        val old = this.oldPosition ?: current
+        val posDelta = old.distanceToSqr(current)
+
+        val boundingBoxes = LinkedList<AABB>()
+        boundingBoxes.add(boundingBox)
+
+        // The player is travelling more than one of their hit-boxes + 1 block
+        val maxPosDelta = Mth.square(1 + boundingBox.xsize)
+        if (posDelta > maxPosDelta) {
+            val halfWidth = boundingBox.xsize / 2.0
+
+            val splits = Mth.ceil(posDelta / maxPosDelta)
+            val delta = 1 / splits.toDouble()
+            for (i in 1..< splits) {
+                val between = old.lerp(current, i * delta)
+                boundingBoxes.add(AABB(
+                    between.x - halfWidth,
+                    between.y,
+                    between.z - halfWidth,
+                    between.x + halfWidth,
+                    between.y + boundingBox.ysize,
+                    between.z + halfWidth
+                ))
+            }
+        }
+
         // This should be big enough for any intersecting entities
-        this.player.xo
-        val boundingBox = this.player.boundingBox.inflate(40.0)
-        val intersecting = this.player.serverLevel().getEntities(this.player, boundingBox)
+        val intersecting = this.player.serverLevel().getEntities(this.player, boundingBox.inflate(40.0))
         for (entity in intersecting) {
-            if (entity is GlideCollider && entity.boundingBox.intersects(this.player.boundingBox)) {
-                entity.collide(this.player, minigame)
+            if (entity is GlideCollider) {
+                for (box in boundingBoxes) {
+                    if (entity.intersects(box)) {
+                        entity.collide(this.player, minigame)
+                        break
+                    }
+                }
             }
         }
 
@@ -77,6 +115,7 @@ class PlayerGlideExtension(
                 iterator.remove()
             }
         }
+        this.oldPosition = current
     }
 
     fun clearAccelerators() {

@@ -50,7 +50,7 @@ open class DynamicThermal(
     override fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean {
         player.glide.setLiftForceModifier(this.liftForceModifier)
 
-        if (this.targetVelocity <= 0) {
+        if (this.targetVelocity < 0) {
             if (player.deltaMovement.y > this.targetVelocity) {
                 player.addVelocityAndMark(
                     0.0,
@@ -58,7 +58,7 @@ open class DynamicThermal(
                     0.0
                 )
             }
-        } else {
+        } else if (this.targetVelocity > 0) {
             if (player.deltaMovement.y < this.targetVelocity) {
                 player.addVelocityAndMark(
                     0.0,
@@ -66,6 +66,12 @@ open class DynamicThermal(
                     0.0
                 )
             }
+        } else {
+            player.addVelocityAndMark(
+                0.0,
+                0.025,
+                0.0
+            )
         }
         return this.boundingBox.intersects(player.boundingBox)
     }

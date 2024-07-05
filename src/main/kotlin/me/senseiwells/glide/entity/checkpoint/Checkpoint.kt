@@ -18,6 +18,7 @@ import net.minecraft.util.Brightness
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
@@ -72,6 +73,10 @@ abstract class Checkpoint(
 
     override fun tick() {
 
+    }
+
+    override fun intersects(box: AABB): Boolean {
+        return this.boundingBox.intersects(box)
     }
 
     override fun modifyRawTrackedData(

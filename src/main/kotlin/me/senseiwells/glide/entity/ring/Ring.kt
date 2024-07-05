@@ -20,6 +20,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.AABB
 import org.joml.Vector3f
 
 class Ring(
@@ -59,6 +60,10 @@ class Ring(
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         compound.putByte("RingType", this.ringType.ordinal.toByte())
+    }
+
+    override fun intersects(box: AABB): Boolean {
+        return false
     }
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
