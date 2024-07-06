@@ -42,17 +42,15 @@ class PlayerGlideExtension(
 
     fun collideWithCheckpoint(checkpoint: Checkpoint): Boolean {
         if (this.lastCheckpoint + 1 == checkpoint.index) {
-            println("Collided next with checkpoint!")
             this.lastCheckpoint = checkpoint.index
             return true
         }
-        println("Collided with invalid checkpoint!")
         return false
     }
 
     fun collideWithFinishLine(finish: FinishLine): Boolean {
         if (!this.finished) {
-            this.finished = true;
+            this.finished = true
             return true
         }
         return false

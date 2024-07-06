@@ -1,9 +1,9 @@
 {
+  "addon_type": "glide",
   "id": "glide:temple",
   "resource_packs": [
     "map_pack.zip"
   ],
-  "structure": "map.nbt",
   "music": [
     "glide:temple_1",
     "glide:temple_2"

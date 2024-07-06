@@ -1,6 +1,8 @@
 package me.senseiwells.glide.minigame
 
 import me.senseiwells.glide.GlideMod
+import me.senseiwells.glide.addon.GlideAddonConfig
+import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
@@ -28,7 +30,7 @@ import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.GameRuleUtils.set
-import net.casual.arcade.utils.LevelUtils
+import net.casual.arcade.utils.JsonUtils.string
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
@@ -39,11 +41,11 @@ import net.casual.arcade.utils.PlayerUtils.teleportTo
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.TimeUtils.format
-import net.casual.arcade.utils.location.Location
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageTypes
@@ -54,15 +56,19 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.Unbreakable
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.GameType
+import net.minecraft.world.level.storage.LevelResource
+import xyz.nucleoid.fantasy.Fantasy
+import xyz.nucleoid.fantasy.RuntimeWorldConfig
+import xyz.nucleoid.fantasy.util.VoidChunkGenerator
 
-class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
+class GlideMinigame(
+    private val config: GlideAddonConfig,
+    private val level: ServerLevel,
+    server: MinecraftServer
+): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
 
-    // StartPos for body
-    // private val startPos = Location.of(279.5, 205.5, 159.5, 180F, 0F)
-
-    // StartPos for temple
-    private val startPos = Location.of(66.0, 236.0, -215.0)
+    private val startPos = this.config.spawn.get(this.level)
 
     private var ticks = 0
 
@@ -79,6 +85,7 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
     override fun initialize() {
         super.initialize()
 
+        // TODO: Clean this up
         val sidebar = ArcadeSidebar(ComponentElements.empty())
         sidebar.addRow { _ ->
             val elapsed = this.ticks.Ticks
@@ -111,11 +118,26 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
         }
         sidebar.addRow(SidebarElements.empty())
         this.ui.setSidebar(sidebar)
-        this.levels.add(LevelUtils.overworld())
 
         this.setGameRules {
             set(GameRules.RULE_KEEPINVENTORY, true)
             set(GameRules.RULE_NATURAL_REGENERATION, false)
+        }
+
+        for (booster in this.config.boosters) {
+            this.level.addFreshEntity(booster.create(this.level))
+        }
+        for (ring in this.config.rings) {
+            this.level.addFreshEntity(ring.create(this.level))
+        }
+        for (thermal in this.config.thermals) {
+            this.level.addFreshEntity(thermal.create(this.level))
+        }
+        for (checkpoint in this.config.checkpoints) {
+            this.level.addFreshEntity(checkpoint.create(this.level))
+            for (beam in checkpoint.createBeaconBeams(this.level)) {
+                this.level.addFreshEntity(beam)
+            }
         }
     }
 
@@ -241,7 +263,26 @@ class GlideMinigame(server: MinecraftServer): Minigame<GlideMinigame>(server) {
         val ID = GlideMod.id("glide_minigame")
 
         override fun create(context: MinigameCreationContext): Minigame<*> {
-            return GlideMinigame(context.server)
+            val id = if (context.hasCustomData()) {
+                ResourceLocation.parse(context.getCustomData().string("id"))
+            } else {
+                GlideMod.id("temple")
+            }
+            val addon = GlideAddons.get(id) ?: throw IllegalArgumentException()
+            val handle = Fantasy.get(context.server).openTemporaryWorld(
+                RuntimeWorldConfig()
+                    .setGenerator(VoidChunkGenerator(context.server))
+                    .setDimensionType(addon.dimensionType)
+            )
+
+            val glide = GlideMinigame(addon.config, handle.asWorld(), context.server)
+            glide.levels.add(handle)
+
+            val tempLocation = handle.registryKey.location()
+            val dimensionDir = context.server.getWorldPath(LevelResource.ROOT).resolve("dimensions")
+                .resolve(tempLocation.namespace).resolve(tempLocation.path)
+            addon.extractWorld(dimensionDir)
+            return glide
         }
     }
 }

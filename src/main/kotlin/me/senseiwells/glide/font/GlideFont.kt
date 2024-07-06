@@ -6,7 +6,7 @@ import net.casual.arcade.resources.font.IndexedBitmapFontResources
 import net.minecraft.network.chat.MutableComponent
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
-    val YOU_CRASHED by bitmap(at("you_crashed.png"), 2, 2)
+    val YOU_CRASHED by bitmap(at("you_crashed.png"), 3, 3)
     val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
 
     object Speedometer: IndexedBitmapFontResources(GlideMod.id("speedometer")) {
