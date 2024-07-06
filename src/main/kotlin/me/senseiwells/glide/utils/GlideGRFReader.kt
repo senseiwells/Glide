@@ -2,8 +2,10 @@ package me.senseiwells.glide.utils
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import me.senseiwells.glide.GlideMod.id
 import me.senseiwells.glide.addon.GlideAddonConfig
 import me.senseiwells.glide.addon.serialization.*
+import me.senseiwells.glide.checkpoint.*
 import me.senseiwells.glide.entity.ring.RingType
 import net.casual.arcade.utils.JsonUtils
 import net.casual.arcade.utils.JsonUtils.array
@@ -25,11 +27,12 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.io.path.reader
+import kotlin.io.path.writer
 
 interface GlideGRFVisitor {
     fun visitSpawn(spawn: ExactLocationTemplate)
 
-    fun visitCheckpoint(checkpoint: CheckpointTemplate)
+    fun visitCheckpoint(checkpoint: Checkpoint)
 
     fun visitBooster(booster: BoosterTemplate)
 
@@ -47,7 +50,7 @@ class GlideGRFConverter(
 ): GlideGRFVisitor {
     private val boosters = ArrayList<BoosterTemplate>()
     private val thermals = ArrayList<ThermalTemplate>()
-    private val checkpoints = ArrayList<CheckpointTemplate>()
+    private val checkpoints = ArrayList<Checkpoint>()
     private val rings = ArrayList<RingTemplate>()
 
     private var spawn = ExactLocationTemplate()
@@ -71,7 +74,7 @@ class GlideGRFConverter(
         this.spawn = spawn
     }
 
-    override fun visitCheckpoint(checkpoint: CheckpointTemplate) {
+    override fun visitCheckpoint(checkpoint: Checkpoint) {
         this.checkpoints.add(checkpoint)
     }
 
@@ -85,6 +88,18 @@ class GlideGRFConverter(
 
     override fun visitRing(ring: RingTemplate) {
         this.rings.add(ring)
+    }
+
+    companion object {
+        @Suppress("DEPRECATION")
+        fun convertSingle(id: ResourceLocation, input: Path, output: Path) {
+            val converter = GlideGRFConverter(id)
+            GlideGRFReader.read(input, converter)
+            val addon = converter.convert()
+            output.writer().use {
+                JsonUtils.encodeWith(GlideAddonConfig.CODEC, addon, it)
+            }
+        }
     }
 }
 
@@ -136,7 +151,7 @@ object GlideGRFReader {
 
     private fun parseFinishLine(parameters: JsonObject, lastCheckpoint: MutableInt, visitor: GlideGRFVisitor) {
         val box = this.readAABB(parameters)
-        visitor.visitCheckpoint(FinishLineTemplate(lastCheckpoint.value + 1, box))
+        visitor.visitCheckpoint(FinishLine(lastCheckpoint.value + 1, box))
     }
 
     private fun parseThermal(parameters: JsonObject, visitor: GlideGRFVisitor) {
@@ -170,18 +185,19 @@ object GlideGRFReader {
         visitor: GlideGRFVisitor
     ) {
         val id = parameters.string("id").toInt()
+        val box = this.readAABB(parameters)
         if (id == 0) {
             val spawn = this.readRespawnPoint(children.get(0).asJsonObject.obj("parameters"))
             visitor.visitSpawn(spawn)
+            visitor.visitCheckpoint(ProgressCheckpoint(id, box))
             return
         }
 
         if (id > lastCheckpoint.value) {
             lastCheckpoint.setValue(id)
         }
-        val box = this.readAABB(parameters)
         if (children.isEmpty) {
-            visitor.visitCheckpoint(ProgressCheckpointTemplate(id, box))
+            visitor.visitCheckpoint(ProgressCheckpoint(id, box))
             return
         }
 
@@ -199,7 +215,7 @@ object GlideGRFReader {
         if (spawn == null) {
             throw IllegalStateException("Respawn checkpoint didn't specify a respawn point!")
         }
-        visitor.visitCheckpoint(RespawnCheckpointTemplate(id, box, spawn, beacons))
+        visitor.visitCheckpoint(RespawnCheckpoint(id, box, spawn, beacons))
     }
 
     private fun readBeaconBeam(json: JsonObject): BeaconBeamTemplate {

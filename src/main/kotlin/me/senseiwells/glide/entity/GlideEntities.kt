@@ -39,18 +39,6 @@ object GlideEntities {
         "ring",
         EntityType.Builder.of(::Ring, MobCategory.MISC)
     )
-    val RESPAWN_CHECKPOINT = register(
-        "checkpoint",
-        EntityType.Builder.of(::RespawnCheckpoint, MobCategory.MISC)
-    )
-    val PROGRESS_CHECKPOINT = register(
-        "progress_checkpoint",
-        EntityType.Builder.of(::ProgressCheckpoint, MobCategory.MISC)
-    )
-    val FINISH_LINE = register(
-        "finish_line",
-        EntityType.Builder.of(::FinishLine, MobCategory.MISC)
-    )
 
     fun noop() {
 

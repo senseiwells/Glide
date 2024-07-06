@@ -1,10 +1,12 @@
 package me.senseiwells.glide.extension
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import me.senseiwells.glide.checkpoint.Checkpoint
+import me.senseiwells.glide.checkpoint.CheckpointData
+import me.senseiwells.glide.checkpoint.FinishLine
+import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
-import me.senseiwells.glide.entity.checkpoint.Checkpoint
-import me.senseiwells.glide.entity.checkpoint.FinishLine
 import me.senseiwells.glide.minigame.GlideMinigame
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
@@ -25,8 +27,14 @@ class PlayerGlideExtension(
 
     private var oldPosition: Vec3? = null
 
-    private var lastCheckpoint = 0
     private var finished = false
+
+    private var lastRespawnCheckpointIndex = 0
+    var lastCheckpointIndex = 0
+        private set
+    var lastCrossedCheckpoint = CheckpointData.DEFAULT
+        private set
+
     var liftForceModifier = 1.0
         private set
 
@@ -41,8 +49,9 @@ class PlayerGlideExtension(
     }
 
     fun collideWithCheckpoint(checkpoint: Checkpoint): Boolean {
-        if (this.lastCheckpoint + 1 == checkpoint.index) {
-            this.lastCheckpoint = checkpoint.index
+        this.lastCrossedCheckpoint = CheckpointData(checkpoint.index, this.player.position())
+        if (this.lastCheckpointIndex + 1 == checkpoint.index) {
+            this.lastCheckpointIndex = checkpoint.index
             return true
         }
         return false
@@ -54,6 +63,11 @@ class PlayerGlideExtension(
             return true
         }
         return false
+    }
+
+    fun collideWithRespawnCheckpoint(checkpoint: RespawnCheckpoint, spawn: Location) {
+        this.respawnLocation = spawn
+        this.lastRespawnCheckpointIndex = checkpoint.index
     }
 
     fun setLiftForceModifier(modifier: Double) {
@@ -92,16 +106,17 @@ class PlayerGlideExtension(
             }
         }
 
+        for (checkpoint in minigame.getAllCheckpoints()) {
+            if (this.checkCollision(checkpoint, boundingBoxes, minigame)) {
+                break
+            }
+        }
+
         // This should be big enough for any intersecting entities
         val intersecting = this.player.serverLevel().getEntities(this.player, boundingBox.inflate(40.0))
         for (entity in intersecting) {
             if (entity is GlideCollider) {
-                for (box in boundingBoxes) {
-                    if (entity.intersects(box)) {
-                        entity.collide(this.player, minigame)
-                        break
-                    }
-                }
+                this.checkCollision(entity, boundingBoxes, minigame)
             }
         }
 
@@ -116,16 +131,17 @@ class PlayerGlideExtension(
         this.oldPosition = current
     }
 
-    fun clearAccelerators() {
+    fun respawn() {
         this.liftForceModifier = 1.0
+        this.lastCrossedCheckpoint = CheckpointData(this.lastRespawnCheckpointIndex, this.respawnLocation.position)
         this.player.isNoGravity = false
         this.accelerators.clear()
     }
 
     fun reset() {
         this.finished = false
-        this.lastCheckpoint = 0
-        this.clearAccelerators()
+        this.lastCheckpointIndex = 0
+        this.respawn()
     }
 
     override fun getName(): String {
@@ -138,6 +154,16 @@ class PlayerGlideExtension(
 
     override fun serialize(): Tag? {
         return null
+    }
+
+    private fun checkCollision(collider: GlideCollider, boxes: List<AABB>, minigame: GlideMinigame): Boolean {
+        for (box in boxes) {
+            if (collider.intersects(box)) {
+                collider.collide(this.player, minigame)
+                return true
+            }
+        }
+        return false
     }
 
     companion object {

@@ -4,9 +4,10 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.common.addon.AddonConfig
 import me.senseiwells.glide.addon.serialization.BoosterTemplate
-import me.senseiwells.glide.addon.serialization.CheckpointTemplate
 import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
+import me.senseiwells.glide.checkpoint.Checkpoint
+import me.senseiwells.glide.checkpoint.CheckpointManager
 import net.casual.arcade.utils.location.template.ExactLocationTemplate
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
@@ -21,9 +22,11 @@ class GlideAddonConfig(
     val spawn: ExactLocationTemplate,
     val boosters: List<BoosterTemplate>,
     val thermals: List<ThermalTemplate>,
-    val checkpoints: List<CheckpointTemplate>,
+    private val allCheckpoints: List<Checkpoint>,
     val rings: List<RingTemplate>
 ): AddonConfig(id, name, description, authors, version) {
+    val checkpoints by lazy { CheckpointManager(this.allCheckpoints) }
+
     companion object {
         val CODEC: Codec<GlideAddonConfig> = RecordCodecBuilder.create { instance ->
             instance.group(
@@ -35,7 +38,7 @@ class GlideAddonConfig(
                 ExactLocationTemplate.CODEC.fieldOf("spawn").forGetter(GlideAddonConfig::spawn),
                 BoosterTemplate.CODEC.listOf().fieldOf("boosters").forGetter(GlideAddonConfig::boosters),
                 ThermalTemplate.CODEC.listOf().fieldOf("thermals").forGetter(GlideAddonConfig::thermals),
-                CheckpointTemplate.CODEC.listOf().fieldOf("checkpoints").forGetter(GlideAddonConfig::checkpoints),
+                Checkpoint.CODEC.listOf().fieldOf("checkpoints").forGetter(GlideAddonConfig::allCheckpoints),
                 RingTemplate.CODEC.listOf().fieldOf("rings").forGetter(GlideAddonConfig::rings)
             ).apply(instance, ::GlideAddonConfig)
         }

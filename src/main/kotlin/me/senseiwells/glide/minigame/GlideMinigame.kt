@@ -3,10 +3,12 @@ package me.senseiwells.glide.minigame
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddonConfig
 import me.senseiwells.glide.addon.GlideAddons
+import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
+import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.events.minigame.MinigameAddNewPlayerEvent
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
@@ -60,10 +62,11 @@ import net.minecraft.world.level.storage.LevelResource
 import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
+import kotlin.math.max
 
 class GlideMinigame(
     private val config: GlideAddonConfig,
-    private val level: ServerLevel,
+    val level: ServerLevel,
     server: MinecraftServer
 ): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
@@ -133,12 +136,15 @@ class GlideMinigame(
         for (thermal in this.config.thermals) {
             this.level.addFreshEntity(thermal.create(this.level))
         }
-        for (checkpoint in this.config.checkpoints) {
-            this.level.addFreshEntity(checkpoint.create(this.level))
+        for (checkpoint in this.config.checkpoints.all()) {
             for (beam in checkpoint.createBeaconBeams(this.level)) {
                 this.level.addFreshEntity(beam)
             }
         }
+    }
+
+    fun getAllCheckpoints(): Collection<Checkpoint> {
+        return this.config.checkpoints.all()
     }
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
@@ -155,11 +161,41 @@ class GlideMinigame(
 
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerTick(event: PlayerTickEvent) {
-        event.player.glide.tick(this)
+        val (player) = event
+        val glide = player.glide
 
-        if (event.player.verticalCollision) {
-            event.player.hurt(event.player.damageSources().flyIntoWall(), 2.0F)
+        glide.tick(this)
+
+        if (player.verticalCollision) {
+            player.hurt(player.damageSources().flyIntoWall(), 2.0F)
         }
+
+        val position = player.position()
+        val checkpoints = this.config.checkpoints
+        val current = glide.lastCrossedCheckpoint
+        if (checkpoints.isFinish(current.index)) {
+            return
+        }
+
+        val previous = checkpoints.getNearest(current.previous, position).position
+        val next = checkpoints.getNearest(current.next, position).position
+
+        val distanceToCurrent = checkpoints.getDistance(current.index)
+        val progress = position.projectionScalar(current.position, next)
+        val delta = if (progress >= 0) {
+            val distanceToNext = checkpoints.getDistance(current.next)
+            (distanceToNext - distanceToCurrent) * progress
+        } else {
+            val distanceToPrevious = checkpoints.getDistance(current.previous)
+            -(distanceToCurrent - distanceToPrevious) * (1 - position.projectionScalar(previous, current.position))
+        }
+        val currentDistance = distanceToCurrent + delta
+        val percentage = Mth.clamp(Math.round((currentDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
+
+        player.sendSystemMessage(
+            Component.literal(".".repeat(percentage) + "⚫" + ".".repeat(100 - percentage)),
+            true
+        )
     }
 
     @Listener(flags = ListenerFlags.IS_PLAYING)
@@ -241,7 +277,7 @@ class GlideMinigame(
     }
 
     private fun respawnPlayer(player: ServerPlayer) {
-        player.glide.clearAccelerators()
+        player.glide.respawn()
         player.clearTitle()
         player.clearPlayerInventory()
         player.setGameMode(GameType.ADVENTURE)
