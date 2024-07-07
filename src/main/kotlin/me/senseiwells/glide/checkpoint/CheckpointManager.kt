@@ -55,6 +55,16 @@ class CheckpointManager(
         return this.checkpoints
     }
 
+    fun respawnCheckpoints(): List<Checkpoint> {
+        val respawnCheckpoints = ArrayList<Checkpoint>()
+        for (checkpoint in this.checkpoints) {
+            if (checkpoint is RespawnCheckpoint) {
+                respawnCheckpoints.add(checkpoint)
+            }
+        }
+        return respawnCheckpoints
+    }
+
     private fun createCheckpointsByIndex(): HashMultimap<Int, Checkpoint> {
         val map = HashMultimap.create<Int, Checkpoint>()
         for (checkpoint in this.checkpoints) {

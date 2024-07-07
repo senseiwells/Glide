@@ -4,6 +4,7 @@ import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddonConfig
 import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.checkpoint.Checkpoint
+import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
@@ -147,6 +148,10 @@ class GlideMinigame(
         return this.config.checkpoints.all()
     }
 
+    fun getAllRespawnCheckpoints(): Collection<Checkpoint> {
+        return this.config.checkpoints.respawnCheckpoints()
+    }
+
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
         this.checkpointBossbar.addPlayer(player)
         this.scheduler.schedule(4.Seconds) {
@@ -192,6 +197,24 @@ class GlideMinigame(
         val currentDistance = distanceToCurrent + delta
         val percentage = Mth.clamp(Math.round((currentDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
 
+        /*
+        val progressBar = Component.empty()
+            .append(GlideFont.Progressbar.PROGRESS_BAR)
+            .append(ComponentUtils.space(-312))
+
+        for (checkpoint in getAllRespawnCheckpoints()) {
+            val checkpointDistance = checkpoints.getDistance(checkpoint.index)
+            val checkpointPercentage = Mth.clamp(Math.round((checkpointDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
+
+            progressBar.append(ComponentUtils.space(checkpointPercentage - 2))
+            progressBar.append(GlideFont.Progressbar.PROGRESS_BAR_CHECKPOINT)
+        }
+
+        player.sendSystemMessage(
+            progressBar,
+            true
+        )
+        */
         /*
           Progressbar should be shifted down vertically to occupy hotbar,
           (hotbar either removed in texture or via core shader (probably texture for time being))
