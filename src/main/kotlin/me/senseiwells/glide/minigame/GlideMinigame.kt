@@ -192,8 +192,22 @@ class GlideMinigame(
         val currentDistance = distanceToCurrent + delta
         val percentage = Mth.clamp(Math.round((currentDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
 
+        /*
+          Progressbar should be shifted down vertically to occupy hotbar,
+          (hotbar either removed in texture or via core shader (probably texture for time being))
+
+          GlideFont.Progressbar.PROGRESS_BAR
+          GlideFont.Progressbar.PROGRESS_BAR_CHECKPOINT (place based on respawn checkpoint position in percentage)
+
+          Player markers shifted down vertically to overlap progressbar
+
+          GlideFont.Progressbar.getPlayerMarker(id) (place each id based on percentage of all (alive) players
+                                                     ServerUtils will likely be made to handle the ids.
+                                                     for now '1' can serve as a placeholder for all players)
+         */
+
         player.sendSystemMessage(
-            Component.literal(".".repeat(percentage) + "⚫" + ".".repeat(100 - percentage)),
+            Component.literal(".".repeat(percentage) + GlideFont.Progressbar.getPlayerMarker(1) + ".".repeat(100 - percentage)),
             true
         )
     }
