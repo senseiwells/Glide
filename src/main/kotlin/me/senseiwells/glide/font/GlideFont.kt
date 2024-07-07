@@ -10,12 +10,12 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
 
     object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-        val PROGRESS_BAR by bitmap(at("progressbar/progressbar.png"), 0, 0) // Placeholder Values
-        val PROGRESS_BAR_CHECKPOINT by bitmap(at("progressbar/checkpointicon.png"), 0, 0) // Placeholder Values
+        val PROGRESS_BAR by bitmap(at("progressbar/progressbar.png"), 5, 10)
+        val PROGRESS_BAR_CHECKPOINT by bitmap(at("progressbar/checkpointicon.png"), 7, 14)
 
         init {
             for (i in 1..16) {
-                indexed(at("progressbar/playermarker/$i.png"), 8, 16)
+                indexed(at("progressbar/playermarker/$i.png"), 3, 5)
             }
         }
 
