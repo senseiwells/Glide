@@ -9,6 +9,22 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val YOU_CRASHED by bitmap(at("you_crashed.png"), 3, 3)
     val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
 
+    object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
+        val PROGRESS_BAR by bitmap(at("progressbar/progressbar.png"), 5, 10)
+        val PROGRESS_BAR_CHECKPOINT by bitmap(at("progressbar/checkpointicon.png"), 7, 14)
+
+        init {
+            for (i in 1..16) {
+                indexed(at("progressbar/playermarker/$i.png"), 3, 5)
+            }
+        }
+
+        fun getPlayerMarker(index: Int): MutableComponent {
+            require(index in 1..16) { "Index must be between 1 and 16" }
+            return this.get(index)
+        }
+    }
+
     object Speedometer: IndexedBitmapFontResources(GlideMod.id("speedometer")) {
         val SPEEDOMETER by bitmap(at("speedometer/speedometer.png"), 8, 16)
 
