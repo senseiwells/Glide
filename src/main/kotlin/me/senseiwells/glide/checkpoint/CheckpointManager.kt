@@ -51,18 +51,12 @@ class CheckpointManager(
         return this.distances.getDouble(index)
     }
 
-    fun all(): List<Checkpoint> {
-        return this.checkpoints
+    fun getPercentageDistance(index: Int): Double {
+        return this.getDistance(index) / this.totalLength
     }
 
-    fun respawnCheckpoints(): List<Checkpoint> {
-        val respawnCheckpoints = ArrayList<Checkpoint>()
-        for (checkpoint in this.checkpoints) {
-            if (checkpoint is RespawnCheckpoint) {
-                respawnCheckpoints.add(checkpoint)
-            }
-        }
-        return respawnCheckpoints
+    fun all(): List<Checkpoint> {
+        return this.checkpoints
     }
 
     private fun createCheckpointsByIndex(): HashMultimap<Int, Checkpoint> {

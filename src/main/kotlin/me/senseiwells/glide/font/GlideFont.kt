@@ -3,6 +3,8 @@ package me.senseiwells.glide.font
 import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
 import net.casual.arcade.resources.font.IndexedBitmapFontResources
+import net.casual.arcade.utils.ComponentUtils
+import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
@@ -10,17 +12,23 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
 
     object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-        val PROGRESS_BAR by bitmap(at("progressbar/progressbar.png"), 5, 10)
-        val PROGRESS_BAR_CHECKPOINT by bitmap(at("progressbar/checkpointicon.png"), 7, 14)
+        private const val SHIFT = -20
+
+        private val BG_1 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
+        private val BG_2 by bitmap(at("progressbar/progressbar_2.png"), 5 + SHIFT, 10)
+        val CHECKPOINT by bitmap(at("progressbar/checkpoint_icon.png"), 7 + SHIFT, 14)
+
+        val BACKGROUND: MutableComponent
+            get() = Component.empty().append(BG_1).append(ComponentUtils.space(-1)).append(BG_2)
 
         init {
             for (i in 1..16) {
-                indexed(at("progressbar/playermarker/$i.png"), 3, 5)
+                indexed(at("progressbar/player_marker/$i.png"), 3 + SHIFT, 5)
             }
         }
 
         fun getPlayerMarker(index: Int): MutableComponent {
-            require(index in 1..16) { "Index must be between 1 and 16" }
+            require(index in 0..15) { "Index must be between 0 and 15" }
             return this.get(index)
         }
     }
