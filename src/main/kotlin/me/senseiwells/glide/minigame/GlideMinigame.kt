@@ -3,13 +3,11 @@ package me.senseiwells.glide.minigame
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddonConfig
 import me.senseiwells.glide.addon.GlideAddons
-import me.senseiwells.glide.checkpoint.Checkpoint
-import me.senseiwells.glide.checkpoint.RespawnCheckpoint
+import me.senseiwells.glide.checkpoint.CheckpointManager
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
-import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.events.minigame.MinigameAddNewPlayerEvent
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
@@ -63,7 +61,6 @@ import net.minecraft.world.level.storage.LevelResource
 import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
-import kotlin.math.max
 
 class GlideMinigame(
     private val config: GlideAddonConfig,
@@ -77,6 +74,9 @@ class GlideMinigame(
     private var ticks = 0
 
     private val checkpointBossbar = SuppliedBossBar()
+
+    val checkpoints: CheckpointManager
+        get() = this.config.checkpoints
 
     init {
         this.checkpointBossbar.setTitle(ComponentElements.of("Checkpoint!".literal()))
@@ -121,6 +121,12 @@ class GlideMinigame(
             )
         }
         sidebar.addRow(SidebarElements.empty())
+        sidebar.addRow { player ->
+            SidebarComponent.withNoScore(
+                Component.literal(player.glide.score.toString())
+            )
+        }
+        sidebar.addRow(SidebarElements.empty())
         this.ui.setSidebar(sidebar)
 
         this.setGameRules {
@@ -137,19 +143,11 @@ class GlideMinigame(
         for (thermal in this.config.thermals) {
             this.level.addFreshEntity(thermal.create(this.level))
         }
-        for (checkpoint in this.config.checkpoints.all()) {
+        for (checkpoint in this.checkpoints.all()) {
             for (beam in checkpoint.createBeaconBeams(this.level)) {
                 this.level.addFreshEntity(beam)
             }
         }
-    }
-
-    fun getAllCheckpoints(): Collection<Checkpoint> {
-        return this.config.checkpoints.all()
-    }
-
-    fun getAllRespawnCheckpoints(): Collection<Checkpoint> {
-        return this.config.checkpoints.respawnCheckpoints()
     }
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
@@ -174,65 +172,6 @@ class GlideMinigame(
         if (player.verticalCollision) {
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
         }
-
-        val position = player.position()
-        val checkpoints = this.config.checkpoints
-        val current = glide.lastCrossedCheckpoint
-        if (checkpoints.isFinish(current.index)) {
-            return
-        }
-
-        val previous = checkpoints.getNearest(current.previous, position).position
-        val next = checkpoints.getNearest(current.next, position).position
-
-        val distanceToCurrent = checkpoints.getDistance(current.index)
-        val progress = position.projectionScalar(current.position, next)
-        val delta = if (progress >= 0) {
-            val distanceToNext = checkpoints.getDistance(current.next)
-            (distanceToNext - distanceToCurrent) * progress
-        } else {
-            val distanceToPrevious = checkpoints.getDistance(current.previous)
-            -(distanceToCurrent - distanceToPrevious) * (1 - position.projectionScalar(previous, current.position))
-        }
-        val currentDistance = distanceToCurrent + delta
-        val percentage = Mth.clamp(Math.round((currentDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
-
-        /*
-        val progressBar = Component.empty()
-            .append(GlideFont.Progressbar.PROGRESS_BAR)
-            .append(ComponentUtils.space(-312))
-
-        for (checkpoint in getAllRespawnCheckpoints()) {
-            val checkpointDistance = checkpoints.getDistance(checkpoint.index)
-            val checkpointPercentage = Mth.clamp(Math.round((checkpointDistance / checkpoints.totalLength * 100)), 0, 100).toInt()
-
-            progressBar.append(ComponentUtils.space(checkpointPercentage - 2))
-            progressBar.append(GlideFont.Progressbar.PROGRESS_BAR_CHECKPOINT)
-        }
-
-        player.sendSystemMessage(
-            progressBar,
-            true
-        )
-        */
-        /*
-          Progressbar should be shifted down vertically to occupy hotbar,
-          (hotbar either removed in texture or via core shader (probably texture for time being))
-
-          GlideFont.Progressbar.PROGRESS_BAR
-          GlideFont.Progressbar.PROGRESS_BAR_CHECKPOINT (place based on respawn checkpoint position in percentage)
-
-          Player markers shifted down vertically to overlap progressbar
-
-          GlideFont.Progressbar.getPlayerMarker(id) (place each id based on percentage of all (alive) players
-                                                     ServerUtils will likely be made to handle the ids.
-                                                     for now '1' can serve as a placeholder for all players)
-         */
-
-        player.sendSystemMessage(
-            Component.literal(".".repeat(percentage) + GlideFont.Progressbar.getPlayerMarker(1) + ".".repeat(100 - percentage)),
-            true
-        )
     }
 
     @Listener(flags = ListenerFlags.IS_PLAYING)
@@ -263,7 +202,8 @@ class GlideMinigame(
         event.cancel(0.0F)
         player.setGameMode(GameType.SPECTATOR)
         player.setVelocityAndMark(0.0, 0.0, 0.0)
-        this.settings.freezeEntities.set(true)
+        // FIXME:
+        // this.settings.freezeEntities.set(true)
 
         // Make sure we remove this bossbar first!
         this.checkpointBossbar.removePlayer(player)
@@ -275,7 +215,7 @@ class GlideMinigame(
         )
 
         this.scheduler.schedule(2.Seconds) {
-            this.settings.freezeEntities.set(false)
+            // this.settings.freezeEntities.set(false)
             this.respawnPlayer(player)
         }
     }
@@ -283,6 +223,35 @@ class GlideMinigame(
     @Listener(during = During(phases = ["active"]))
     private fun onServerTick(event: ServerTickEvent) {
         this.ticks++
+
+        val progressBar = GlideFont.Progressbar.BACKGROUND
+            .append(ComponentUtils.space(-300))
+        var lastOffset = 0
+        for (checkpoint in this.checkpoints.all()) {
+            if (!checkpoint.shouldMarkOnProgressBar) {
+                continue
+            }
+
+            val distance = this.checkpoints.getPercentageDistance(checkpoint.index)
+            val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
+
+            progressBar.append(ComponentUtils.space(offset - lastOffset))
+            progressBar.append(GlideFont.Progressbar.CHECKPOINT)
+            lastOffset = offset + 5
+        }
+
+        for ((i, player) in this.players.playing.withIndex()) {
+            val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
+
+            progressBar.append(ComponentUtils.space(offset - lastOffset))
+            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i))
+            lastOffset = offset + 6
+        }
+
+        progressBar.append(ComponentUtils.space(300 - lastOffset))
+        for (player in this.players) {
+            player.sendSystemMessage(progressBar.shadowless(), true)
+        }
     }
 
     @Listener
@@ -298,6 +267,7 @@ class GlideMinigame(
     @Listener
     private fun onMinigameSetPlaying(event: MinigameSetPlayingEvent) {
         val player = event.player
+
         player.glide.respawnLocation = this.startPos
         this.respawnPlayer(player)
         player.isNoGravity = true

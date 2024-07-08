@@ -7,8 +7,6 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
-import me.senseiwells.glide.utils.GlideGRFConverter
-import me.senseiwells.glide.utils.GlideGRFReader
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
 import net.casual.arcade.events.player.PlayerJoinEvent
@@ -27,8 +25,6 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.nio.file.Path
-import kotlin.system.exitProcess
 
 // TODO:
 //  - Behaviour of going back on checkpoints
@@ -44,6 +40,7 @@ object GlideMod: ModInitializer {
         addFont(GlideFont)
         addFont(GlideFont.Timer)
         addFont(GlideFont.Speedometer)
+        addFont(GlideFont.Progressbar)
         addSounds(GlideSounds)
         packDescription = "GlidePack".literal()
     }

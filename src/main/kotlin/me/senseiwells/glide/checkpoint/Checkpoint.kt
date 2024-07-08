@@ -27,8 +27,11 @@ interface Checkpoint: GlideCollider {
     val index: Int
     val boundingBox: AABB
 
+    val shouldMarkOnProgressBar: Boolean
+
     val position: Vec3
         get() = this.boundingBox.center
+
 
     fun codec(): MapCodec<out Checkpoint>
 
@@ -58,6 +61,8 @@ class ProgressCheckpoint(
     override val index: Int,
     override val boundingBox: AABB
 ): Checkpoint {
+    override val shouldMarkOnProgressBar: Boolean = false
+
     override fun codec(): MapCodec<out Checkpoint> {
         return CODEC
     }
@@ -82,6 +87,8 @@ class FinishLine(
     override val index: Int,
     override val boundingBox: AABB
 ): Checkpoint {
+    override val shouldMarkOnProgressBar: Boolean = false
+
     override fun codec(): MapCodec<out Checkpoint> {
         return CODEC
     }
@@ -133,6 +140,8 @@ class RespawnCheckpoint(
     private val spawn: ExactLocationTemplate,
     private val beacons: List<BeaconBeamTemplate>
 ): Checkpoint {
+    override val shouldMarkOnProgressBar: Boolean = true
+
     override fun createBeaconBeams(level: ServerLevel): List<BeaconBeam> {
         return this.beacons.map { it.create(level) }
     }

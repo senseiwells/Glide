@@ -1,6 +1,5 @@
 package me.senseiwells.glide.utils
 
-import me.senseiwells.glide.utils.VecUtils.projectOntoLine
 import net.minecraft.world.phys.Vec3
 
 object VecUtils {
