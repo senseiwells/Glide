@@ -7,7 +7,6 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
-import net.casual.arcade.utils.MinigameUtils.getMinigame
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TagUtils.getVec3OrNull
@@ -123,6 +122,7 @@ abstract class Accelerator(
 
         if (initial) {
             data.add(DisplayTrackedData.Item.ITEM.createValue(this.getModelItem()))
+            data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
         }
     }
 

@@ -17,27 +17,27 @@ import net.minecraft.world.entity.MobCategory
 object GlideEntities {
     val DYNAMIC_THERMAL = register(
         "dynamic_thermal",
-        EntityType.Builder.of(::DynamicThermal, MobCategory.MISC)
+        EntityType.Builder.of(::DynamicThermal, MobCategory.MISC).clientTrackingRange(32)
     )
     val STATIC_THERMAL = register(
         "static_thermal",
-        EntityType.Builder.of(::StaticThermal, MobCategory.MISC)
+        EntityType.Builder.of(::StaticThermal, MobCategory.MISC).clientTrackingRange(32)
     )
     val BOOSTER = register(
         "booster",
-        EntityType.Builder.of(::Booster, MobCategory.MISC)
+        EntityType.Builder.of(::Booster, MobCategory.MISC).clientTrackingRange(32)
     )
     val DIRECTIONAL_BOOSTER = register(
         "directional_booster",
-        EntityType.Builder.of(::DirectionalBooster, MobCategory.MISC)
+        EntityType.Builder.of(::DirectionalBooster, MobCategory.MISC).clientTrackingRange(32)
     )
     val BEACON_BEAM = register(
         "beacon_beam",
-        EntityType.Builder.of(::BeaconBeam, MobCategory.MISC)
+        EntityType.Builder.of(::BeaconBeam, MobCategory.MISC).clientTrackingRange(32)
     )
     val RING = register(
         "ring",
-        EntityType.Builder.of(::Ring, MobCategory.MISC)
+        EntityType.Builder.of(::Ring, MobCategory.MISC).clientTrackingRange(32)
     )
 
     fun noop() {
