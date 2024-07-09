@@ -8,11 +8,11 @@ import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
-import net.casual.arcade.events.minigame.MinigameAddNewPlayerEvent
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
 import net.casual.arcade.events.player.PlayerDamageEvent
 import net.casual.arcade.events.player.PlayerPoseEvent
+import net.casual.arcade.events.player.PlayerSlotClickEvent
 import net.casual.arcade.events.player.PlayerTickEvent
 import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.gui.bossbar.SuppliedBossBar
@@ -21,7 +21,7 @@ import net.casual.arcade.gui.elements.SidebarElements
 import net.casual.arcade.gui.sidebar.ArcadeSidebar
 import net.casual.arcade.gui.sidebar.SidebarComponent
 import net.casual.arcade.minigame.Minigame
-import net.casual.arcade.minigame.annotation.During
+import net.casual.arcade.minigame.MinigameResources
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.phase.Phase
@@ -39,6 +39,7 @@ import net.casual.arcade.utils.PlayerUtils.resetHealth
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
 import net.casual.arcade.utils.PlayerUtils.teleportTo
+import net.casual.arcade.utils.ResourcePackUtils.afterPacksLoad
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.TimeUtils.format
@@ -61,19 +62,23 @@ import net.minecraft.world.level.storage.LevelResource
 import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
+import kotlin.math.min
 
 class GlideMinigame(
     private val config: GlideAddonConfig,
+    private val mode: GlideMode,
     val level: ServerLevel,
     server: MinecraftServer
 ): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
 
+    private val checkpointBossbar = SuppliedBossBar()
     private val startPos = this.config.spawn.get(this.level)
 
-    private var ticks = 0
+    private val sidebar = ArcadeSidebar(ComponentElements.empty())
+    private var progressBar: Component = Component.empty()
 
-    private val checkpointBossbar = SuppliedBossBar()
+    private var ticks = 0
 
     val checkpoints: CheckpointManager
         get() = this.config.checkpoints
@@ -89,9 +94,10 @@ class GlideMinigame(
     override fun initialize() {
         super.initialize()
 
+        this.addResources(MinigameResources.of(GlideMod.resourcePackInfo))
+
         // TODO: Clean this up
-        val sidebar = ArcadeSidebar(ComponentElements.empty())
-        sidebar.addRow { _ ->
+        this.sidebar.addRow { _ ->
             val elapsed = this.ticks.Ticks
             val secondsHandIndex = (elapsed.seconds / 10) % 11
             val minutesHandIndex = (elapsed.minutes / 5) % 11
@@ -106,8 +112,8 @@ class GlideMinigame(
                 Component.empty().append(stopwatch).append(ComponentUtils.space(5))
             )
         }
-        sidebar.addRow(SidebarElements.empty())
-        sidebar.addRow { player ->
+        this.sidebar.addRow(SidebarElements.empty())
+        this.sidebar.addRow { player ->
             val mps = player.deltaMovement.length() * 20
             // See https://www.desmos.com/calculator/6bhuudkjpm
             val needleIndex = Mth.clamp(Mth.floor(0.24 * mps - 0.5), 0, 11)
@@ -120,15 +126,21 @@ class GlideMinigame(
                 Component.empty().append(speedometer).append(ComponentUtils.space(4))
             )
         }
-        sidebar.addRow(SidebarElements.empty())
-        sidebar.addRow { player ->
-            SidebarComponent.withNoScore(
-                Component.literal(player.glide.score.toString())
-            )
+        if (this.mode == GlideMode.ScoreAttack) {
+            this.sidebar.addRow(SidebarElements.empty())
+            this.sidebar.addRow { player ->
+                SidebarComponent.withCustomScore(
+                    Component.literal(player.glide.score.toString()),
+                    Component.empty().append(player.glide.scoreIcon).append(ComponentUtils.space(6))
+                )
+            }
         }
-        sidebar.addRow(SidebarElements.empty())
-        this.ui.setSidebar(sidebar)
+        this.sidebar.addRow(SidebarElements.empty())
+        this.ui.setSidebar(this.sidebar)
 
+        this.settings.canLookAroundWhenFrozen = false
+        this.settings.tickFreezeOnPause.set(true)
+        this.settings.canGetHungry.set(false)
         this.setGameRules {
             set(GameRules.RULE_KEEPINVENTORY, true)
             set(GameRules.RULE_NATURAL_REGENERATION, false)
@@ -137,15 +149,17 @@ class GlideMinigame(
         for (booster in this.config.boosters) {
             this.level.addFreshEntity(booster.create(this.level))
         }
-        for (ring in this.config.rings) {
-            this.level.addFreshEntity(ring.create(this.level))
-        }
         for (thermal in this.config.thermals) {
             this.level.addFreshEntity(thermal.create(this.level))
         }
         for (checkpoint in this.checkpoints.all()) {
             for (beam in checkpoint.createBeaconBeams(this.level)) {
                 this.level.addFreshEntity(beam)
+            }
+        }
+        if (this.mode == GlideMode.ScoreAttack) {
+            for (ring in this.config.rings) {
+                this.level.addFreshEntity(ring.create(this.level))
             }
         }
     }
@@ -165,9 +179,10 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerTick(event: PlayerTickEvent) {
         val (player) = event
-        val glide = player.glide
 
+        val glide = player.glide
         glide.tick(this)
+        this.sendProgress(player)
 
         if (player.verticalCollision) {
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
@@ -202,61 +217,38 @@ class GlideMinigame(
         event.cancel(0.0F)
         player.setGameMode(GameType.SPECTATOR)
         player.setVelocityAndMark(0.0, 0.0, 0.0)
-        // FIXME:
-        // this.settings.freezeEntities.set(true)
+        this.effects.freeze(player)
 
         // Make sure we remove this bossbar first!
         this.checkpointBossbar.removePlayer(player)
+        this.sidebar.removePlayer(player)
 
         player.setTitleAnimation(2.Seconds, 5.Seconds)
         player.sendTitle(
             GlideFont.YOU_CRASHED.shadowless(),
             GlideFont.YOU_CRASHED_BACKGROUND.shadowless(),
         )
+        player.sendSystemMessage(Component.empty(), true)
 
         this.scheduler.schedule(2.Seconds) {
-            // this.settings.freezeEntities.set(false)
+            this.effects.unfreeze(player)
+            this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
         }
     }
 
-    @Listener(during = During(phases = ["active"]))
+    @Listener
     private fun onServerTick(event: ServerTickEvent) {
-        this.ticks++
-
-        val progressBar = GlideFont.Progressbar.BACKGROUND
-            .append(ComponentUtils.space(-300))
-        var lastOffset = 0
-        for (checkpoint in this.checkpoints.all()) {
-            if (!checkpoint.shouldMarkOnProgressBar) {
-                continue
-            }
-
-            val distance = this.checkpoints.getPercentageDistance(checkpoint.index)
-            val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
-
-            progressBar.append(ComponentUtils.space(offset - lastOffset))
-            progressBar.append(GlideFont.Progressbar.CHECKPOINT)
-            lastOffset = offset + 5
+        if (this.phase == GlidePhase.Active) {
+            this.ticks++
         }
 
-        for ((i, player) in this.players.playing.withIndex()) {
-            val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
-
-            progressBar.append(ComponentUtils.space(offset - lastOffset))
-            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i))
-            lastOffset = offset + 6
-        }
-
-        progressBar.append(ComponentUtils.space(300 - lastOffset))
-        for (player in this.players) {
-            player.sendSystemMessage(progressBar.shadowless(), true)
-        }
+        this.tickProgress()
     }
 
     @Listener
-    private fun onMinigameAddPlayer(event: MinigameAddNewPlayerEvent) {
-        event.player.glide.reset()
+    private fun onPlayerSlotClick(event: PlayerSlotClickEvent) {
+        event.cancel()
     }
 
     @Listener
@@ -269,8 +261,11 @@ class GlideMinigame(
         val player = event.player
 
         player.glide.respawnLocation = this.startPos
+        event.player.glide.reset()
         this.respawnPlayer(player)
-        player.isNoGravity = true
+        if (this.phase < GlidePhase.Active) {
+            player.isNoGravity = true
+        }
 
         this.start()
     }
@@ -290,6 +285,7 @@ class GlideMinigame(
         player.setGameMode(GameType.ADVENTURE)
         player.boostHealth(-0.7)
         player.resetHealth()
+        player.clearFire()
         player.teleportTo(player.glide.respawnLocation)
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         val elytra = ItemStack(Items.ELYTRA)
@@ -300,6 +296,49 @@ class GlideMinigame(
         this.scheduler.schedule(1.Ticks) {
             player.startFallFlying()
         }
+    }
+
+    private fun sendProgress(player: ServerPlayer) {
+        val progressBar = Component.empty().append(this.progressBar)
+        progressBar.append(ComponentUtils.space(-163)).append(ComponentUtils.space(-1, 2))
+
+        val fullHearts = Mth.floor(player.health / 2.0)
+        for (i in 0..< min(fullHearts, 3)) {
+            progressBar.append(GlideFont.FULL_HEART.shadowless())
+            progressBar.append(ComponentUtils.space(-2))
+        }
+        if (fullHearts < 3) {
+            var empty = 3 - fullHearts
+            if (player.health - fullHearts * 2 >= 1.0) {
+                progressBar.append(GlideFont.HALF_HEART.shadowless())
+                progressBar.append(ComponentUtils.space(-2))
+                empty--
+            }
+            for (i in 0..< empty) {
+                progressBar.append(GlideFont.EMPTY_HEART.shadowless())
+                progressBar.append(ComponentUtils.space(-2))
+            }
+        }
+
+        player.afterPacksLoad {  }
+
+        progressBar.append(ComponentUtils.space(138))
+        player.sendSystemMessage(progressBar, true)
+    }
+
+    private fun tickProgress() {
+        val progressBar = Component.empty().append(this.checkpoints.progressBar)
+        var lastOffset = 300
+        for ((i, player) in this.players.playing.withIndex()) {
+            val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
+
+            progressBar.append(ComponentUtils.space(offset - lastOffset))
+            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i).shadowless())
+            lastOffset = offset + 6
+        }
+
+        progressBar.append(ComponentUtils.space(300 - lastOffset))
+        this.progressBar = progressBar
     }
 
     companion object: MinigameFactory {
@@ -318,7 +357,7 @@ class GlideMinigame(
                     .setDimensionType(addon.dimensionType)
             )
 
-            val glide = GlideMinigame(addon.config, handle.asWorld(), context.server)
+            val glide = GlideMinigame(addon.config, GlideMode.ScoreAttack, handle.asWorld(), context.server)
             glide.levels.add(handle)
 
             val tempLocation = handle.registryKey.location()

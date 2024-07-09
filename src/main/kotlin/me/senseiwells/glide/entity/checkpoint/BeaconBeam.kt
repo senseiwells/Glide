@@ -94,6 +94,7 @@ class BeaconBeam(
         if (initial) {
             data.add(DisplayTrackedData.Item.ITEM.createValue(GlideItem.FAKE_BEAM))
             data.add(DisplayTrackedData.BRIGHTNESS.createValue(this.getModelBrightness().pack()))
+            data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
         }
     }
 

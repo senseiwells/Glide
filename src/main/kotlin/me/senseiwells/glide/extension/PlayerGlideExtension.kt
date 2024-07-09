@@ -1,8 +1,8 @@
 package me.senseiwells.glide.extension
 
 import com.google.common.collect.Iterables
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.FinishLine
@@ -10,13 +10,21 @@ import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
 import me.senseiwells.glide.entity.ring.Ring
+import me.senseiwells.glide.entity.ring.RingType
+import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
+import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.PlayerUtils.getExtension
+import net.casual.arcade.utils.TagUtils.getLocation
+import net.casual.arcade.utils.TagUtils.getVec3
+import net.casual.arcade.utils.TagUtils.putLocation
+import net.casual.arcade.utils.TagUtils.putVec3
 import net.casual.arcade.utils.location.Location
-import net.minecraft.nbt.Tag
+import net.minecraft.nbt.*
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.AABB
@@ -37,9 +45,15 @@ class PlayerGlideExtension(
     private var lastCheckpointIndex = 0
     private var lastCrossedCheckpoint = CheckpointData.DEFAULT
 
-    private val rings = IntOpenHashSet()
+    private var ringTypes = ArrayList<RingType>()
+    private var lastSavedRingType = RingType.Grey
+    private var ringTypeTicks = 0
+
+    private val rings = ObjectOpenHashSet<UUID>()
+    private val lastSavedRings = ObjectOpenHashSet<UUID>()
     private var lastSavedScore = 0
 
+    var scoreIcon: Component = GlideFont.Score.GREY
     var score = 0
     var progress = 0.0
 
@@ -57,7 +71,12 @@ class PlayerGlideExtension(
     }
 
     fun collideWithRing(ring: Ring): Boolean {
-        return this.rings.add(ring.id)
+        if (this.rings.add(ring.uuid)) {
+            val type = ring.getRingType()
+            this.addRingType(type)
+            return true
+        }
+        return false
     }
 
     fun collideWithCheckpoint(checkpoint: Checkpoint): Boolean {
@@ -81,6 +100,7 @@ class PlayerGlideExtension(
         this.respawnLocation = spawn
         this.lastRespawnCheckpointIndex = checkpoint.index
         this.lastSavedScore = this.score
+        this.lastSavedRingType = this.ringTypes.last()
     }
 
     fun setLiftForceModifier(modifier: Double) {
@@ -102,21 +122,52 @@ class PlayerGlideExtension(
         }
 
         this.tickProgress(minigame)
+
+        if (this.ringTypes.size >= 2) {
+            val fade = this.ringTypes[0].getIconFade(this.ringTypeTicks)
+            val base = this.ringTypes[1].icon
+
+            this.scoreIcon = Component.empty()
+                .append(base)
+                .append(ComponentUtils.space(-15))
+                .append(fade)
+
+            if (++this.ringTypeTicks > 20) {
+                this.ringTypes.removeFirst()
+                this.ringTypeTicks = 0
+            }
+            return
+        }
+        this.scoreIcon = this.ringTypes[0].icon
     }
 
     fun respawn() {
+        this.oldPosition = null
         this.liftForceModifier = 1.0
         this.lastCrossedCheckpoint = CheckpointData(this.lastRespawnCheckpointIndex, this.respawnLocation.position)
         this.player.isNoGravity = false
         this.score = this.lastSavedScore
+        this.rings.clear()
+        this.rings.addAll(this.lastSavedRings)
         this.accelerators.clear()
+
+        val recent = this.ringTypes.last()
+        this.ringTypes.clear()
+        this.ringTypes.add(recent)
+        this.addRingType(this.lastSavedRingType)
+        this.ringTypeTicks = 0
     }
 
     fun reset() {
         this.finished = false
+        this.lastRespawnCheckpointIndex = 0
         this.lastCheckpointIndex = 0
         this.lastSavedScore = 0
-        this.rings.clear()
+        this.scoreIcon = GlideFont.Score.GREY
+        this.ringTypes.clear()
+        this.ringTypes.add(RingType.Grey)
+        this.lastSavedRings.clear()
+        this.lastSavedRingType = RingType.Grey
         this.respawn()
     }
 
@@ -125,11 +176,44 @@ class PlayerGlideExtension(
     }
 
     override fun deserialize(element: Tag) {
-
+        element as CompoundTag
+        this.finished = element.getBoolean("finished")
+        this.lastRespawnCheckpointIndex = element.getInt("last_respawn_checkpoint_index")
+        this.lastCheckpointIndex = element.getInt("last_checkpoint_index")
+        this.lastCrossedCheckpoint = CheckpointData(
+            element.getInt("last_crossed_checkpoint_index"),
+            element.getVec3("last_crossed_checkpoint_position")
+        )
+        this.ringTypes.addAll(element.getIntArray("ring_types").map { RingType.entries[it] })
+        this.lastSavedRingType = RingType.entries[element.getInt("last_saved_ring_type")]
+        this.rings.addAll(element.getList("rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
+        this.lastSavedRings.addAll(element.getList("last_saved_rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
+        this.score = element.getInt("score")
+        this.lastSavedScore = element.getInt("last_saved_score")
+        this.respawnLocation = element.getLocation("respawn_location", this.player.server)
     }
 
-    override fun serialize(): Tag? {
-        return null
+    override fun serialize(): Tag {
+        val tag = CompoundTag()
+        tag.putBoolean("finished", this.finished)
+        tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
+        tag.putInt("last_checkpoint_index", this.lastCheckpointIndex)
+        tag.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
+        tag.putVec3("last_crossed_checkpoint_position", this.lastCrossedCheckpoint.position)
+        tag.put("ring_types", IntArrayTag(this.ringTypes.map { it.ordinal }.toIntArray()))
+        tag.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
+        tag.put("rings", this.rings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
+        tag.put("last_saved_rings", this.lastSavedRings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
+        tag.putInt("score", this.score)
+        tag.putInt("last_saved_score", this.lastSavedScore)
+        tag.putLocation("respawn_location", this.respawnLocation)
+        return tag
+    }
+
+    private fun addRingType(type: RingType) {
+        if (this.ringTypes.last() != type) {
+            this.ringTypes.addLast(type)
+        }
     }
 
     private fun tickProgress(minigame: GlideMinigame) {

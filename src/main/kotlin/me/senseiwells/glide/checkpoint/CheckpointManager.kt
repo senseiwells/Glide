@@ -3,6 +3,11 @@ package me.senseiwells.glide.checkpoint
 import com.google.common.collect.HashMultimap
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
+import me.senseiwells.glide.font.GlideFont
+import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.minecraft.network.chat.Component
+import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
 
 class CheckpointManager(
@@ -12,7 +17,8 @@ class CheckpointManager(
     private val byIndex = this.createCheckpointsByIndex()
     private val distances = this.calculateCheckpointDistances()
 
-    val totalLength = this.distances.last()
+    val totalLength: Double = this.distances.last()
+    val progressBar = this.createProgressBar()
 
     init {
         this.validate()
@@ -57,6 +63,25 @@ class CheckpointManager(
 
     fun all(): List<Checkpoint> {
         return this.checkpoints
+    }
+
+    private fun createProgressBar(): Component {
+        val progressBar = GlideFont.Progressbar.BACKGROUND.append(ComponentUtils.space(-300))
+        var lastOffset = 0
+        for (checkpoint in this.all()) {
+            if (!checkpoint.shouldMarkOnProgressBar) {
+                continue
+            }
+
+            val distance = this.getPercentageDistance(checkpoint.index)
+            val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
+
+            progressBar.append(ComponentUtils.space(offset - lastOffset))
+            progressBar.append(GlideFont.Progressbar.CHECKPOINT)
+            lastOffset = offset + 5
+        }
+        progressBar.append(ComponentUtils.space(300 - lastOffset))
+        return progressBar.shadowless()
     }
 
     private fun createCheckpointsByIndex(): HashMultimap<Int, Checkpoint> {

@@ -10,9 +10,11 @@ import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
 import net.casual.arcade.events.player.PlayerJoinEvent
+import net.casual.arcade.events.server.ServerLoadedEvent
 import net.casual.arcade.events.server.ServerStoppingEvent
 import net.casual.arcade.minigame.Minigames
 import net.casual.arcade.resources.ArcadePacks
+import net.casual.arcade.resources.PackInfo
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
 import net.casual.arcade.resources.hosting.DirectoryPackSupplier
 import net.casual.arcade.resources.hosting.PackHost
@@ -26,14 +28,11 @@ import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-// TODO:
-//  - Behaviour of going back on checkpoints
-//  - Booster / Thermal implementation
-//  - UI implementation
 object GlideMod: ModInitializer {
     const val MOD_ID = "glide"
 
     val logger: Logger = LogManager.getLogger(MOD_ID)
+
 
     val resourcePack = NamedResourcePackCreator.named("glide_pack") {
         addAssetSource(MOD_ID)
@@ -41,9 +40,12 @@ object GlideMod: ModInitializer {
         addFont(GlideFont.Timer)
         addFont(GlideFont.Speedometer)
         addFont(GlideFont.Progressbar)
+        addFont(GlideFont.Score)
         addSounds(GlideSounds)
         packDescription = "GlidePack".literal()
     }
+
+    lateinit var resourcePackInfo: PackInfo
 
     fun id(path: String): ResourceLocation {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
@@ -76,8 +78,11 @@ object GlideMod: ModInitializer {
             host.shutdown()
         }
 
+        GlobalEventHandler.register<ServerLoadedEvent> {
+            resourcePackInfo = host.getHostedPack("glide_pack")!!.toPackInfo()
+        }
+
         GlobalEventHandler.register<PlayerJoinEvent> {
-            it.player.sendResourcePack(host.getHostedPack("glide_pack")!!.toPackInfo())
             it.player.sendResourcePack(host.getHostedPack("spaces_font")!!.toPackInfo())
             it.player.sendResourcePack(host.getHostedPack("no_shadow")!!.toPackInfo())
         }

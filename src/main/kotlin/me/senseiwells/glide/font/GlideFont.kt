@@ -8,11 +8,16 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
+    private const val SHIFT = -35
+
     val YOU_CRASHED by bitmap(at("you_crashed.png"), 3, 3)
     val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
 
+    val FULL_HEART by bitmap(at("heart/full.png"), 18 + SHIFT, 9)
+    val HALF_HEART by bitmap(at("heart/half.png"), 18 + SHIFT, 9)
+    val EMPTY_HEART by bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
+
     object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-        private const val SHIFT = -20
 
         private val BG_1 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
         private val BG_2 by bitmap(at("progressbar/progressbar_2.png"), 5 + SHIFT, 10)
@@ -68,6 +73,48 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
         fun getMinutesHand(index: Int): MutableComponent {
             require(index in 0..11) { "Index must be between 0 and 11" }
             return this.get(index + 12)
+        }
+    }
+
+    object Score: IndexedBitmapFontResources(GlideMod.id("score")) {
+        val GREY by bitmap(at("score/grey.png"), 8, 16)
+        val GREEN by bitmap(at("score/green.png"), 8, 16)
+        val YELLOW by bitmap(at("score/yellow.png"), 8, 16)
+        val BLUE by bitmap(at("score/blue.png"), 8, 16)
+
+        init {
+            for (i in 0..20) {
+                indexed(at("score/grey_fade_$i.png"), 8, 16)
+            }
+            for (i in 0..20) {
+                indexed(at("score/green_fade_$i.png"), 8, 16)
+            }
+            for (i in 0..20) {
+                indexed(at("score/yellow_fade_$i.png"), 8, 16)
+            }
+            for (i in 0..20) {
+                indexed(at("score/blue_fade_$i.png"), 8, 16)
+            }
+        }
+
+        fun getGreyFade(index: Int): MutableComponent {
+            require(index in 0..20) { "Index must be between 0 and 20" }
+            return this.get(index)
+        }
+
+        fun getGreenFade(index: Int): MutableComponent {
+            require(index in 0..20) { "Index must be between 0 and 20" }
+            return this.get(index + 21)
+        }
+
+        fun getYellowFade(index: Int): MutableComponent {
+            require(index in 0..20) { "Index must be between 0 and 20" }
+            return this.get(index + 42)
+        }
+
+        fun getBlueFade(index: Int): MutableComponent {
+            require(index in 0..20) { "Index must be between 0 and 20" }
+            return this.get(index + 63)
         }
     }
 }
