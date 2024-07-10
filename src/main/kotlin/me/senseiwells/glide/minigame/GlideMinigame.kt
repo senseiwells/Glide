@@ -10,6 +10,7 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.SidebarScoreElement
 import me.senseiwells.glide.gui.SidebarTimerElement
 import me.senseiwells.glide.gui.SidebarVelocityElement
+import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
@@ -22,7 +23,6 @@ import net.casual.arcade.gui.bossbar.SuppliedBossBar
 import net.casual.arcade.gui.elements.ComponentElements
 import net.casual.arcade.gui.elements.SidebarElements
 import net.casual.arcade.gui.sidebar.ArcadeSidebar
-import net.casual.arcade.gui.sidebar.SidebarComponent
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.MinigameResources
 import net.casual.arcade.minigame.annotation.Listener
@@ -39,13 +39,13 @@ import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
 import net.casual.arcade.utils.PlayerUtils.resetHealth
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
 import net.casual.arcade.utils.PlayerUtils.teleportTo
 import net.casual.arcade.utils.ResourcePackUtils.afterPacksLoad
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
-import net.casual.arcade.utils.TimeUtils.format
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -137,13 +137,15 @@ class GlideMinigame(
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
         this.checkpointBossbar.addPlayer(player)
-        this.scheduler.schedule(4.Seconds) {
+        // 2 Seconds, then 1 second fade
+        this.scheduler.schedule(3.Seconds) {
             this.checkpointBossbar.removePlayer(player)
         }
     }
 
     fun markPlayerFinished(player: ServerPlayer) {
         this.players.setSpectating(player)
+        player.sendSound(GlideSounds.FINISH_NO_PODIUM)
         player.sendSystemMessage("Finished! :)".literal())
     }
 
@@ -194,14 +196,14 @@ class GlideMinigame(
         this.checkpointBossbar.removePlayer(player)
         this.sidebar.removePlayer(player)
 
-        player.setTitleAnimation(2.Seconds, 5.Seconds)
+        player.setTitleAnimation(10.Ticks, 1.Seconds)
         player.sendTitle(
             GlideFont.YOU_CRASHED.shadowless(),
             GlideFont.YOU_CRASHED_BACKGROUND.shadowless(),
         )
         player.sendSystemMessage(Component.empty(), true)
 
-        this.scheduler.schedule(2.Seconds) {
+        this.scheduler.schedule(1.Seconds) {
             this.effects.unfreeze(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)

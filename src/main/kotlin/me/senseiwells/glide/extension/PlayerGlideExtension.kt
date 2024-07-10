@@ -53,6 +53,7 @@ class PlayerGlideExtension(
     private val lastSavedRings = ObjectOpenHashSet<UUID>()
     private var lastSavedScore = 0
 
+    var combo = 0
     var scoreIcon: Component = GlideFont.Score.GREY
     var score = 0
     var progress = 0.0
@@ -124,7 +125,7 @@ class PlayerGlideExtension(
         this.tickProgress(minigame)
 
         if (this.ringTypes.size >= 2) {
-            val fade = this.ringTypes[0].getIconFade(this.ringTypeTicks)
+            val fade = this.ringTypes[0].getFade(this.ringTypeTicks)
             val base = this.ringTypes[1].icon
 
             this.scoreIcon = Component.empty()
@@ -213,6 +214,9 @@ class PlayerGlideExtension(
     private fun addRingType(type: RingType) {
         if (this.ringTypes.last() != type) {
             this.ringTypes.addLast(type)
+            this.combo = 0
+        } else {
+            this.combo++
         }
     }
 

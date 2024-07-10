@@ -10,6 +10,7 @@ import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import net.casual.arcade.entity.firework.VirtualFireworkBuilder
 import net.casual.arcade.utils.PlayerUtils.location
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.minecraft.core.Direction
@@ -100,6 +101,7 @@ class Ring(
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (player.glide.collideWithRing(this)) {
             player.glide.score += this.getRingType().points
+            player.sendSound(this.getRingType().getSound(player.glide.combo))
 
             val builder = VirtualFireworkBuilder()
             builder.duration(0.Ticks)
@@ -131,7 +133,7 @@ class Ring(
     }
 
     private fun getModelItem(): ItemStack {
-        return this.getRingType().getItemModel()
+        return this.getRingType().getModel()
     }
 
     companion object {
