@@ -22,7 +22,7 @@ version = "${modVersion}+mc${mcVersion}"
 group = "me.senseiwells"
 
 repositories {
-    mavenLocal()
+    // mavenLocal()
     maven("https://maven.parchmentmc.org/")
     maven("https://jitpack.io")
     maven("https://ueaj.dev/maven")

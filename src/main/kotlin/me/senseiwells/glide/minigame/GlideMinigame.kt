@@ -7,6 +7,9 @@ import me.senseiwells.glide.checkpoint.CheckpointManager
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
+import me.senseiwells.glide.gui.SidebarScoreElement
+import me.senseiwells.glide.gui.SidebarTimerElement
+import me.senseiwells.glide.gui.SidebarVelocityElement
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
@@ -96,44 +99,12 @@ class GlideMinigame(
 
         this.addResources(MinigameResources.of(GlideMod.resourcePackInfo))
 
-        // TODO: Clean this up
-        this.sidebar.addRow { _ ->
-            val elapsed = this.ticks.Ticks
-            val secondsHandIndex = (elapsed.seconds / 10) % 11
-            val minutesHandIndex = (elapsed.minutes / 5) % 11
-            val stopwatch = Component.empty()
-                .append(GlideFont.Timer.TIMER)
-                .append(ComponentUtils.space(-16))
-                .append(GlideFont.Timer.getSecondsHand(secondsHandIndex))
-                .append(ComponentUtils.space(-16))
-                .append(GlideFont.Timer.getMinutesHand(minutesHandIndex))
-            SidebarComponent.withCustomScore(
-                elapsed.format().literal(),
-                Component.empty().append(stopwatch).append(ComponentUtils.space(5))
-            )
-        }
+        this.sidebar.addRow(SidebarTimerElement { this.ticks.Ticks })
         this.sidebar.addRow(SidebarElements.empty())
-        this.sidebar.addRow { player ->
-            val mps = player.deltaMovement.length() * 20
-            // See https://www.desmos.com/calculator/6bhuudkjpm
-            val needleIndex = Mth.clamp(Mth.floor(0.24 * mps - 0.5), 0, 11)
-            val speedometer = Component.empty()
-                .append(GlideFont.Speedometer.SPEEDOMETER)
-                .append(ComponentUtils.space(-17))
-                .append(GlideFont.Speedometer.getNeedle(needleIndex))
-            SidebarComponent.withCustomScore(
-                "%.2f m/s".format(mps).literal(),
-                Component.empty().append(speedometer).append(ComponentUtils.space(4))
-            )
-        }
+        this.sidebar.addRow(SidebarVelocityElement)
         if (this.mode == GlideMode.ScoreAttack) {
             this.sidebar.addRow(SidebarElements.empty())
-            this.sidebar.addRow { player ->
-                SidebarComponent.withCustomScore(
-                    Component.literal(player.glide.score.toString()),
-                    Component.empty().append(player.glide.scoreIcon).append(ComponentUtils.space(6))
-                )
-            }
+            this.sidebar.addRow(SidebarScoreElement)
         }
         this.sidebar.addRow(SidebarElements.empty())
         this.ui.setSidebar(this.sidebar)

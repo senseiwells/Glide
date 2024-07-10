@@ -1,7 +1,9 @@
 package me.senseiwells.glide.minigame
 
+import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.utils.MinigameUtils.countdown
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TimeUtils.Seconds
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
@@ -16,6 +18,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
             for (player in minigame.players) {
                 player.isNoGravity = false
+                player.sendSound(GlideSounds.MUSIC_MAP_1)
             }
         }
     },
