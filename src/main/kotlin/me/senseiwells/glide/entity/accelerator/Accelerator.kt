@@ -41,7 +41,7 @@ abstract class Accelerator(
     var targetVelocity: Double = 1.5
 
     init {
-        this.setDisplaySize(size.toVector3f())
+        this.setDisplaySize(size.scale(0.95).toVector3f())
         this.boundingBox = this.makeBoundingBox()
     }
 
