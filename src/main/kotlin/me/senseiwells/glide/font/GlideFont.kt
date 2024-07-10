@@ -18,13 +18,14 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val EMPTY_HEART by bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
 
     object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-
         private val BG_1 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
         private val BG_2 by bitmap(at("progressbar/progressbar_2.png"), 5 + SHIFT, 10)
         val CHECKPOINT by bitmap(at("progressbar/checkpoint_icon.png"), 7 + SHIFT, 14)
 
         val BACKGROUND: MutableComponent
             get() = Component.empty().append(BG_1).append(ComponentUtils.space(-1)).append(BG_2)
+
+        val CURRENT by bitmap(at("progressbar/player_marker/current.png"), 4 + SHIFT, 7)
 
         init {
             for (i in 1..16) {

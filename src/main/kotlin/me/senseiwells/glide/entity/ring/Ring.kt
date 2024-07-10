@@ -101,7 +101,7 @@ class Ring(
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (player.glide.collideWithRing(this)) {
             player.glide.score += this.getRingType().points
-            player.sendSound(this.getRingType().getSound(player.glide.combo))
+            player.sendSound(this.getRingType().getSound(player.glide.combo), static = true)
 
             val builder = VirtualFireworkBuilder()
             builder.duration(0.Ticks)

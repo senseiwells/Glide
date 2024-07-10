@@ -152,7 +152,7 @@ class RespawnCheckpoint(
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (player.glide.collideWithCheckpoint(this)) {
-            player.sendSound(GlideSounds.CHECKPOINT)
+            player.sendSound(GlideSounds.CHECKPOINT, static = true)
             glide.displayCheckpointNotificationTo(player)
             player.glide.collideWithRespawnCheckpoint(this, this.spawn.get(glide.level))
         }

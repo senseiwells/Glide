@@ -11,6 +11,22 @@
     "replace": true,
     "sounds": []
   },
+  "entity.firework_rocket.twinkle": {
+    "replace": true,
+    "sounds": []
+  },
+  "entity.firework_rocket.twinkle_far": {
+    "replace": true,
+    "sounds": []
+  },
+  "entity.firework_rocket.large_blast": {
+    "replace": true,
+    "sounds": []
+  },
+  "entity.firework_rocket.large_blast_far": {
+    "replace": true,
+    "sounds": []
+  },
   "music.creative": {
     "replace": true,
     "sounds": []

@@ -66,7 +66,7 @@ class CheckpointManager(
     }
 
     private fun createProgressBar(): Component {
-        val progressBar = GlideFont.Progressbar.BACKGROUND.append(ComponentUtils.space(-300))
+        val progressBar = GlideFont.Progressbar.BACKGROUND.append(ComponentUtils.space(-306))
         var lastOffset = 0
         for (checkpoint in this.all()) {
             if (!checkpoint.shouldMarkOnProgressBar) {
@@ -80,7 +80,7 @@ class CheckpointManager(
             progressBar.append(GlideFont.Progressbar.CHECKPOINT)
             lastOffset = offset + 5
         }
-        progressBar.append(ComponentUtils.space(300 - lastOffset))
+        progressBar.append(ComponentUtils.space(306 - lastOffset))
         return progressBar.shadowless()
     }
 
