@@ -77,7 +77,7 @@ open class DynamicThermal(
     }
 
     override fun getSound(): Sound {
-        return Sound(GlideSounds.THERMAL_BOOST)
+        return Sound(GlideSounds.THERMAL)
     }
 
     override fun getModelScale(): Vector3f {

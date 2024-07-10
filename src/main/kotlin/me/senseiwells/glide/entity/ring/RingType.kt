@@ -2,30 +2,77 @@ package me.senseiwells.glide.entity.ring
 
 import me.senseiwells.glide.font.GlideFont.Score
 import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.sound.GlideSounds
 import net.minecraft.network.chat.Component
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.item.ItemStack
 
 enum class RingType(
     val points: Int,
     val color: Int,
-    val icon: Component,
-    private val fade: (Int) -> Component,
-    private val model: () -> ItemStack
+    val icon: Component
 ) {
-    Blue(7, 0x63CECA, Score.BLUE, Score::getBlueFade, GlideItem::BLUE_RING),
-    Yellow(5, 0xDFBA25, Score.YELLOW, Score::getYellowFade, GlideItem::YELLOW_RING),
-    Green(3, 0x49D671, Score.GREEN, Score::getGreenFade, GlideItem::GREEN_RING),
-    Grey(0, 0x000000, Score.GREY, Score::getGreyFade, ItemStack::EMPTY);
+    Blue(7, 0x63CECA, Score.BLUE) {
+        override fun getModel(): ItemStack {
+            return GlideItem.BLUE_RING
+        }
+
+        override fun getFade(delta: Int): Component {
+            return Score.getBlueFade(delta)
+        }
+
+        override fun getSound(combo: Int): SoundEvent {
+            return GlideSounds.RING_BLUE
+        }
+    },
+    Yellow(5, 0xDFBA25, Score.YELLOW) {
+        override fun getModel(): ItemStack {
+            return GlideItem.YELLOW_RING
+        }
+
+        override fun getFade(delta: Int): Component {
+            return Score.getYellowFade(delta)
+        }
+
+        override fun getSound(combo: Int): SoundEvent {
+            return if (combo % 2 == 0) GlideSounds.RING_YELLOW_1 else GlideSounds.RING_YELLOW_2
+        }
+    },
+    Green(3, 0x49D671, Score.GREEN) {
+        override fun getModel(): ItemStack {
+            return GlideItem.GREEN_RING
+        }
+
+        override fun getFade(delta: Int): Component {
+            return Score.getGreenFade(delta)
+        }
+
+        override fun getSound(combo: Int): SoundEvent {
+            return if (combo % 2 == 0) GlideSounds.RING_GREEN_1 else GlideSounds.RING_GREEN_2
+        }
+    },
+    Grey(0, 0x000000, Score.GREY) {
+        override fun getModel(): ItemStack {
+            return ItemStack.EMPTY
+        }
+
+        override fun getFade(delta: Int): Component {
+            return Score.getGreyFade(delta)
+        }
+
+        override fun getSound(combo: Int): SoundEvent {
+            return SoundEvents.EMPTY
+        }
+    };
+
+    abstract fun getModel(): ItemStack
+
+    abstract fun getFade(delta: Int): Component
+
+    abstract fun getSound(combo: Int): SoundEvent
 
     fun getSize(): Int {
         return this.points + 2
-    }
-
-    fun getIconFade(ticks: Int): Component {
-        return this.fade.invoke(ticks)
-    }
-
-    fun getItemModel(): ItemStack {
-        return this.model.invoke()
     }
 }
