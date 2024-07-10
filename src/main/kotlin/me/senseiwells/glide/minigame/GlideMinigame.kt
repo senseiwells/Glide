@@ -43,7 +43,6 @@ import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
 import net.casual.arcade.utils.PlayerUtils.teleportTo
-import net.casual.arcade.utils.ResourcePackUtils.afterPacksLoad
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.minecraft.core.component.DataComponents
@@ -75,7 +74,7 @@ class GlideMinigame(
 ): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
 
-    private val checkpointBossbar = SuppliedBossBar()
+    private val checkpointBossbar = SuppliedBossBar(ComponentElements.of("Checkpoint!".literal()))
     private val startPos = this.config.spawn.get(this.level)
 
     private val sidebar = ArcadeSidebar(ComponentElements.empty())
@@ -85,10 +84,6 @@ class GlideMinigame(
 
     val checkpoints: CheckpointManager
         get() = this.config.checkpoints
-
-    init {
-        this.checkpointBossbar.setTitle(ComponentElements.of("Checkpoint!".literal()))
-    }
 
     override fun getPhases(): Collection<Phase<GlideMinigame>> {
         return GlidePhase.entries
@@ -145,7 +140,7 @@ class GlideMinigame(
 
     fun markPlayerFinished(player: ServerPlayer) {
         this.players.setSpectating(player)
-        player.sendSound(GlideSounds.FINISH_NO_PODIUM)
+        player.sendSound(GlideSounds.FINISH_1ST, static = true)
         player.sendSystemMessage("Finished! :)".literal())
     }
 
@@ -155,7 +150,6 @@ class GlideMinigame(
 
         val glide = player.glide
         glide.tick(this)
-        this.sendProgress(player)
 
         if (player.verticalCollision) {
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
@@ -192,7 +186,6 @@ class GlideMinigame(
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         this.effects.freeze(player)
 
-        // Make sure we remove this bossbar first!
         this.checkpointBossbar.removePlayer(player)
         this.sidebar.removePlayer(player)
 
@@ -217,6 +210,14 @@ class GlideMinigame(
         }
 
         this.tickProgress()
+        for ((i, player) in this.players.playing.withIndex()) {
+            if (!player.isSpectator) {
+                this.sendProgress(player, i)
+            }
+        }
+        for (player in this.players.spectating) {
+            player.sendSystemMessage(this.progressBar, true)
+        }
     }
 
     @Listener
@@ -271,8 +272,14 @@ class GlideMinigame(
         }
     }
 
-    private fun sendProgress(player: ServerPlayer) {
+    private fun sendProgress(player: ServerPlayer, index: Int) {
         val progressBar = Component.empty().append(this.progressBar)
+
+        val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300) - 1
+        progressBar.append(ComponentUtils.space(offset - 309))
+        progressBar.append(GlideFont.Progressbar.CURRENT.shadowless())
+        progressBar.append(ComponentUtils.space(309 - (offset + 6)))
+
         progressBar.append(ComponentUtils.space(-163)).append(ComponentUtils.space(-1, 2))
 
         val fullHearts = Mth.floor(player.health / 2.0)
@@ -293,15 +300,13 @@ class GlideMinigame(
             }
         }
 
-        player.afterPacksLoad {  }
-
         progressBar.append(ComponentUtils.space(138))
         player.sendSystemMessage(progressBar, true)
     }
 
     private fun tickProgress() {
         val progressBar = Component.empty().append(this.checkpoints.progressBar)
-        var lastOffset = 300
+        var lastOffset = 309
         for ((i, player) in this.players.playing.withIndex()) {
             val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
 
@@ -310,7 +315,7 @@ class GlideMinigame(
             lastOffset = offset + 6
         }
 
-        progressBar.append(ComponentUtils.space(300 - lastOffset))
+        progressBar.append(ComponentUtils.space(309 - lastOffset))
         this.progressBar = progressBar
     }
 
