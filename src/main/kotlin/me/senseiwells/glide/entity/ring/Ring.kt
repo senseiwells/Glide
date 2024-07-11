@@ -6,12 +6,15 @@ import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
+import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import net.casual.arcade.entity.firework.VirtualFireworkBuilder
 import net.casual.arcade.utils.PlayerUtils.location
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.impl.Sound
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
@@ -111,6 +114,7 @@ class Ring(
                 twinkle()
             }
             builder.build().sendTo(player)
+            player.sendSound(this.getSound(this.getRingType()))
         }
     }
 
@@ -136,5 +140,25 @@ class Ring(
 
     companion object {
         private val TYPE: EntityDataAccessor<Byte> = SynchedEntityData.defineId(Ring::class.java, EntityDataSerializers.BYTE)
+    }
+
+    fun getSound(type: RingType): Sound {
+        if (type == RingType.Blue) {
+            return Sound(GlideSounds.BLUERING)
+        } else if (type == RingType.Yellow) {
+            val sound = (0..1).random()
+            if (sound == 0) {
+                return Sound(GlideSounds.YELLOWRING1)
+            } else {
+                return Sound(GlideSounds.YELLOWRING2)
+            }
+        } else {
+            val sound = (0..1).random()
+            if (sound == 0) {
+                return Sound(GlideSounds.GREENRING1)
+            } else {
+                return Sound(GlideSounds.GREENRING2)
+            }
+        }
     }
 }

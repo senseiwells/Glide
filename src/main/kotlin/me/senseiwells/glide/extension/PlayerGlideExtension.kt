@@ -13,11 +13,13 @@ import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
+import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.PlayerUtils.getExtension
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TagUtils.getLocation
 import net.casual.arcade.utils.TagUtils.getVec3
 import net.casual.arcade.utils.TagUtils.putLocation
@@ -156,6 +158,8 @@ class PlayerGlideExtension(
         this.ringTypes.add(recent)
         this.addRingType(this.lastSavedRingType)
         this.ringTypeTicks = 0
+
+        player.sendSound(GlideSounds.RESPAWN)
     }
 
     fun reset() {
