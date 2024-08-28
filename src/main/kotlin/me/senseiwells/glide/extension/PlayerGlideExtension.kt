@@ -3,6 +3,7 @@ package me.senseiwells.glide.extension
 import com.google.common.collect.Iterables
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.FinishLine
@@ -14,10 +15,7 @@ import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
-import me.senseiwells.glide.tracker.GlidePersonalBest
-import me.senseiwells.glide.tracker.GlideScorePersonalBest
-import me.senseiwells.glide.tracker.GlideTimePersonalBest
-import me.senseiwells.glide.tracker.GlideTrail
+import me.senseiwells.glide.tracker.*
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
@@ -29,20 +27,28 @@ import net.casual.arcade.utils.TagUtils.getLocation
 import net.casual.arcade.utils.TagUtils.getVec3
 import net.casual.arcade.utils.TagUtils.putLocation
 import net.casual.arcade.utils.TagUtils.putVec3
-import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.location.Location
+import net.minecraft.Util
 import net.minecraft.nbt.*
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
+import net.minecraft.world.level.storage.LevelResource
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
+import java.io.IOException
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.isRegularFile
 
 class PlayerGlideExtension(
     player: ServerPlayer
 ): PlayerExtension(player), DataExtension {
+    private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
+
     private val accelerators = Object2ObjectOpenHashMap<Accelerator, MutableInt>()
 
     private var oldPosition: Vec3? = null
@@ -66,15 +72,14 @@ class PlayerGlideExtension(
     var score = 0
     var progress = 0.0
 
-    var bestScore = GlideScorePersonalBest.DEFAULT
-        private set
-    var bestTime = GlideTimePersonalBest.DEFAULT
-        private set
-
     var liftForceModifier = 1.0
         private set
 
     var respawnLocation = Location.of()
+
+    init {
+        this.deserializeAdditionalData()
+    }
 
     fun collideWithAccelerator(accelerator: Accelerator): Boolean {
         if (!this.accelerators.containsKey(accelerator)) {
@@ -123,22 +128,47 @@ class PlayerGlideExtension(
         }
     }
 
-    fun getBestFor(mode: GlideMode): GlidePersonalBest {
+    fun getBestFor(id: ResourceLocation, mode: GlideMode): GlidePersonalBest {
+        val bests = this.personalBests[id] ?: return GlideTimePersonalBest.DEFAULT
         return when (mode) {
-            GlideMode.ScoreAttack -> this.bestScore
-            GlideMode.TimeAttack -> this.bestTime
+            GlideMode.ScoreAttack -> bests.score
+            GlideMode.TimeAttack -> bests.time
         }
     }
 
-    fun checkForBest(mode: GlideMode, time: MinecraftTimeDuration, trails: List<GlideTrail>) {
-        when (mode) {
-            GlideMode.ScoreAttack -> if (this.score > this.bestScore.score) {
-                this.bestScore = GlideScorePersonalBest(this.score, trails)
+    fun checkForBest(
+        id: ResourceLocation,
+        mode: GlideMode,
+        time: MinecraftTimeDuration,
+        trails: List<GlideTrail>
+    ): Boolean {
+        val bests = this.personalBests[id]
+        if (bests == null) {
+            this.personalBests[id] = when (mode) {
+                GlideMode.ScoreAttack -> GlidePersonalBests(
+                    id, GlideTimePersonalBest.DEFAULT, GlideScorePersonalBest(this.score, trails)
+                )
+                GlideMode.TimeAttack -> GlidePersonalBests(
+                    id, GlideTimePersonalBest(time, trails), GlideScorePersonalBest.DEFAULT
+                )
             }
-            GlideMode.TimeAttack -> if (time < this.bestTime.time) {
-                this.bestTime = GlideTimePersonalBest(time, trails)
+            this.serializeAdditionalData()
+            return true
+        }
+
+        when (mode) {
+            GlideMode.ScoreAttack -> if (this.score > bests.score.score) {
+                this.personalBests[id] = bests.copy(score = GlideScorePersonalBest(this.score, trails))
+                this.serializeAdditionalData()
+                return true
+            }
+            GlideMode.TimeAttack -> if (time < bests.time.time) {
+                this.personalBests[id] = bests.copy(time = GlideTimePersonalBest(time, trails))
+                this.serializeAdditionalData()
+                return true
             }
         }
+        return false
     }
 
     fun tick(minigame: GlideMinigame) {
@@ -201,49 +231,6 @@ class PlayerGlideExtension(
         this.lastSavedRings.clear()
         this.lastSavedRingType = RingType.Grey
         this.respawn()
-    }
-
-    override fun getName(): String {
-        return "glide_extension"
-    }
-
-    override fun deserialize(element: Tag) {
-        element as CompoundTag
-        this.finished = element.getBoolean("finished")
-        this.lastRespawnCheckpointIndex = element.getInt("last_respawn_checkpoint_index")
-        this.lastCheckpointIndex = element.getInt("last_checkpoint_index")
-        this.lastCrossedCheckpoint = CheckpointData(
-            element.getInt("last_crossed_checkpoint_index"),
-            element.getVec3("last_crossed_checkpoint_position")
-        )
-        this.ringTypes.addAll(element.getIntArray("ring_types").map { RingType.entries[it] })
-        this.lastSavedRingType = RingType.entries[element.getInt("last_saved_ring_type")]
-        this.rings.addAll(element.getList("rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
-        this.lastSavedRings.addAll(element.getList("last_saved_rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
-        this.score = element.getInt("score")
-        this.lastSavedScore = element.getInt("last_saved_score")
-        this.respawnLocation = element.getLocation("respawn_location", this.player.server)
-    }
-
-    override fun serialize(): CompoundTag? {
-        if (this.player.getMinigame() !is GlideMinigame) {
-            return null
-        }
-
-        val tag = CompoundTag()
-        tag.putBoolean("finished", this.finished)
-        tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
-        tag.putInt("last_checkpoint_index", this.lastCheckpointIndex)
-        tag.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
-        tag.putVec3("last_crossed_checkpoint_position", this.lastCrossedCheckpoint.position)
-        tag.put("ring_types", IntArrayTag(this.ringTypes.map { it.ordinal }.toIntArray()))
-        tag.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
-        tag.put("rings", this.rings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
-        tag.put("last_saved_rings", this.lastSavedRings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
-        tag.putInt("score", this.score)
-        tag.putInt("last_saved_score", this.lastSavedScore)
-        tag.putLocation("respawn_location", this.respawnLocation)
-        return tag
     }
 
     private fun addRingType(type: RingType) {
@@ -343,6 +330,95 @@ class PlayerGlideExtension(
             }
         }
         return false
+    }
+
+    override fun getName(): String {
+        return "glide_extension"
+    }
+
+    override fun deserialize(element: Tag) {
+        element as CompoundTag
+        this.finished = element.getBoolean("finished")
+        this.lastRespawnCheckpointIndex = element.getInt("last_respawn_checkpoint_index")
+        this.lastCheckpointIndex = element.getInt("last_checkpoint_index")
+        this.lastCrossedCheckpoint = CheckpointData(
+            element.getInt("last_crossed_checkpoint_index"),
+            element.getVec3("last_crossed_checkpoint_position")
+        )
+        this.ringTypes.addAll(element.getIntArray("ring_types").map { RingType.entries[it] })
+        this.lastSavedRingType = RingType.entries[element.getInt("last_saved_ring_type")]
+        this.rings.addAll(element.getList("rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
+        this.lastSavedRings.addAll(element.getList("last_saved_rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
+        this.score = element.getInt("score")
+        this.lastSavedScore = element.getInt("last_saved_score")
+        this.respawnLocation = element.getLocation("respawn_location", this.player.server)
+    }
+
+    override fun serialize(): CompoundTag? {
+        if (this.player.getMinigame() !is GlideMinigame) {
+            return null
+        }
+
+        val tag = CompoundTag()
+        tag.putBoolean("finished", this.finished)
+        tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
+        tag.putInt("last_checkpoint_index", this.lastCheckpointIndex)
+        tag.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
+        tag.putVec3("last_crossed_checkpoint_position", this.lastCrossedCheckpoint.position)
+        tag.put("ring_types", IntArrayTag(this.ringTypes.map { it.ordinal }.toIntArray()))
+        tag.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
+        tag.put("rings", this.rings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
+        tag.put("last_saved_rings", this.lastSavedRings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
+        tag.putInt("score", this.score)
+        tag.putInt("last_saved_score", this.lastSavedScore)
+        tag.putLocation("respawn_location", this.respawnLocation)
+        return tag
+    }
+
+    // Additional data that may be large,
+    // we don't want to store it in player data
+
+    private fun deserializeAdditionalData() {
+        val path = this.getAdditionalDataPath()
+        if (!path.isRegularFile()) {
+            return
+        }
+        try {
+            val tag = NbtIo.read(path) ?: return
+            val encoded = tag.getList("personal_bests", Tag.TAG_COMPOUND.toInt())
+            val result = GlidePersonalBests.CODEC.listOf().parse(NbtOps.INSTANCE, encoded).result()
+            if (result.isPresent) {
+                for (best in result.get()) {
+                    this.personalBests[best.map] = best
+                }
+            }
+        } catch (e: IOException) {
+            GlideMod.logger.warn("Failed to read additional data for ${this.player.scoreboardName}", e)
+        }
+    }
+
+    private fun serializeAdditionalData() {
+        val path = this.getAdditionalDataPath()
+        path.createParentDirectories()
+
+        val tag = CompoundTag()
+        val bests = this.personalBests.values.toList()
+        val result = GlidePersonalBests.CODEC.listOf().encodeStart(NbtOps.INSTANCE, bests).result()
+        if (result.isPresent) {
+            tag.put("personal_bests", result.get())
+        }
+        Util.ioPool().execute {
+            try {
+                NbtIo.write(tag, path)
+            } catch (e: IOException) {
+                GlideMod.logger.warn("Failed to write additional data for ${this.player.score}", e)
+            }
+        }
+    }
+
+    private fun getAdditionalDataPath(): Path {
+        val root = this.player.server.getWorldPath(LevelResource.ROOT)
+        return root.resolve("glide").resolve(this.player.stringUUID + ".nbt")
     }
 
     companion object {
