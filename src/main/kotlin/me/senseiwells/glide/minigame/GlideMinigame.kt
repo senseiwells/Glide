@@ -11,6 +11,8 @@ import me.senseiwells.glide.gui.SidebarScoreElement
 import me.senseiwells.glide.gui.SidebarTimerElement
 import me.senseiwells.glide.gui.SidebarVelocityElement
 import me.senseiwells.glide.sound.GlideSounds
+import me.senseiwells.glide.tracker.GlideTrail
+import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
@@ -34,7 +36,7 @@ import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.GameRuleUtils.set
-import net.casual.arcade.utils.JsonUtils.string
+import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
@@ -64,6 +66,8 @@ import net.minecraft.world.level.storage.LevelResource
 import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.min
 
 class GlideMinigame(
@@ -79,6 +83,8 @@ class GlideMinigame(
 
     private val sidebar = ArcadeSidebar(ComponentElements.empty())
     private var progressBar: Component = Component.empty()
+
+    private val trackers = HashMap<UUID, GlideTrailTracker>()
 
     private var ticks = 0
 
@@ -146,6 +152,11 @@ class GlideMinigame(
         this.players.setSpectating(player)
         player.sendSound(GlideSounds.FINISH_1ST, static = true)
         player.sendSystemMessage("Finished! :)".literal())
+
+        val tracker = this.trackers.remove(player.uuid)
+        if (tracker != null) {
+            player.glide.checkForBest(this.mode, this.ticks.Ticks, tracker.finish())
+        }
     }
 
     @Listener(flags = ListenerFlags.IS_PLAYING)
@@ -157,6 +168,11 @@ class GlideMinigame(
 
         if (player.verticalCollision) {
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
+        }
+
+        val tracker = this.trackers[player.uuid] ?: return
+        if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
+            tracker.update(player.position())
         }
     }
 
@@ -204,6 +220,8 @@ class GlideMinigame(
             this.effects.unfreeze(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
+            player.sendSound(GlideSounds.RESPAWN)
+            this.trackers[player.uuid]?.restart(this.ticks.Ticks)
         }
     }
 
@@ -244,6 +262,15 @@ class GlideMinigame(
         if (this.phase < GlidePhase.Active) {
             player.isNoGravity = true
         }
+
+        val best = player.glide.getBestFor(this.mode)
+        if (best.display()) {
+            for (display in best.trails.flatMap(GlideTrail::createDisplays)) {
+                display.startWatching(player, player.connection::send)
+            }
+        }
+
+        this.trackers[player.uuid] = GlideTrailTracker(this.ticks.Ticks)
 
         this.start()
     }
@@ -327,11 +354,8 @@ class GlideMinigame(
         val ID = GlideMod.id("glide_minigame")
 
         override fun create(context: MinigameCreationContext): Minigame<*> {
-            val id = if (context.hasCustomData()) {
-                ResourceLocation.parse(context.getCustomData().string("id"))
-            } else {
-                GlideMod.id("temple")
-            }
+            val rawId = context.parameters.stringOrNull("id")
+            val id = if (rawId == null) GlideMod.id("temple") else ResourceLocation.parse(rawId)
             val addon = GlideAddons.get(id) ?: throw IllegalArgumentException()
             val handle = Fantasy.get(context.server).openTemporaryWorld(
                 RuntimeWorldConfig()

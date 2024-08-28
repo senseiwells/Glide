@@ -13,15 +13,23 @@ import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
+import me.senseiwells.glide.minigame.GlideMode
+import me.senseiwells.glide.tracker.GlidePersonalBest
+import me.senseiwells.glide.tracker.GlideScorePersonalBest
+import me.senseiwells.glide.tracker.GlideTimePersonalBest
+import me.senseiwells.glide.tracker.GlideTrail
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
+import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.utils.MinigameUtils.getMinigame
 import net.casual.arcade.utils.PlayerUtils.getExtension
 import net.casual.arcade.utils.TagUtils.getLocation
 import net.casual.arcade.utils.TagUtils.getVec3
 import net.casual.arcade.utils.TagUtils.putLocation
 import net.casual.arcade.utils.TagUtils.putVec3
+import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.location.Location
 import net.minecraft.nbt.*
 import net.minecraft.network.chat.Component
@@ -57,6 +65,11 @@ class PlayerGlideExtension(
     var scoreIcon: Component = GlideFont.Score.GREY
     var score = 0
     var progress = 0.0
+
+    var bestScore = GlideScorePersonalBest.DEFAULT
+        private set
+    var bestTime = GlideTimePersonalBest.DEFAULT
+        private set
 
     var liftForceModifier = 1.0
         private set
@@ -107,6 +120,24 @@ class PlayerGlideExtension(
     fun setLiftForceModifier(modifier: Double) {
         if (modifier > this.liftForceModifier) {
             this.liftForceModifier = modifier
+        }
+    }
+
+    fun getBestFor(mode: GlideMode): GlidePersonalBest {
+        return when (mode) {
+            GlideMode.ScoreAttack -> this.bestScore
+            GlideMode.TimeAttack -> this.bestTime
+        }
+    }
+
+    fun checkForBest(mode: GlideMode, time: MinecraftTimeDuration, trails: List<GlideTrail>) {
+        when (mode) {
+            GlideMode.ScoreAttack -> if (this.score > this.bestScore.score) {
+                this.bestScore = GlideScorePersonalBest(this.score, trails)
+            }
+            GlideMode.TimeAttack -> if (time < this.bestTime.time) {
+                this.bestTime = GlideTimePersonalBest(time, trails)
+            }
         }
     }
 
@@ -194,7 +225,11 @@ class PlayerGlideExtension(
         this.respawnLocation = element.getLocation("respawn_location", this.player.server)
     }
 
-    override fun serialize(): Tag {
+    override fun serialize(): CompoundTag? {
+        if (this.player.getMinigame() !is GlideMinigame) {
+            return null
+        }
+
         val tag = CompoundTag()
         tag.putBoolean("finished", this.finished)
         tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
