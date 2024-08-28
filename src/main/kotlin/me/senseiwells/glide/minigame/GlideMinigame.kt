@@ -107,9 +107,13 @@ class GlideMinigame(
         this.settings.canLookAroundWhenFrozen = false
         this.settings.tickFreezeOnPause.set(true)
         this.settings.canGetHungry.set(false)
+        this.settings.canPvp.set(false)
         this.setGameRules {
             set(GameRules.RULE_KEEPINVENTORY, true)
             set(GameRules.RULE_NATURAL_REGENERATION, false)
+            set(GameRules.RULE_DOMOBSPAWNING, false)
+            set(GameRules.RULE_RANDOMTICKING, 0)
+            set(GameRules.RULE_DOFIRETICK, false)
         }
 
         for (booster in this.config.boosters) {
