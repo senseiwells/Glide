@@ -1,6 +1,7 @@
 package me.senseiwells.glide.tracker
 
 import net.casual.arcade.scheduler.MinecraftTimeDuration
+import net.casual.arcade.utils.TimeUtils.Ticks
 import net.minecraft.world.phys.Vec3
 
 class GlideTrailTracker(
@@ -15,13 +16,13 @@ class GlideTrailTracker(
     }
 
     fun restart(time: MinecraftTimeDuration) {
-        this.trails.add(GlideTrail(this.start, this.current))
+        this.trails.add(GlideTrail(this.start, this.current, TICK_INTERVAL.Ticks))
         this.current = ArrayList()
         this.start = time
     }
 
     fun finish(): List<GlideTrail> {
-        this.trails.add(GlideTrail(this.start, this.current))
+        this.trails.add(GlideTrail(this.start, this.current, TICK_INTERVAL.Ticks))
         return this.trails
     }
 

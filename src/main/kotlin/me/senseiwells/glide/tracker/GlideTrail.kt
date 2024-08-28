@@ -1,13 +1,11 @@
 package me.senseiwells.glide.tracker
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement
 import me.senseiwells.glide.utils.VecUtils.rotationTowards
 import net.casual.arcade.scheduler.MinecraftTimeDuration
-import net.casual.arcade.utils.TagUtils.getVec3OrNull
-import net.casual.arcade.utils.TagUtils.putVec3
-import net.casual.arcade.utils.TimeUtils.Ticks
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.Brightness
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
@@ -16,7 +14,8 @@ import java.nio.ByteBuffer
 
 class GlideTrail(
     private val start: MinecraftTimeDuration,
-    private val points: List<Vec3>
+    private val points: List<Vec3>,
+    private val interval: MinecraftTimeDuration
 ) {
     fun createDisplays(): List<DisplayElement> {
         if (this.points.isEmpty()) {
@@ -42,41 +41,51 @@ class GlideTrail(
         return elements
     }
 
-    fun serialize(): CompoundTag {
-        val tag = CompoundTag()
-        tag.putInt("StartTime", this.start.ticks)
-        if (this.points.isEmpty()) {
-            return tag
-        }
-
-        val iter = this.points.iterator()
-        var previous = iter.next()
-        tag.putVec3("StartPosition", previous)
-        val buffer = ByteBuffer.allocate((this.points.size - 1) * 3 * Short.SIZE_BYTES)
-        for (current in iter) {
-            val deltaX = current.x - previous.x
-            val deltaY = current.y - previous.y
-            val deltaZ = current.z - previous.z
-
-            buffer.putShort((deltaX * SCALE).toInt().toShort())
-            buffer.putShort((deltaY * SCALE).toInt().toShort())
-            buffer.putShort((deltaZ * SCALE).toInt().toShort())
-            previous = current
-        }
-        tag.putByteArray("PositionDeltas", buffer.array())
-        return tag
-    }
-
     companion object {
         private const val SCALE = 1_000
 
-        fun deserialize(tag: CompoundTag): GlideTrail {
-            val start = tag.getInt("StartTime").Ticks
-            var previous = tag.getVec3OrNull("StartPosition") ?: return GlideTrail(start, listOf())
+        private val POINTS_CODEC = Codec.BYTE_BUFFER.xmap(::deserializePoints, ::serializePoints)
+
+        val CODEC = RecordCodecBuilder.create { instance ->
+            instance.group(
+                MinecraftTimeDuration.CODEC.fieldOf("start_time").forGetter(GlideTrail::start),
+                POINTS_CODEC.fieldOf("points").forGetter(GlideTrail::points),
+                MinecraftTimeDuration.CODEC.fieldOf("interval_time").forGetter(GlideTrail::interval)
+            ).apply(instance, ::GlideTrail)
+        }
+
+        private fun serializePoints(points: List<Vec3>): ByteBuffer {
+            if (points.isEmpty()) {
+                return ByteBuffer.wrap(byteArrayOf())
+            }
+
+            val buffer = ByteBuffer.allocate((points.size - 1) * 3 * Short.SIZE_BYTES + 3 * Double.SIZE_BYTES)
+            val iter = points.iterator()
+            var previous = iter.next()
+            buffer.putDouble(previous.x)
+            buffer.putDouble(previous.y)
+            buffer.putDouble(previous.z)
+            for (current in iter) {
+                val deltaX = current.x - previous.x
+                val deltaY = current.y - previous.y
+                val deltaZ = current.z - previous.z
+
+                buffer.putShort((deltaX * SCALE).toInt().toShort())
+                buffer.putShort((deltaY * SCALE).toInt().toShort())
+                buffer.putShort((deltaZ * SCALE).toInt().toShort())
+                previous = current
+            }
+            return buffer
+        }
+
+        private fun deserializePoints(buffer: ByteBuffer): List<Vec3> {
+            if (!buffer.hasRemaining()) {
+                return listOf()
+            }
 
             val points = ArrayList<Vec3>()
+            var previous = Vec3(buffer.getDouble(), buffer.getDouble(), buffer.getDouble())
             points.add(previous)
-            val buffer = ByteBuffer.wrap(tag.getByteArray("PositionDeltas"))
             while (buffer.hasRemaining()) {
                 val deltaX = buffer.getShort().toDouble() / SCALE
                 val deltaY = buffer.getShort().toDouble() / SCALE
@@ -87,7 +96,7 @@ class GlideTrail(
                 previous = current
             }
 
-            return GlideTrail(start, points)
+            return points
         }
     }
 }
