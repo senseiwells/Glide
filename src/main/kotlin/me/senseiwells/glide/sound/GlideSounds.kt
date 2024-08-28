@@ -15,6 +15,7 @@ object GlideSounds: SoundResources(GlideMod.MOD_ID) {
     val RING_YELLOW_1 = sound(at("glide.ring.yellow.1"))
     val RING_YELLOW_2 = sound(at("glide.ring.yellow.2"))
     val CHECKPOINT = sound(at("glide.checkpoint"))
+    val RESPAWN = sound(at("glide.respawn"))
     val FINISH_1ST = sound(at("glide.finish.1st"))
     val FINISH_2ND = sound(at("glide.finish.2nd"))
     val FINISH_3RD = sound(at("glide.finish.3rd"))
