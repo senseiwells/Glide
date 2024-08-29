@@ -5,6 +5,7 @@ import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.utils.MinigameUtils.countdown
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TimeUtils.Seconds
+import net.minecraft.sounds.SoundSource
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     Countdown("countdown") {
@@ -18,7 +19,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
             for (player in minigame.players) {
                 player.isNoGravity = false
-                player.sendSound(GlideSounds.MUSIC_MAP_1)
+                player.sendSound(GlideSounds.MUSIC_MAP_1, source = SoundSource.MUSIC)
             }
         }
     },

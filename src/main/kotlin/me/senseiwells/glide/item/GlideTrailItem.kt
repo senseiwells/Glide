@@ -1,10 +1,12 @@
 package me.senseiwells.glide.item
 
 import com.mojang.serialization.Codec
-import eu.pb4.polymer.core.api.item.PolymerItem
 import eu.pb4.polymer.core.api.other.PolymerComponent
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.utils.ResourcePackUtils.registerNextModel
+import me.senseiwells.glide.GlideMod.id
+import net.casual.arcade.items.ArcadeModelledItem
+import net.casual.arcade.items.ItemModeller
+import net.casual.arcade.items.ResourcePackItemModeller
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponentType
@@ -18,13 +20,13 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.DyedItemColor
 
-class GlideTrailItem: Item(Properties()), PolymerItem {
-    override fun getPolymerItem(itemStack: ItemStack, player: ServerPlayer?): Item {
+class GlideTrailItem private constructor(): Item(Properties()), ArcadeModelledItem {
+    override fun getPolymerItem(stack: ItemStack, player: ServerPlayer?): Item {
         return Items.LEATHER_HORSE_ARMOR
     }
 
-    override fun getPolymerCustomModelData(itemStack: ItemStack, player: ServerPlayer?): Int {
-        return MODEL_ID
+    override fun getModeller(): ItemModeller {
+        return MODELLER
     }
 
     override fun getPolymerItemStack(
@@ -39,13 +41,15 @@ class GlideTrailItem: Item(Properties()), PolymerItem {
     }
 
     companion object {
-        private val MODEL_ID = GlideMod.resourcePack.getCreator().registerNextModel(
-            Items.LEATHER_HORSE_ARMOR, GlideMod.id("item/trail/tinted")
-        )
+        val MODELLER = ResourcePackItemModeller(GlideTrailItem(), GlideMod.resourcePack.getCreator())
+        val TRAIL by MODELLER.model(id("item/trail/tinted"))
+        val GHOST by MODELLER.model(id("item/trail/ghost"))
+        val RIGHT_WING by MODELLER.model(id("item/trail/ghost_wing_right"))
+        val LEFT_WING by MODELLER.model(id("item/trail/ghost_wing_left"))
 
         val TRAIL_COLOR: DataComponentType<Int> = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
-            GlideMod.id("trail_color"),
+            id("trail_color"),
             DataComponentType.builder<Int>().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT).build()
         )
 
