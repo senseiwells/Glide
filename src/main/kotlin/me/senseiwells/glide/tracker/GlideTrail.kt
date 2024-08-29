@@ -4,22 +4,19 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
-import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
 import me.senseiwells.glide.utils.VecUtils.rotationTowards
 import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.minecraft.util.Brightness
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import java.nio.ByteBuffer
-import kotlin.math.min
 
 class GlideTrail(
-    private val start: MinecraftTimeDuration,
-    private val points: List<Vec3>,
-    private val interval: MinecraftTimeDuration
+    val start: MinecraftTimeDuration,
+    val points: List<Vec3>,
+    val interval: MinecraftTimeDuration
 ) {
     fun createDisplays(): List<DisplayElement> {
         if (this.points.isEmpty()) {
@@ -29,14 +26,17 @@ class GlideTrail(
         val elements = ArrayList<DisplayElement>(this.points.size - 1)
         val iterator = this.points.iterator()
         var previous = iterator.next()
+        var previousColor = 0xFF0000
 
-        var delta = 0.0F
         for (current in iterator) {
-            val stack = ItemStack(GlideItems.GLIDE_TRAIL_ITEM)
-            val color = ColorUtils.blend(0xFF0000, 0xFFFF00, delta)
-            stack.set(GlideTrailItem.TRAIL_COLOR, color)
-
             val length = previous.distanceTo(current) * 1.01
+            val stack = GlideTrailItem.TRAIL
+            val speed = length / this.interval.ticks * 20
+            val color = ColorUtils.blend(0xFF0000, 0xFFFF00, speed.toFloat() / 25.0F)
+            val blended = ColorUtils.blend(previousColor, color, 0.5F)
+            previousColor = blended
+            stack.set(GlideTrailItem.TRAIL_COLOR, blended)
+
             val item = ItemDisplayElement(stack)
             // We use quaternions because we get more precision with them
             item.leftRotation = previous.rotationTowards(current)
@@ -47,13 +47,10 @@ class GlideTrail(
             elements.add(item)
 
             previous = current
-            delta = min(delta + 0.01F, 1.0F)
         }
 
         return elements
     }
-
-
 
     companion object {
         private const val SCALE = 1_000

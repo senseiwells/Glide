@@ -11,22 +11,20 @@ import me.senseiwells.glide.gui.SidebarScoreElement
 import me.senseiwells.glide.gui.SidebarTimerElement
 import me.senseiwells.glide.gui.SidebarVelocityElement
 import me.senseiwells.glide.sound.GlideSounds
-import me.senseiwells.glide.tracker.GlideTrail
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
+import net.casual.arcade.events.minigame.MinigameLoadPlayingEvent
 import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
 import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
-import net.casual.arcade.events.player.PlayerDamageEvent
-import net.casual.arcade.events.player.PlayerPoseEvent
-import net.casual.arcade.events.player.PlayerSlotClickEvent
-import net.casual.arcade.events.player.PlayerTickEvent
+import net.casual.arcade.events.minigame.MinigameSetSpectatingEvent
+import net.casual.arcade.events.player.*
 import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.gui.bossbar.SuppliedBossBar
 import net.casual.arcade.gui.elements.ComponentElements
 import net.casual.arcade.gui.elements.SidebarElements
 import net.casual.arcade.gui.sidebar.ArcadeSidebar
 import net.casual.arcade.minigame.Minigame
-import net.casual.arcade.minigame.MinigameResources
+import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.phase.Phase
@@ -57,7 +55,6 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.Pose
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.Unbreakable
@@ -68,6 +65,7 @@ import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.min
 
 class GlideMinigame(
@@ -98,8 +96,6 @@ class GlideMinigame(
 
     override fun initialize() {
         super.initialize()
-
-        this.addResources(MinigameResources.of(GlideMod.resourcePackInfo))
 
         this.sidebar.addRow(SidebarTimerElement { this.ticks.Ticks })
         this.sidebar.addRow(SidebarElements.empty())
@@ -168,7 +164,7 @@ class GlideMinigame(
         val (player) = event
 
         val glide = player.glide
-        glide.tick(this)
+        glide.tick(this, this.ticks)
 
         if (player.verticalCollision) {
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
@@ -227,14 +223,12 @@ class GlideMinigame(
             this.effects.unfreeze(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
-            player.sendSound(GlideSounds.RESPAWN, static = true)
-            this.trackers[player.uuid]?.restart(this.ticks.Ticks)
         }
     }
 
     @Listener
     private fun onServerTick(event: ServerTickEvent) {
-        if (this.phase == GlidePhase.Active) {
+        if (this.phase == GlidePhase.Active && !this.paused) {
             this.ticks++
         }
 
@@ -266,17 +260,10 @@ class GlideMinigame(
         val player = event.player
 
         player.glide.respawnLocation = this.startPos
-        event.player.glide.reset()
-        this.respawnPlayer(player)
+        player.glide.reset()
+        this.setPlayerPlayingState(player)
         if (this.phase < GlidePhase.Active) {
             player.isNoGravity = true
-        }
-
-        val best = player.glide.getBestFor(this.config.id, this.mode)
-        if (best.display()) {
-            for (display in best.trails.flatMap(GlideTrail::createDisplays)) {
-                display.startWatching(player, player.connection::send)
-            }
         }
 
         this.trackers[player.uuid] = GlideTrailTracker(this.ticks.Ticks)
@@ -284,15 +271,44 @@ class GlideMinigame(
         this.start()
     }
 
+    @Listener
+    private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
+        event.player.glide.showTrailFor(this.config.id, this.mode, this.ticks)
+    }
+
+    @Listener
+    private fun onSetSpectating(event: MinigameSetSpectatingEvent) {
+        event.player.glide.hideTrail()
+    }
+
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
-        if (updated != Pose.FALL_FLYING) {
-            player.kill()
+        // if (updated != Pose.FALL_FLYING) {
+        //     player.kill()
+        // }
+    }
+
+    @Listener(flags = ListenerFlags.IS_PLAYING, during = During(phases = ["active"]))
+    private fun onPlayerSneak(event: PlayerSetSneakingEvent) {
+        val (player, sneaking) = event
+        if (sneaking && !player.isSpectator) {
+            val last = this.stats.getOrCreateStat(player, GlideStats.LAST_SNEAK_TIME)
+            if (abs(this.server.tickCount - last.value) < 7) {
+                this.respawnPlayer(event.player)
+            } else {
+                last.modify { this.server.tickCount }
+            }
         }
     }
 
     private fun respawnPlayer(player: ServerPlayer) {
+        this.setPlayerPlayingState(player)
+        player.sendSound(GlideSounds.RESPAWN, static = true)
+        this.trackers[player.uuid]?.restart(this.ticks.Ticks)
+    }
+
+    private fun setPlayerPlayingState(player: ServerPlayer) {
         player.glide.respawn()
         player.clearTitle()
         player.clearPlayerInventory()

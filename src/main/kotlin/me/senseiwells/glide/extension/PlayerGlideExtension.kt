@@ -1,6 +1,7 @@
 package me.senseiwells.glide.extension
 
 import com.google.common.collect.Iterables
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import me.senseiwells.glide.GlideMod
@@ -15,6 +16,7 @@ import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
+import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
@@ -31,6 +33,7 @@ import net.casual.arcade.utils.location.Location
 import net.minecraft.Util
 import net.minecraft.nbt.*
 import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
@@ -50,6 +53,9 @@ class PlayerGlideExtension(
     private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
 
     private val accelerators = Object2ObjectOpenHashMap<Accelerator, MutableInt>()
+
+    private val trails = IntArrayList()
+    private var ghost: GlideGhost? = null
 
     private var oldPosition: Vec3? = null
 
@@ -128,11 +134,34 @@ class PlayerGlideExtension(
         }
     }
 
-    fun getBestFor(id: ResourceLocation, mode: GlideMode): GlidePersonalBest {
-        val bests = this.personalBests[id] ?: return GlideTimePersonalBest.DEFAULT
-        return when (mode) {
+    fun showTrailFor(id: ResourceLocation, mode: GlideMode, tick: Int) {
+        val bests = this.personalBests[id] ?: return
+        val best = when (mode) {
             GlideMode.ScoreAttack -> bests.score
             GlideMode.TimeAttack -> bests.time
+        }
+        if (!best.display()) {
+            return
+        }
+        for (display in best.trails.flatMap(GlideTrail::createDisplays)) {
+            display.startWatching(this.player, this.player.connection::send)
+            this.trails.add(display.entityId)
+        }
+
+        val ghost = GlideGhost(best.trails)
+        ghost.skip(tick)
+        this.ghost = ghost
+    }
+
+    fun hideTrail() {
+        if (this.trails.isNotEmpty()) {
+            this.player.connection.send(ClientboundRemoveEntitiesPacket(this.trails))
+            this.trails.clear()
+        }
+        val ghost = this.ghost
+        if (ghost != null) {
+            ghost.destroy(this.player)
+            this.ghost = null
         }
     }
 
@@ -171,7 +200,11 @@ class PlayerGlideExtension(
         return false
     }
 
-    fun tick(minigame: GlideMinigame) {
+    fun tick(minigame: GlideMinigame, tick: Int) {
+        if (minigame.isPhase(GlidePhase.Active)) {
+            this.ghost?.tick(this.player, tick)
+        }
+
         this.tickCollisions(minigame)
 
         this.liftForceModifier = 1.0
@@ -231,6 +264,7 @@ class PlayerGlideExtension(
         this.lastSavedRings.clear()
         this.lastSavedRingType = RingType.Grey
         this.respawn()
+        this.hideTrail()
     }
 
     private fun addRingType(type: RingType) {
