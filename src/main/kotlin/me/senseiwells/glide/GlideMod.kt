@@ -7,7 +7,6 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
-import me.senseiwells.glide.tracker.GlideTrail
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
 import net.casual.arcade.events.player.PlayerJoinEvent
@@ -19,7 +18,6 @@ import net.casual.arcade.resources.PackInfo
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
 import net.casual.arcade.resources.hosting.DirectoryPackSupplier
 import net.casual.arcade.resources.hosting.PackHost
-import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.ResourcePackUtils.addFont
 import net.casual.arcade.utils.ResourcePackUtils.addSounds
@@ -27,7 +25,6 @@ import net.casual.arcade.utils.ResourcePackUtils.sendResourcePack
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.phys.Vec3
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 

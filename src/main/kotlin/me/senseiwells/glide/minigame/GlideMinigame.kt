@@ -174,9 +174,11 @@ class GlideMinigame(
             player.hurt(player.damageSources().flyIntoWall(), 2.0F)
         }
 
-        val tracker = this.trackers[player.uuid] ?: return
-        if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
-            tracker.update(player.position())
+        if (this.phase == GlidePhase.Active) {
+            val tracker = this.trackers[player.uuid] ?: return
+            if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
+                tracker.update(player.position())
+            }
         }
     }
 
