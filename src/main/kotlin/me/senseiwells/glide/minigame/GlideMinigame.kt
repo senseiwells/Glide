@@ -55,6 +55,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.Unbreakable
@@ -284,9 +285,9 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
-        // if (updated != Pose.FALL_FLYING) {
-        //     player.kill()
-        // }
+        if (updated != Pose.FALL_FLYING) {
+            player.kill()
+        }
     }
 
     @Listener(flags = ListenerFlags.IS_PLAYING, during = During(phases = ["active"]))
