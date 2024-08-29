@@ -2,15 +2,19 @@ package me.senseiwells.glide.tracker
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
+import me.senseiwells.glide.item.GlideItems
+import me.senseiwells.glide.item.GlideTrailItem
+import me.senseiwells.glide.utils.ColorUtils
 import me.senseiwells.glide.utils.VecUtils.rotationTowards
 import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.minecraft.util.Brightness
-import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import java.nio.ByteBuffer
+import kotlin.math.min
 
 class GlideTrail(
     private val start: MinecraftTimeDuration,
@@ -23,23 +27,33 @@ class GlideTrail(
         }
 
         val elements = ArrayList<DisplayElement>(this.points.size - 1)
-        val yellow = Blocks.YELLOW_STAINED_GLASS.defaultBlockState()
         val iterator = this.points.iterator()
         var previous = iterator.next()
+
+        var delta = 0.0F
         for (current in iterator) {
+            val stack = ItemStack(GlideItems.GLIDE_TRAIL_ITEM)
+            val color = ColorUtils.blend(0xFF0000, 0xFFFF00, delta)
+            stack.set(GlideTrailItem.TRAIL_COLOR, color)
+
             val length = previous.distanceTo(current) * 1.01
-            val element = BlockDisplayElement(yellow)
+            val item = ItemDisplayElement(stack)
             // We use quaternions because we get more precision with them
-            element.leftRotation = previous.rotationTowards(current)
-            element.overridePos = previous
-            element.scale = Vector3f(0.3F, 0.1F, length.toFloat())
-            element.brightness = Brightness.FULL_BRIGHT
-            elements.add(element)
+            item.leftRotation = previous.rotationTowards(current)
+            item.overridePos = previous
+            item.scale = Vector3f(0.3F, 0.1F, length.toFloat())
+            item.translation = current.subtract(previous).scale(0.5).toVector3f()
+            item.brightness = Brightness.FULL_BRIGHT
+            elements.add(item)
 
             previous = current
+            delta = min(delta + 0.01F, 1.0F)
         }
+
         return elements
     }
+
+
 
     companion object {
         private const val SCALE = 1_000
