@@ -34,7 +34,7 @@ class GlideAddon(
                 }
 
                 val addonHeader = zip.getFileHeader("addon.json")
-                    ?: throw IllegalArgumentException("lemaddon didn't contain temple_addon.json")
+                    ?: throw IllegalArgumentException("lemaddon didn't contain addon.json")
                 val config = zip.getInputStream(addonHeader).use {
                     JsonUtils.decodeWith(GlideAddonConfig.CODEC, it).partialOrThrow
                 }

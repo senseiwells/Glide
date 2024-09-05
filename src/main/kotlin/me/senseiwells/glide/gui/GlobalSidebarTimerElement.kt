@@ -10,7 +10,7 @@ import net.casual.arcade.utils.TimeUtils.format
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 
-class SidebarTimerElement(
+class GlobalSidebarTimerElement(
     private val time: () -> MinecraftTimeDuration
 ): UniversalElement<SidebarComponent> {
     override fun get(server: MinecraftServer): SidebarComponent {

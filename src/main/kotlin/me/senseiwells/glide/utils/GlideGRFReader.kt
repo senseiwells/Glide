@@ -2,9 +2,11 @@ package me.senseiwells.glide.utils
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import me.senseiwells.glide.GlideMod.id
+import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddonConfig
-import me.senseiwells.glide.addon.serialization.*
+import me.senseiwells.glide.addon.serialization.BoosterTemplate
+import me.senseiwells.glide.addon.serialization.RingTemplate
+import me.senseiwells.glide.addon.serialization.ThermalTemplate
 import me.senseiwells.glide.checkpoint.*
 import me.senseiwells.glide.entity.ring.RingType
 import net.casual.arcade.utils.JsonUtils
@@ -25,7 +27,6 @@ import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
 import java.nio.file.Path
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.io.path.reader
 import kotlin.io.path.writer
 
@@ -94,7 +95,12 @@ class GlideGRFConverter(
         @Suppress("DEPRECATION")
         fun convertSingle(id: ResourceLocation, input: Path, output: Path) {
             val converter = GlideGRFConverter(id)
-            GlideGRFReader.read(input, converter)
+            try {
+                GlideGRFReader.read(input, converter)
+            } catch (e: Exception) {
+                GlideMod.logger.error("Failed to convert GRF file $input", e)
+                return
+            }
             val addon = converter.convert()
             output.writer().use {
                 JsonUtils.encodeWith(GlideAddonConfig.CODEC, addon, it)
@@ -134,9 +140,9 @@ object GlideGRFReader {
     }
 
     private fun parseRing(parameters: JsonObject, visitor: GlideGRFVisitor) {
-        val x = parameters.string("x").toInt()
-        val y = parameters.string("y").toInt()
-        val z = parameters.string("z").toInt()
+        val x = parameters.string("x").trim().toInt()
+        val y = parameters.string("y").trim().toInt()
+        val z = parameters.string("z").trim().toInt()
         val axis = Axis.byName(parameters.string("orientation"))
             ?: throw IllegalArgumentException("Unknown orientation")
         val ringType = when (parameters.string("size")) {
@@ -237,12 +243,12 @@ object GlideGRFReader {
     }
 
     private fun readRespawnPoint(json: JsonObject): ExactLocationTemplate {
-        val x = json.string("spawnX").toInt()
-        val y = json.string("spawnY").toInt()
-        val z = json.string("spawnZ").toInt()
+        val x = json.string("spawnX").toDouble()
+        val y = json.string("spawnY").toDouble()
+        val z = json.string("spawnZ").toDouble()
         val yRot = json.string("yRot").toFloat()
         val xRot = json.string("xRot").toFloat()
-        return ExactLocationTemplate(Vec3.atCenterOf(Vec3i(x, y, z)), Vec2(xRot, yRot))
+        return ExactLocationTemplate(Vec3(x, y, z), Vec2(xRot, yRot))
     }
 
     private fun readAABB(json: JsonObject): AABB {

@@ -1,6 +1,7 @@
 package me.senseiwells.glide.minigame
 
 import me.senseiwells.glide.GlideMod
+import me.senseiwells.glide.addon.GlideAddon
 import me.senseiwells.glide.addon.GlideAddonConfig
 import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.checkpoint.CheckpointManager
@@ -8,7 +9,8 @@ import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.SidebarScoreElement
-import me.senseiwells.glide.gui.SidebarTimerElement
+import me.senseiwells.glide.gui.GlobalSidebarTimerElement
+import me.senseiwells.glide.gui.PlayerSidebarTimerElement
 import me.senseiwells.glide.gui.SidebarVelocityElement
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
@@ -98,7 +100,7 @@ class GlideMinigame(
     override fun initialize() {
         super.initialize()
 
-        this.sidebar.addRow(SidebarTimerElement { this.ticks.Ticks })
+        this.sidebar.addRow(PlayerSidebarTimerElement(GlobalSidebarTimerElement { this.ticks.Ticks }))
         this.sidebar.addRow(SidebarElements.empty())
         this.sidebar.addRow(SidebarVelocityElement)
         if (this.mode == GlideMode.ScoreAttack) {
@@ -331,11 +333,7 @@ class GlideMinigame(
 
     private fun sendProgress(player: ServerPlayer, index: Int) {
         val progressBar = Component.empty().append(this.progressBar)
-
-        val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300) - 1
-        progressBar.append(ComponentUtils.space(offset - 309))
-        progressBar.append(GlideFont.Progressbar.CURRENT.shadowless())
-        progressBar.append(ComponentUtils.space(309 - (offset + 6)))
+        player.glide.addProgressComponents(this, progressBar, index)
 
         progressBar.append(ComponentUtils.space(-171)).append(ComponentUtils.space(-1, 2))
 
@@ -384,18 +382,23 @@ class GlideMinigame(
             val rawId = context.parameters.stringOrNull("map")
             val id = if (rawId == null) GlideMod.id("temple") else ResourceLocation.parse(rawId)
             val addon = GlideAddons.get(id) ?: throw IllegalArgumentException()
-            val handle = Fantasy.get(context.server).openTemporaryWorld(
+
+            val mode = if (isScoreMode) GlideMode.ScoreAttack else GlideMode.TimeAttack
+            return this.create(context.server, addon, mode)
+        }
+
+        fun create(server: MinecraftServer, addon: GlideAddon, mode: GlideMode): GlideMinigame {
+            val handle = Fantasy.get(server).openTemporaryWorld(
                 RuntimeWorldConfig()
-                    .setGenerator(VoidChunkGenerator(context.server))
+                    .setGenerator(VoidChunkGenerator(server))
                     .setDimensionType(addon.dimensionType)
             )
 
-            val mode = if (isScoreMode) GlideMode.ScoreAttack else GlideMode.TimeAttack
-            val glide = GlideMinigame(addon.config, mode, handle.asWorld(), context.server)
+            val glide = GlideMinigame(addon.config, mode, handle.asWorld(), server)
             glide.levels.add(handle)
 
             val tempLocation = handle.registryKey.location()
-            val dimensionDir = context.server.getWorldPath(LevelResource.ROOT).resolve("dimensions")
+            val dimensionDir = server.getWorldPath(LevelResource.ROOT).resolve("dimensions")
                 .resolve(tempLocation.namespace).resolve(tempLocation.path)
             addon.extractWorld(dimensionDir)
             return glide

@@ -18,9 +18,8 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val EMPTY_HEART by bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
 
     object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-        private val BG_1 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
-        private val BG_2 by bitmap(at("progressbar/progressbar_2.png"), 5 + SHIFT, 10)
-        val CHECKPOINT by bitmap(at("progressbar/checkpoint_icon.png"), 7 + SHIFT, 14)
+        private val BG_1 by bitmap(at("progressbar/progressbar_0.png"), 5 + SHIFT, 10)
+        private val BG_2 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
 
         val BACKGROUND: MutableComponent
             get() = Component.empty().append(BG_1).append(ComponentUtils.space(-1)).append(BG_2)
@@ -31,11 +30,19 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             for (i in 1..16) {
                 indexed(at("progressbar/player_marker/$i.png"), 3 + SHIFT, 5)
             }
+            for (i in 0..5) {
+                indexed(at("progressbar/checkpoint_$i.png"), 12 + SHIFT, 24)
+            }
         }
 
         fun getPlayerMarker(index: Int): MutableComponent {
             require(index in 0..15) { "Index must be between 0 and 15" }
             return this.get(index)
+        }
+
+        fun getCheckpoint(index: Int): MutableComponent {
+            require(index in 0..5) { "Index must be between 0 and 5" }
+            return this.get(index + 16)
         }
     }
 
