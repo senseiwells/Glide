@@ -4,14 +4,17 @@ import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
 import net.casual.arcade.resources.font.IndexedBitmapFontResources
 import net.casual.arcade.utils.ComponentUtils
+import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
     private const val SHIFT = -35
 
-    val YOU_CRASHED by bitmap(at("you_crashed.png"), 3, 3)
-    val YOU_CRASHED_BACKGROUND by bitmap(at("you_crashed_background_2.png"), 500, 1000)
+    val YOU_CRASHED by translatable("glide.you_crashed") {
+        bitmap("en_us", at("crash/you_crashed_en_us.png"), 3, 3)
+    }
+    val YOU_CRASHED_BACKGROUND by bitmap(at("crash/you_crashed_background_2.png"), 500, 1000)
 
     val FULL_HEART by bitmap(at("heart/full.png"), 18 + SHIFT, 9)
     val HALF_HEART by bitmap(at("heart/half.png"), 18 + SHIFT, 9)
