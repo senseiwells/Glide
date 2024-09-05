@@ -24,6 +24,7 @@ import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.gui.bossbar.SuppliedBossBar
 import net.casual.arcade.gui.elements.ComponentElements
 import net.casual.arcade.gui.elements.SidebarElements
+import net.casual.arcade.gui.predicate.PlayerObserverPredicate
 import net.casual.arcade.gui.sidebar.ArcadeSidebar
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.During
@@ -38,6 +39,7 @@ import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.GameRuleUtils.set
 import net.casual.arcade.utils.JsonUtils.booleanOrDefault
 import net.casual.arcade.utils.JsonUtils.stringOrNull
+import net.casual.arcade.utils.PlayerUtils.addToTeam
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
@@ -45,7 +47,9 @@ import net.casual.arcade.utils.PlayerUtils.resetHealth
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
+import net.casual.arcade.utils.PlayerUtils.spoofTeam
 import net.casual.arcade.utils.PlayerUtils.teleportTo
+import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.minecraft.core.component.DataComponents
@@ -64,6 +68,9 @@ import net.minecraft.world.item.component.Unbreakable
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.storage.LevelResource
+import net.minecraft.world.scores.PlayerTeam
+import net.minecraft.world.scores.Scoreboard
+import net.minecraft.world.scores.Team
 import xyz.nucleoid.fantasy.Fantasy
 import xyz.nucleoid.fantasy.RuntimeWorldConfig
 import xyz.nucleoid.fantasy.util.VoidChunkGenerator
@@ -78,6 +85,11 @@ class GlideMinigame(
     server: MinecraftServer
 ): Minigame<GlideMinigame>(server) {
     override val id: ResourceLocation = ID
+
+    private val team = this.server.scoreboard.getOrCreateTeam("Glide") {
+        setSeeFriendlyInvisibles(true)
+        collisionRule = Team.CollisionRule.NEVER
+    }
 
     private val checkpointBossbar = SuppliedBossBar(ComponentElements.of("Checkpoint!".literal()))
     private val startPos = this.config.spawn.get(this.level)
@@ -121,6 +133,10 @@ class GlideMinigame(
             set(GameRules.RULE_RANDOMTICKING, 0)
             set(GameRules.RULE_DOFIRETICK, false)
         }
+
+        this.effects.setInvisiblePredicate({ observee, observer ->
+            observer != observee && observee.distanceToSqr(observer) < 6 * 6
+        }, true)
 
         for (booster in this.config.boosters) {
             this.level.addFreshEntity(booster.create(this.level))
@@ -268,9 +284,9 @@ class GlideMinigame(
         if (this.phase < GlidePhase.Active) {
             player.isNoGravity = true
         }
+        player.addToTeam(this.team)
 
         this.trackers[player.uuid] = GlideTrailTracker(this.ticks.Ticks)
-
         this.start()
     }
 
