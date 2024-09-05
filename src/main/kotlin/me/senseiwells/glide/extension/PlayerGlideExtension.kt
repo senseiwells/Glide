@@ -23,6 +23,7 @@ import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.MinigameUtils.getMinigame
 import net.casual.arcade.utils.PlayerUtils.getExtension
 import net.casual.arcade.utils.TagUtils.getLocation
@@ -33,6 +34,7 @@ import net.casual.arcade.utils.location.Location
 import net.minecraft.Util
 import net.minecraft.nbt.*
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -46,6 +48,8 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class PlayerGlideExtension(
     player: ServerPlayer
@@ -59,9 +63,9 @@ class PlayerGlideExtension(
 
     private var oldPosition: Vec3? = null
 
-    private var finished = false
 
     private var lastRespawnCheckpointIndex = 0
+    private var lastRespawnCheckpointTicks = 0
     private var lastCheckpointIndex = 0
     private var lastCrossedCheckpoint = CheckpointData.DEFAULT
 
@@ -73,6 +77,8 @@ class PlayerGlideExtension(
     private val lastSavedRings = ObjectOpenHashSet<UUID>()
     private var lastSavedScore = 0
 
+    var finished = false
+        private set
     var combo = 0
     var scoreIcon: Component = GlideFont.Score.GREY
     var score = 0
@@ -126,6 +132,7 @@ class PlayerGlideExtension(
         this.lastRespawnCheckpointIndex = checkpoint.index
         this.lastSavedScore = this.score
         this.lastSavedRingType = this.ringTypes.last()
+        this.lastRespawnCheckpointTicks = CHECKPOINT_TICKS + 2
     }
 
     fun setLiftForceModifier(modifier: Double) {
@@ -204,6 +211,9 @@ class PlayerGlideExtension(
         if (minigame.isPhase(GlidePhase.Active)) {
             this.ghost?.tick(this.player, tick)
         }
+        if (this.lastRespawnCheckpointTicks > 0) {
+            this.lastRespawnCheckpointTicks--
+        }
 
         this.tickCollisions(minigame)
 
@@ -265,6 +275,28 @@ class PlayerGlideExtension(
         this.lastSavedRingType = RingType.Grey
         this.respawn()
         this.hideTrail()
+    }
+
+    fun addProgressComponents(minigame: GlideMinigame, progressBar: MutableComponent, marker: Int) {
+        val playerOffset = Mth.clamp(Math.round(this.progress * 300).toInt(), 0, 300) - 1
+        progressBar.append(ComponentUtils.space(playerOffset - 309))
+        progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker).shadowless())
+        progressBar.append(ComponentUtils.space(-7))
+        progressBar.append(GlideFont.Progressbar.CURRENT.shadowless())
+
+        var lastOffset = playerOffset + 6
+        if (this.lastRespawnCheckpointIndex != 0 && this.lastRespawnCheckpointTicks in 0..CHECKPOINT_TICKS) {
+            val distance = minigame.checkpoints.getPercentageDistance(this.lastRespawnCheckpointIndex)
+
+            val index = 5 - 5 * abs(2.0F * this.lastRespawnCheckpointTicks - CHECKPOINT_TICKS) / CHECKPOINT_TICKS
+            val checkpointOffset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
+
+            progressBar.append(ComponentUtils.space(checkpointOffset - (playerOffset + 4)))
+            progressBar.append(GlideFont.Progressbar.getCheckpoint(index.roundToInt()).shadowless())
+            lastOffset = checkpointOffset + 5
+        }
+
+        progressBar.append(ComponentUtils.space(309 - lastOffset))
     }
 
     private fun addRingType(type: RingType) {
@@ -456,6 +488,8 @@ class PlayerGlideExtension(
     }
 
     companion object {
+        private const val CHECKPOINT_TICKS = 12
+
         @JvmStatic
         val ServerPlayer.glide
             get() = this.getExtension(PlayerGlideExtension::class.java)

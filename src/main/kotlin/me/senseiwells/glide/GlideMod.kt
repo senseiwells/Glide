@@ -31,7 +31,6 @@ object GlideMod: ModInitializer {
 
     val logger: Logger = LogManager.getLogger(MOD_ID)
 
-
     val resourcePack = NamedResourcePackCreator.named("glide_pack") {
         addAssetSource(MOD_ID)
         addFont(GlideFont)
@@ -55,12 +54,7 @@ object GlideMod: ModInitializer {
         GlideExtensions.register()
         GlideAddons.load()
 
-        // GlideGRFConverter.convertSingle(
-        //     id("temple"),
-        //     Path.of("/Users/sensei/Documents/Coding/Kotlin/Glide/src/main/resources/rules/temple.json"),
-        //     Path.of("/Users/sensei/Documents/Coding/Kotlin/Glide/src/main/resources/rules/addon.json"),
-        // )
-        // exitProcess(0)
+        Minigames.registerFactory(GlideMinigame.ID, GlideMinigame)
 
         // TODO: For testing purposes
         val packDir = FabricLoader.getInstance().gameDir.resolve("glide_packs")
@@ -79,7 +73,5 @@ object GlideMod: ModInitializer {
             player.sendResourcePack(host.getHostedPack("no_shadow")!!.toPackInfo())
             player.sendResourcePack(host.getHostedPack("glide_pack")!!.toPackInfo())
         }
-
-        Minigames.registerFactory(GlideMinigame.ID, GlideMinigame)
     }
 }

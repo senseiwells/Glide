@@ -28,8 +28,8 @@ class GlideGhost(
     init {
         this.currentPoint = this.trails.firstOrNull()?.points?.firstOrNull() ?: Vec3.ZERO
 
-        this.rightWing.translation = Vector3f(.55F, .180F, 0.05F)
-        this.leftWing.translation = Vector3f(-.55F, .180F, 0.05F)
+        this.rightWing.translation = Vector3f(0.55F, 0.180F, 0.05F)
+        this.leftWing.translation = Vector3f(-0.55F, 0.180F, 0.05F)
 
         this.rightWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, ELYTRA_Y_ROT, ELYTRA_Z_ROT)
         this.leftWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, -ELYTRA_Y_ROT, -ELYTRA_Z_ROT)

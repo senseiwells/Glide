@@ -77,8 +77,8 @@ class CheckpointManager(
             val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
 
             progressBar.append(ComponentUtils.space(offset - lastOffset))
-            progressBar.append(GlideFont.Progressbar.CHECKPOINT)
-            lastOffset = offset + 5
+            progressBar.append(GlideFont.Progressbar.getCheckpoint(0))
+            lastOffset = offset + 3
         }
         progressBar.append(ComponentUtils.space(306 - lastOffset))
         return progressBar.shadowless()
