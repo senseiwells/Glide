@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.entity.accelerator.*
 import net.casual.arcade.utils.BoundingBoxUtils.getSizeVec
-import net.casual.arcade.utils.serialization.ArcadeExtraCodecs
+import net.casual.arcade.utils.codec.ArcadeExtraCodecs
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.phys.AABB

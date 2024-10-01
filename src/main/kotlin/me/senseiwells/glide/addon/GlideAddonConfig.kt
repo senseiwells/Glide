@@ -8,7 +8,7 @@ import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointManager
-import net.casual.arcade.utils.location.template.ExactLocationTemplate
+import net.casual.arcade.minigame.template.location.ExactLocationTemplate
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.resources.ResourceLocation
