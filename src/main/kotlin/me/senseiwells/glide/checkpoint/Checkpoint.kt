@@ -10,11 +10,11 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
+import net.casual.arcade.minigame.template.location.ExactLocationTemplate
 import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.location.template.ExactLocationTemplate
-import net.casual.arcade.utils.serialization.ArcadeExtraCodecs
-import net.casual.arcade.utils.serialization.CodecProvider
-import net.casual.arcade.utils.serialization.CodecProvider.Companion.register
+import net.casual.arcade.utils.codec.ArcadeExtraCodecs
+import net.casual.arcade.utils.codec.CodecProvider
+import net.casual.arcade.utils.codec.CodecProvider.Companion.register
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
