@@ -11,15 +11,16 @@ import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
 import net.casual.arcade.events.player.PlayerJoinEvent
 import net.casual.arcade.events.server.ServerStoppingEvent
+import net.casual.arcade.host.PackHost
 import net.casual.arcade.minigame.Minigames
-import net.casual.arcade.resources.ArcadePacks
+import net.casual.arcade.resources.ArcadeResourcePacks
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
-import net.casual.arcade.resources.hosting.DirectoryPackSupplier
-import net.casual.arcade.resources.hosting.PackHost
+import net.casual.arcade.resources.utils.ResourcePackUtils.addFont
+import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
+import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
+import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
+import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
 import net.casual.arcade.utils.ComponentUtils.literal
-import net.casual.arcade.utils.ResourcePackUtils.addFont
-import net.casual.arcade.utils.ResourcePackUtils.addSounds
-import net.casual.arcade.utils.ResourcePackUtils.sendResourcePack
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
@@ -58,20 +59,21 @@ object GlideMod: ModInitializer {
 
         // TODO: For testing purposes
         val packDir = FabricLoader.getInstance().gameDir.resolve("glide_packs")
-        resourcePack.buildTo(packDir)
-        ArcadePacks.SPACES_FONT_PACK.buildTo(packDir)
-        ArcadePacks.NO_SHADOW_PACK.buildTo(packDir)
-        val host = PackHost()
-        host.addPacks(DirectoryPackSupplier(packDir))
+
+        val host = PackHost(null)
+        val glidePack by host.addPack(packDir, resourcePack).toPackInfo()
+        val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACES_FONT_PACK).toPackInfo()
+        val noShadowPack by host.addPack(packDir, ArcadeResourcePacks.NO_SHADOW_PACK).toPackInfo()
         host.start()
+
         GlobalEventHandler.register<ServerStoppingEvent> {
-            host.shutdown()
+            host.stop()
         }
 
         GlobalEventHandler.register<PlayerJoinEvent> { (player) ->
-            player.sendResourcePack(host.getHostedPack("spaces_font")!!.toPackInfo())
-            player.sendResourcePack(host.getHostedPack("no_shadow")!!.toPackInfo())
-            player.sendResourcePack(host.getHostedPack("glide_pack")!!.toPackInfo())
+            player.sendResourcePack(glidePack)
+            player.sendResourcePack(spacesPack)
+            player.sendResourcePack(noShadowPack)
         }
     }
 }

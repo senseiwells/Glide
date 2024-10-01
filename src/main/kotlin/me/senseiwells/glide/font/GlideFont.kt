@@ -4,7 +4,6 @@ import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
 import net.casual.arcade.resources.font.IndexedBitmapFontResources
 import net.casual.arcade.utils.ComponentUtils
-import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 

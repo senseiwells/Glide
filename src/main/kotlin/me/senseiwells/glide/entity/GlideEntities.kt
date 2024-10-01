@@ -6,7 +6,7 @@ import me.senseiwells.glide.entity.accelerator.Booster
 import me.senseiwells.glide.entity.accelerator.DirectionalBooster
 import me.senseiwells.glide.entity.accelerator.DynamicThermal
 import me.senseiwells.glide.entity.accelerator.StaticThermal
-import me.senseiwells.glide.entity.checkpoint.*
+import me.senseiwells.glide.entity.checkpoint.BeaconBeam
 import me.senseiwells.glide.entity.ring.Ring
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries

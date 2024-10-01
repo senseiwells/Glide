@@ -5,8 +5,7 @@ import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.item.GlideItem
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
-import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
-import net.casual.arcade.utils.TagUtils.contains
+import net.casual.arcade.utils.contains
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerPlayer

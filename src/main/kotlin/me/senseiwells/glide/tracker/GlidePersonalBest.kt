@@ -2,8 +2,8 @@ package me.senseiwells.glide.tracker
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.resources.ResourceLocation
 
 data class GlidePersonalBests(
@@ -37,7 +37,7 @@ class GlideScorePersonalBest(
     companion object {
         val DEFAULT = GlideScorePersonalBest(0, listOf())
 
-        val CODEC = RecordCodecBuilder.create { instance ->
+        val CODEC: Codec<GlideScorePersonalBest> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.INT.fieldOf("score").forGetter(GlideScorePersonalBest::score),
                 GlideTrail.CODEC.listOf().fieldOf("trails").forGetter(GlideScorePersonalBest::trails)
@@ -57,7 +57,7 @@ class GlideTimePersonalBest(
     companion object {
         val DEFAULT = GlideTimePersonalBest(Int.MAX_VALUE.Ticks, listOf())
 
-        val CODEC = RecordCodecBuilder.create { instance ->
+        val CODEC: Codec<GlideTimePersonalBest> = RecordCodecBuilder.create { instance ->
             instance.group(
                 MinecraftTimeDuration.CODEC.fieldOf("time").forGetter(GlideTimePersonalBest::time),
                 GlideTrail.CODEC.listOf().fieldOf("trails").forGetter(GlideTimePersonalBest::trails)

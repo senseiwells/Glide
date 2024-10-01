@@ -1,12 +1,12 @@
 package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.gui.elements.UniversalElement
-import net.casual.arcade.gui.sidebar.SidebarComponent
-import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.TimeUtils.format
+import net.casual.arcade.utils.time.MinecraftTimeDuration
+import net.casual.arcade.visuals.elements.UniversalElement
+import net.casual.arcade.visuals.sidebar.SidebarComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 

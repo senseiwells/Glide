@@ -1,9 +1,9 @@
 package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import net.casual.arcade.gui.elements.PlayerSpecificElement
-import net.casual.arcade.gui.sidebar.SidebarComponent
 import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.visuals.elements.PlayerSpecificElement
+import net.casual.arcade.visuals.sidebar.SidebarComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
