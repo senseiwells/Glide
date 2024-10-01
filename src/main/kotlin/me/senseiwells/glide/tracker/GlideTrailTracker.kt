@@ -1,7 +1,7 @@
 package me.senseiwells.glide.tracker
 
-import net.casual.arcade.scheduler.MinecraftTimeDuration
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.world.phys.Vec3
 
 class GlideTrailTracker(

@@ -21,16 +21,12 @@ import me.senseiwells.glide.tracker.*
 import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
-import net.casual.arcade.scheduler.MinecraftTimeDuration
-import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
+import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
+import net.casual.arcade.utils.*
 import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.MinigameUtils.getMinigame
-import net.casual.arcade.utils.PlayerUtils.getExtension
-import net.casual.arcade.utils.TagUtils.getLocation
-import net.casual.arcade.utils.TagUtils.getVec3
-import net.casual.arcade.utils.TagUtils.putLocation
-import net.casual.arcade.utils.TagUtils.putVec3
-import net.casual.arcade.utils.location.Location
+import net.casual.arcade.utils.impl.Location
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.Util
 import net.minecraft.nbt.*
 import net.minecraft.network.chat.Component
@@ -492,6 +488,6 @@ class PlayerGlideExtension(
 
         @JvmStatic
         val ServerPlayer.glide
-            get() = this.getExtension(PlayerGlideExtension::class.java)
+            get() = this.getExtension<PlayerGlideExtension>()
     }
 }

@@ -9,13 +9,13 @@ import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
 import me.senseiwells.glide.checkpoint.*
 import me.senseiwells.glide.entity.ring.RingType
+import net.casual.arcade.minigame.template.location.ExactLocationTemplate
 import net.casual.arcade.utils.JsonUtils
 import net.casual.arcade.utils.JsonUtils.array
 import net.casual.arcade.utils.JsonUtils.obj
 import net.casual.arcade.utils.JsonUtils.objects
 import net.casual.arcade.utils.JsonUtils.string
 import net.casual.arcade.utils.JsonUtils.stringOrNull
-import net.casual.arcade.utils.location.template.ExactLocationTemplate
 import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i

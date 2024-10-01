@@ -8,35 +8,32 @@ import me.senseiwells.glide.checkpoint.CheckpointManager
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
-import me.senseiwells.glide.gui.SidebarScoreElement
 import me.senseiwells.glide.gui.GlobalSidebarTimerElement
 import me.senseiwells.glide.gui.PlayerSidebarTimerElement
+import me.senseiwells.glide.gui.SidebarScoreElement
 import me.senseiwells.glide.gui.SidebarVelocityElement
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
-import net.casual.arcade.events.minigame.MinigameLoadPlayingEvent
-import net.casual.arcade.events.minigame.MinigameRemovePlayerEvent
-import net.casual.arcade.events.minigame.MinigameSetPlayingEvent
-import net.casual.arcade.events.minigame.MinigameSetSpectatingEvent
+import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
+import net.casual.arcade.dimensions.utils.getDimensionPath
+import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
 import net.casual.arcade.events.player.*
 import net.casual.arcade.events.server.ServerTickEvent
-import net.casual.arcade.gui.bossbar.SuppliedBossBar
-import net.casual.arcade.gui.elements.ComponentElements
-import net.casual.arcade.gui.elements.SidebarElements
-import net.casual.arcade.gui.predicate.PlayerObserverPredicate
-import net.casual.arcade.gui.sidebar.ArcadeSidebar
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
+import net.casual.arcade.minigame.events.MinigameLoadPlayingEvent
+import net.casual.arcade.minigame.events.MinigameRemovePlayerEvent
+import net.casual.arcade.minigame.events.MinigameSetPlayingEvent
+import net.casual.arcade.minigame.events.MinigameSetSpectatingEvent
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.serialization.MinigameCreationContext
 import net.casual.arcade.minigame.serialization.MinigameFactory
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.GameRuleUtils.set
 import net.casual.arcade.utils.JsonUtils.booleanOrDefault
 import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.PlayerUtils.addToTeam
@@ -47,11 +44,15 @@ import net.casual.arcade.utils.PlayerUtils.resetHealth
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
-import net.casual.arcade.utils.PlayerUtils.spoofTeam
 import net.casual.arcade.utils.PlayerUtils.teleportTo
 import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.set
+import net.casual.arcade.visuals.bossbar.SuppliedBossbar
+import net.casual.arcade.visuals.elements.ComponentElements
+import net.casual.arcade.visuals.elements.SidebarElements
+import net.casual.arcade.visuals.sidebar.Sidebar
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -67,13 +68,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.Unbreakable
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.GameType
-import net.minecraft.world.level.storage.LevelResource
-import net.minecraft.world.scores.PlayerTeam
-import net.minecraft.world.scores.Scoreboard
 import net.minecraft.world.scores.Team
-import xyz.nucleoid.fantasy.Fantasy
-import xyz.nucleoid.fantasy.RuntimeWorldConfig
-import xyz.nucleoid.fantasy.util.VoidChunkGenerator
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -91,10 +86,10 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
-    private val checkpointBossbar = SuppliedBossBar(ComponentElements.of("Checkpoint!".literal()))
+    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of("Checkpoint!".literal()))
     private val startPos = this.config.spawn.get(this.level)
 
-    private val sidebar = ArcadeSidebar(ComponentElements.empty())
+    private val sidebar = Sidebar(ComponentElements.empty())
     private var progressBar: Component = Component.empty()
 
     private val trackers = HashMap<UUID, GlideTrailTracker>()
@@ -208,21 +203,21 @@ class GlideMinigame(
 
     @Listener
     private fun onPlayerDamage(event: PlayerDamageEvent) {
-        val (player, amount, source) = event
+        val (player, source, amount) = event
         if (this.players.isSpectating(player)) {
-            event.cancel(0.0F)
+            event.cancel()
             return
         }
 
         if (source.`is`(DamageTypes.FALL) || source.`is`(DamageTypes.FLY_INTO_WALL)) {
             if (player.health > 2.0F) {
-                event.cancel(2.0F)
+                event.amount = 2.0F
                 return
             }
         } else if (player.health > amount) {
             return
         }
-        event.cancel(0.0F)
+        event.cancel()
         player.setGameMode(GameType.SPECTATOR)
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         this.effects.freeze(player)
@@ -287,7 +282,6 @@ class GlideMinigame(
         player.addToTeam(this.team)
 
         this.trackers[player.uuid] = GlideTrailTracker(this.ticks.Ticks)
-        this.start()
     }
 
     @Listener
@@ -404,20 +398,14 @@ class GlideMinigame(
         }
 
         fun create(server: MinecraftServer, addon: GlideAddon, mode: GlideMode): GlideMinigame {
-            val handle = Fantasy.get(server).openTemporaryWorld(
-                RuntimeWorldConfig()
-                    .setGenerator(VoidChunkGenerator(server))
-                    .setDimensionType(addon.dimensionType)
-            )
+            val level = CustomLevelBuilder.build(server) {
+                randomDimensionKey()
+                dimensionType(addon.dimensionType)
+                chunkGenerator(VoidChunkGenerator(server))
+            }
 
-            val glide = GlideMinigame(addon.config, mode, handle.asWorld(), server)
-            glide.levels.add(handle)
-
-            val tempLocation = handle.registryKey.location()
-            val dimensionDir = server.getWorldPath(LevelResource.ROOT).resolve("dimensions")
-                .resolve(tempLocation.namespace).resolve(tempLocation.path)
-            addon.extractWorld(dimensionDir)
-            return glide
+            addon.extractWorld(server.getDimensionPath(level.dimension()))
+            return GlideMinigame(addon.config, mode, level, server)
         }
     }
 }

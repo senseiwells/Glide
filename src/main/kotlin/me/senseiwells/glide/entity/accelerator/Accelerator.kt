@@ -7,12 +7,8 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
+import net.casual.arcade.utils.*
 import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.TagUtils.contains
-import net.casual.arcade.utils.TagUtils.getVec3OrNull
-import net.casual.arcade.utils.TagUtils.getVector3fOrNull
-import net.casual.arcade.utils.TagUtils.putVec3
-import net.casual.arcade.utils.TagUtils.putVector3f
 import net.casual.arcade.utils.impl.Sound
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag

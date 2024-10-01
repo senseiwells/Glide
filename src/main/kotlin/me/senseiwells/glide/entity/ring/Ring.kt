@@ -8,11 +8,11 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
-import net.casual.arcade.entity.firework.VirtualFireworkBuilder
 import net.casual.arcade.utils.PlayerUtils.location
 import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.TagUtils.contains
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.contains
+import net.casual.arcade.visuals.firework.VirtualFireworkBuilder
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag

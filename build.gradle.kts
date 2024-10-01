@@ -1,28 +1,22 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization") version "1.9.21"
-    id("fabric-loom")
+    val jvmVersion = libs.versions.fabric.kotlin.get()
+        .split("+kotlin.")[1]
+        .split("+")[0]
+
+    kotlin("jvm").version(jvmVersion)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.fabric.loom)
     `maven-publish`
     java
 }
 
-val modVersion: String by project
-
-val mcVersion: String by project
-val parchmentVersion: String by project
-val loaderVersion: String by project
-val fabricVersion: String by project
-val fabricKotlinVersion: String by project
-
-val arcadeVersion: String by project
-
-val zip4jVersion: String by project
-
-version = "${modVersion}+mc${mcVersion}"
+val modVersion = "0.1.0"
+version = "${modVersion}+mc${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 
 repositories {
     mavenLocal()
+    maven("https://maven.supersanta.me/snapshots")
     maven("https://maven.parchmentmc.org/")
     maven("https://jitpack.io")
     maven("https://ueaj.dev/maven")
@@ -33,44 +27,47 @@ repositories {
 
 @Suppress("UnstableApiUsage")
 dependencies {
-    minecraft("com.mojang:minecraft:${mcVersion}")
+    minecraft(libs.minecraft)
+    @Suppress("UnstableApiUsage")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchmentVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${libs.versions.parchment.get()}@zip")
     })
-    modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
+    modImplementation(libs.fabric.loader)
+    modImplementation(libs.fabric.api)
+    modImplementation(libs.fabric.kotlin)
 
-    modImplementation("net.fabricmc:fabric-language-kotlin:${fabricKotlinVersion}")
+    modImplementation(libs.arcade)
+    modImplementation(libs.polymer.core)
+    modImplementation(libs.polymer.virtual.entity)
 
-    include(modImplementation("com.github.CasualChampionships:arcade:${arcadeVersion}")!!)
-
-    include(modImplementation("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")!!)
-
-    include(implementation("net.lingala.zip4j:zip4j:${zip4jVersion}")!!)
+    include(implementation(libs.zip4j.get())!!)
 }
 
 tasks {
     processResources {
-        inputs.property("version", modVersion)
+        inputs.property("version", project.version)
         filesMatching("fabric.mod.json") {
-            expand(mutableMapOf("version" to modVersion))
+            expand(mutableMapOf("version" to project.version))
         }
     }
 
     jar {
         from("LICENSE")
     }
-
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                from(project.components.getByName("java"))
-            }
-        }
-    }
 }
 
 java {
     withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = "me.senseiwells"
+            artifactId = "glide"
+            version = "${modVersion}+${libs.versions.minecraft.get()}"
+            from(components["java"])
+        }
+    }
 }
