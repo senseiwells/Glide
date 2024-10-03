@@ -31,7 +31,6 @@ public class LivingEntityMixin {
 			)
 		)
 	)
-	@SuppressWarnings("InvalidInjectorMethodSignature")
 	private float onFlyFallHorizontalCollision(float original) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerHorizontalFlyFallCollisionEvent event = new PlayerHorizontalFlyFallCollisionEvent(player, original);

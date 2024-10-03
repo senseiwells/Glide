@@ -2,11 +2,17 @@ package me.senseiwells.glide.sound
 
 import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.sound.SoundResources
+import net.casual.arcade.utils.TimeUtils.Minutes
+import net.casual.arcade.utils.TimeUtils.Seconds
+import net.casual.arcade.utils.impl.Sound
+import net.casual.arcade.utils.impl.TimedSound
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
 
 object GlideSounds: SoundResources(GlideMod.MOD_ID) {
-    val MUSIC_MAP_1 = sound(at("glide.music.map1"), stream = true)
-    val MUSIC_MAP_3 = sound(at("glide.music.map3"), stream = true)
+    val COUNTDOWN_TICK = sound(at("glide.countdown.tick"))
+    val COUNTDOWN_START = sound(at("glide.countdown.start"))
+
     val BONK = sound(at("glide.bonk"))
     val BOOST = sound(at("glide.boost"))
     val THERMAL = sound(at("glide.boost.thermal"))
@@ -29,6 +35,35 @@ object GlideSounds: SoundResources(GlideMod.MOD_ID) {
         sound(at("glide.crash.3"))
         sound(at("glide.crash.4"))
     }
+
+    val MAP_1_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.1"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 12.Seconds
+    )
+    val MAP_2_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.2"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 6.Seconds
+    )
+    val MAP_3_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.3"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 27.Seconds
+    )
+    val MAP_4_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.4"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 7.Seconds
+    )
+    val MAP_5_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.5"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 5.Seconds
+    )
+    val MAP_6_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.6"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 7.Seconds
+    )
+    val MAP_7_MUSIC = TimedSound(
+        Sound(sound(at("glide.music.map.7"), stream = true), SoundSource.MUSIC),
+        2.Minutes + 1.Seconds
+    )
 
     fun getFinishSound(placement: Int): SoundEvent {
         return when (placement) {

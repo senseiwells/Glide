@@ -1,0 +1,6 @@
+{
+  "glide.round.solo": "Solo Round!",
+  "glide.round.numbered": "Round %s",
+  "glide.round.solo.negativeWidth": "\uDAFF\uDFC7",
+  "glide.round.numbered.negativeWidth": "\uDAFF\uDFD8"
+}

@@ -18,6 +18,12 @@
         "adapter": "kotlin",
         "value": "me.senseiwells.glide.GlideMod"
       }
+    ],
+    "arcade-datagen": [
+      {
+        "adapter": "kotlin",
+        "value": "me.senseiwells.glide.datagen.GlideResourceGenerator"
+      }
     ]
   },
   "mixins": [

@@ -6,3 +6,5 @@ run/
 /glidepack/
 /legacy-maps/
 /rules/
+/run-datagen/
+/.kotlin/

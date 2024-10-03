@@ -3,6 +3,7 @@ package me.senseiwells.glide
 import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.GlideExtensions
+import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigame
@@ -16,16 +17,24 @@ import net.casual.arcade.minigame.Minigames
 import net.casual.arcade.resources.ArcadeResourcePacks
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
 import net.casual.arcade.resources.utils.ResourcePackUtils.addFont
+import net.casual.arcade.resources.utils.ResourcePackUtils.addLangsFromData
 import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
 import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
 import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
 import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
+import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.literal
+import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import kotlin.math.min
 
 object GlideMod: ModInitializer {
     const val MOD_ID = "glide"
@@ -39,7 +48,9 @@ object GlideMod: ModInitializer {
         addFont(GlideFont.Speedometer)
         addFont(GlideFont.Progressbar)
         addFont(GlideFont.Score)
+        addFont(GlideFont.Banner)
         addSounds(GlideSounds)
+        addLangsFromData(MOD_ID)
         packDescription = "GlidePack".literal()
     }
 
@@ -64,6 +75,7 @@ object GlideMod: ModInitializer {
         val glidePack by host.addPack(packDir, resourcePack).toPackInfo()
         val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACES_FONT_PACK).toPackInfo()
         val noShadowPack by host.addPack(packDir, ArcadeResourcePacks.NO_SHADOW_PACK).toPackInfo()
+        val shiftedPack by host.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
         host.start()
 
         GlobalEventHandler.register<ServerStoppingEvent> {
@@ -74,6 +86,22 @@ object GlideMod: ModInitializer {
             player.sendResourcePack(glidePack)
             player.sendResourcePack(spacesPack)
             player.sendResourcePack(noShadowPack)
+            player.sendResourcePack(shiftedPack)
         }
+    }
+
+    // TODO:
+    private fun getUsernameStringLength(string: String): Int {
+        var totalLength = 0
+        for (character in string) {
+            totalLength += when (character) {
+                'f', 'k' -> 5
+                'i' -> 2
+                'l' -> 3
+                't', 'I' -> 4
+                else -> 6
+            }
+        }
+        return totalLength
     }
 }

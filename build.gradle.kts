@@ -25,7 +25,6 @@ repositories {
     mavenCentral()
 }
 
-@Suppress("UnstableApiUsage")
 dependencies {
     minecraft(libs.minecraft)
     @Suppress("UnstableApiUsage")
@@ -40,6 +39,8 @@ dependencies {
     modImplementation(libs.arcade)
     modImplementation(libs.polymer.core)
     modImplementation(libs.polymer.virtual.entity)
+
+    modImplementation(libs.arcade.datagen)
 
     include(implementation(libs.zip4j.get())!!)
 }
@@ -59,6 +60,16 @@ tasks {
 
 java {
     withSourcesJar()
+}
+
+loom {
+    runs {
+        create("datagenClient") {
+            client()
+            programArgs("--arcade-datagen")
+            runDir = "run-datagen"
+        }
+    }
 }
 
 publishing {

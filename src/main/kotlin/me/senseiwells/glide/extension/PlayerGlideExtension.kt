@@ -59,7 +59,6 @@ class PlayerGlideExtension(
 
     private var oldPosition: Vec3? = null
 
-
     private var lastRespawnCheckpointIndex = 0
     private var lastRespawnCheckpointTicks = 0
     private var lastCheckpointIndex = 0
@@ -72,6 +71,9 @@ class PlayerGlideExtension(
     private val rings = ObjectOpenHashSet<UUID>()
     private val lastSavedRings = ObjectOpenHashSet<UUID>()
     private var lastSavedScore = 0
+
+    var animationTick = 0
+        private set
 
     var finished = false
         private set
@@ -207,6 +209,8 @@ class PlayerGlideExtension(
         if (minigame.isPhase(GlidePhase.Active)) {
             this.ghost?.tick(this.player, tick)
         }
+        this.animationTick++
+
         if (this.lastRespawnCheckpointTicks > 0) {
             this.lastRespawnCheckpointTicks--
         }
@@ -260,6 +264,7 @@ class PlayerGlideExtension(
     }
 
     fun reset() {
+        this.animationTick = 0
         this.finished = false
         this.lastRespawnCheckpointIndex = 0
         this.lastCheckpointIndex = 0
@@ -276,7 +281,7 @@ class PlayerGlideExtension(
     fun addProgressComponents(minigame: GlideMinigame, progressBar: MutableComponent, marker: Int) {
         val playerOffset = Mth.clamp(Math.round(this.progress * 300).toInt(), 0, 300) - 1
         progressBar.append(ComponentUtils.space(playerOffset - 309))
-        progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker).shadowless())
+        progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker % 16).shadowless())
         progressBar.append(ComponentUtils.space(-7))
         progressBar.append(GlideFont.Progressbar.CURRENT.shadowless())
 

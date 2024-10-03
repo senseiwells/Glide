@@ -1,14 +1,20 @@
 package me.senseiwells.glide.font
 
+import it.unimi.dsi.fastutil.ints.IntIntPair
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
 import net.casual.arcade.resources.font.IndexedBitmapFontResources
 import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.utils.component1
+import net.casual.arcade.utils.component2
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
     private const val SHIFT = -35
+
+    val SUPPORTED_LANGS = listOf("en_us")
 
     val YOU_CRASHED by translatable("glide.you_crashed") {
         bitmap("en_us", at("crash/you_crashed_en_us.png"), 3, 3)
@@ -126,5 +132,84 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             require(index in 0..20) { "Index must be between 0 and 20" }
             return this.get(index + 63)
         }
+    }
+
+    object Banner: IndexedBitmapFontResources(GlideMod.id("banner_font")) {
+        private val BOXES = Object2ObjectOpenHashMap<FramedKey, Component>()
+
+        private val BOX_SIZES = listOf(
+            IntIntPair.of(3, -18),
+            IntIntPair.of(4, -22),
+            IntIntPair.of(7, -25),
+            IntIntPair.of(8, -27),
+            IntIntPair.of(11, -30),
+            IntIntPair.of(12, -32),
+            IntIntPair.of(15, -34),
+            IntIntPair.of(16, -36),
+            IntIntPair.of(18, -38)
+        )
+        private val SHIELD_SIZES = listOf(
+            IntIntPair.of(52, -15),
+            IntIntPair.of(60, -11),
+            IntIntPair.of(68, -7),
+            IntIntPair.of(76, -3),
+            IntIntPair.of(84, 1),
+            IntIntPair.of(92, 5),
+            IntIntPair.of(96, 7),
+            IntIntPair.of(94, 6),
+            IntIntPair.of(92, 5),
+            IntIntPair.of(90, 4),
+            IntIntPair.of(88, 3)
+        )
+
+        init {
+            for ((height, ascent) in this.BOX_SIZES) {
+                indexed(at("banner/textbox/left.png"), ascent, height)
+                indexed(at("banner/textbox/right.png"), ascent, height)
+            }
+            for ((height, ascent) in this.SHIELD_SIZES) {
+                indexed(at("banner/elytra_shield.png"), ascent, height)
+            }
+
+            registerTextbox(GlideComponents.SOLO_ROUND, GlideComponents::soloRoundTextbox)
+            registerTextbox(GlideComponents.NUMBERED_ROUND.generate(), GlideComponents::numberedRoundTextbox)
+        }
+
+        fun elytraShield(index: Int): Component {
+            val frame = index.coerceIn(0, this.SHIELD_SIZES.lastIndex)
+            return this.get(this.BOX_SIZES.size * 2 + frame)
+        }
+
+        fun textbox(component: Component, index: Int): Component {
+            val frame = index.coerceIn(0, this.BOX_SIZES.lastIndex)
+            val key = GlideComponents.textboxKey(component, this.BOX_SIZES[frame].keyInt())
+            val box = this.BOXES[FramedKey(key, frame)] ?: return Component.empty() // TODO
+            val left = this.get(frame * 2)
+            val right = this.get(frame * 2 + 1)
+            val textbox = Component.empty()
+                .append(ComponentUtils.space(1, 2))
+                .append(left)
+                .append(ComponentUtils.space(-1))
+                .append(box)
+            if (frame == 8) {
+                textbox.append(ComponentUtils.negativeWidthOf(component))
+                textbox.append(ComponentUtils.space(-4))
+                textbox.append(component)
+                textbox.append(ComponentUtils.space(2))
+            }
+            return textbox.append(ComponentUtils.space(-2)).append(right)
+        }
+
+        private fun registerTextbox(component: Component, file: (String) -> String) {
+            for ((i, size) in this.BOX_SIZES.withIndex()) {
+                val key = GlideComponents.textboxKey(component, size.keyInt())
+                val textbox = translatable(key) {
+                    SUPPORTED_LANGS.forEach { bitmap(it, at(file(it)), size.valueInt(), size.keyInt()) }
+                }.generate()
+                this.BOXES[FramedKey(key, i)] = textbox
+            }
+        }
+
+        private data class FramedKey(val key: String, val frame: Int)
     }
 }

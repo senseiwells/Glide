@@ -8,7 +8,11 @@ import net.casual.arcade.utils.TimeUtils.Seconds
 import net.minecraft.sounds.SoundSource
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
-    Waiting("waiting"),
+    Waiting("waiting") {
+        override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
+            minigame.settings.canLookAroundWhenFrozen = true
+        }
+    },
     Countdown("countdown") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
             minigame.ui.countdown.countdown(minigame, 5.Seconds).then {
@@ -18,10 +22,11 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Active("active") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
+            minigame.settings.canLookAroundWhenFrozen = false
             for (player in minigame.players) {
                 player.isNoGravity = false
-                player.sendSound(GlideSounds.MUSIC_MAP_1, source = SoundSource.MUSIC)
             }
+            minigame.music.start()
         }
     },
     Finish("finish") {
