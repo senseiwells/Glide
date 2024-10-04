@@ -1,16 +1,16 @@
 package me.senseiwells.glide.minigame
 
-import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.countdown
-import net.casual.arcade.utils.PlayerUtils.sendSound
+import net.casual.arcade.resources.utils.ResourcePackUtils
 import net.casual.arcade.utils.TimeUtils.Seconds
-import net.minecraft.sounds.SoundSource
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     Waiting("waiting") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.settings.canLookAroundWhenFrozen = true
+            ResourcePackUtils.afterPacksLoad(minigame.players) {
+                minigame.setPhase(Countdown)
+            }
         }
     },
     Countdown("countdown") {

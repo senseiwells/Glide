@@ -3,7 +3,6 @@ package me.senseiwells.glide
 import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.GlideExtensions
-import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigame
@@ -22,24 +21,19 @@ import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
 import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
 import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
 import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
-import net.casual.arcade.utils.ComponentUtils
-import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.literal
-import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
-import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import kotlin.math.min
 
 object GlideMod: ModInitializer {
     const val MOD_ID = "glide"
 
     val logger: Logger = LogManager.getLogger(MOD_ID)
+
+    val container = FabricLoader.getInstance().getModContainer(MOD_ID).get()
 
     val resourcePack = NamedResourcePackCreator.named("glide_pack") {
         addAssetSource(MOD_ID)
@@ -88,20 +82,5 @@ object GlideMod: ModInitializer {
             player.sendResourcePack(noShadowPack)
             player.sendResourcePack(shiftedPack)
         }
-    }
-
-    // TODO:
-    private fun getUsernameStringLength(string: String): Int {
-        var totalLength = 0
-        for (character in string) {
-            totalLength += when (character) {
-                'f', 'k' -> 5
-                'i' -> 2
-                'l' -> 3
-                't', 'I' -> 4
-                else -> 6
-            }
-        }
-        return totalLength
     }
 }

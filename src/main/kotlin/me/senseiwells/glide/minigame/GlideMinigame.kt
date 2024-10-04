@@ -11,10 +11,7 @@ import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
-import me.senseiwells.glide.gui.GlobalSidebarTimerElement
-import me.senseiwells.glide.gui.PlayerSidebarTimerElement
-import me.senseiwells.glide.gui.SidebarScoreElement
-import me.senseiwells.glide.gui.SidebarVelocityElement
+import me.senseiwells.glide.gui.*
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
@@ -36,10 +33,7 @@ import net.casual.arcade.minigame.serialization.MinigameCreationContext
 import net.casual.arcade.minigame.serialization.MinigameFactory
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils
-import net.casual.arcade.utils.ComponentUtils.color
-import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
 import net.casual.arcade.utils.JsonUtils.booleanOrDefault
 import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.PlayerUtils.addToTeam
@@ -47,6 +41,7 @@ import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
 import net.casual.arcade.utils.PlayerUtils.clearTitle
 import net.casual.arcade.utils.PlayerUtils.player
+import net.casual.arcade.utils.PlayerUtils.removeFromTeam
 import net.casual.arcade.utils.PlayerUtils.resetHealth
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
@@ -56,9 +51,7 @@ import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.set
-import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
-import net.casual.arcade.visuals.countdown.Countdown
 import net.casual.arcade.visuals.elements.ComponentElements
 import net.casual.arcade.visuals.elements.SidebarElements
 import net.casual.arcade.visuals.sidebar.Sidebar
@@ -77,7 +70,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.Unbreakable
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.GameType
-import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Team
 import java.util.*
 import kotlin.math.abs
@@ -96,12 +88,12 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
-    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of("Checkpoint!".literal()))
+    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of(GlideComponents.CHECKPOINT))
     private val startPos = this.config.spawn.get(this.level)
 
-    private val countdownBossbar = SuppliedBossbar()
-    private val shieldBossbar = SuppliedBossbar()
-    private val textboxBossbar = SuppliedBossbar()
+    private val countdown = GlideStartBanner()
+    private val finish = GlideFinishBanner(this.mode)
+    private val end = GlideEndBanner(this.mode)
 
     private val sidebar = Sidebar(ComponentElements.empty())
     private var progressBar: Component = Component.empty()
@@ -133,65 +125,7 @@ class GlideMinigame(
         this.sidebar.addRow(SidebarElements.empty())
         this.ui.setSidebar(this.sidebar)
 
-        // TODO: Cleanup this
-        this.countdownBossbar.setTitle(ComponentElements.of("Starting".literal().withShiftedDownFont(1)))
-        this.shieldBossbar.setTitle { player ->
-            val frame = player.glide.animationTick - 10
-            if (frame >= 0) {
-                GlideFont.Banner.elytraShield(frame)
-            } else {
-                Component.empty()
-            }
-        }
-        this.textboxBossbar.setTitle { player ->
-            val frame = player.glide.animationTick - 30
-            if (frame >= 0) {
-                val textbox = GlideFont.Banner.textbox(
-                    GlideComponents.NUMBERED_ROUND.generate(1).color(0x000000).withShiftedDownFont(4),
-                    frame
-                )
-                Component.empty().append(textbox).shadowless()
-            } else {
-                Component.empty()
-            }
-        }
-
-        this.ui.countdown = object: Countdown {
-            override fun beforeCountdown(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration) {
-                for (player in players) {
-                    countdownBossbar.addPlayer(player)
-                }
-            }
-
-            override fun sendCountdown(
-                players: Collection<ServerPlayer>,
-                current: Int,
-                remaining: MinecraftTimeDuration
-            ) {
-                for (player in players) {
-                    player.sendSound(GlideSounds.COUNTDOWN_TICK)
-                }
-                countdownBossbar.setTitle(
-                    ComponentElements.of("Time to start: $current seconds".literal().withShiftedDownFont(1))
-                )
-            }
-
-            override fun afterCountdown(players: Collection<ServerPlayer>) {
-                for (player in players) {
-                    shieldBossbar.removePlayer(player)
-                    textboxBossbar.removePlayer(player)
-                    player.sendSound(GlideSounds.COUNTDOWN_START)
-                }
-                countdownBossbar.setTitle(
-                    ComponentElements.of("Round start!".literal().withShiftedDownFont(1))
-                )
-                GlobalTickedScheduler.schedule(1.Seconds) {
-                    for (player in players) {
-                        countdownBossbar.removePlayer(player)
-                    }
-                }
-            }
-        }
+        this.ui.countdown = this.countdown
 
         this.music.suppressGameMusic(true)
         this.music.provider = GlideMusicProvider
@@ -206,6 +140,8 @@ class GlideMinigame(
             set(GameRules.RULE_DOMOBSPAWNING, false)
             set(GameRules.RULE_RANDOMTICKING, 0)
             set(GameRules.RULE_DOFIRETICK, false)
+            set(GameRules.RULE_WEATHER_CYCLE, false)
+            set(GameRules.RULE_DAYLIGHT, false)
         }
 
         this.effects.setInvisiblePredicate({ observee, observer ->
@@ -241,7 +177,6 @@ class GlideMinigame(
     fun markPlayerFinished(player: ServerPlayer) {
         this.players.setSpectating(player)
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
-        player.sendSystemMessage("Finished! :)".literal())
 
         val tracker = this.trackers.remove(player.uuid) ?: return
         val best = player.glide.checkForBest(this.config.id, this.mode, this.ticks.Ticks, tracker.finish())
@@ -250,23 +185,32 @@ class GlideMinigame(
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
             }
         }
+
+        // TODO: If it's the last player we use end instead
+        player.glide.resetAnimation()
+        this.finish.addPlayer(player)
+        this.scheduler.schedule(10.Seconds) {
+            this.finish.removePlayer(player)
+        }
     }
 
-    @Listener(flags = ListenerFlags.IS_PLAYING)
+    @Listener
     private fun onPlayerTick(event: PlayerTickEvent) {
         val (player) = event
 
         val glide = player.glide
         glide.tick(this, this.ticks)
 
-        if (player.verticalCollision) {
-            player.hurt(player.damageSources().flyIntoWall(), 2.0F)
-        }
+        if (this.players.isPlaying(player)) {
+            if (player.verticalCollision) {
+                player.hurt(player.damageSources().flyIntoWall(), 2.0F)
+            }
 
-        if (this.phase == GlidePhase.Active) {
-            val tracker = this.trackers[player.uuid] ?: return
-            if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
-                tracker.update(player.position())
+            if (this.phase == GlidePhase.Active) {
+                val tracker = this.trackers[player.uuid] ?: return
+                if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
+                    tracker.update(player.position())
+                }
             }
         }
     }
@@ -350,9 +294,11 @@ class GlideMinigame(
 
         this.trackers.remove(player.uuid)
 
-        this.countdownBossbar.removePlayer(player)
-        this.shieldBossbar.removePlayer(player)
-        this.textboxBossbar.removePlayer(player)
+        this.countdown.removePlayer(player)
+
+        if (player.team === this.team) {
+            player.removeFromTeam()
+        }
     }
 
     @Listener
@@ -365,9 +311,7 @@ class GlideMinigame(
         if (this.phase < GlidePhase.Active) {
             player.isNoGravity = true
 
-            this.countdownBossbar.addPlayer(player)
-            this.shieldBossbar.addPlayer(player)
-            this.textboxBossbar.addPlayer(player)
+            this.countdown.addPlayer(player)
         }
         player.addToTeam(this.team)
 
@@ -398,7 +342,7 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING, during = During(phases = ["active"]))
     private fun onPlayerSneak(event: PlayerSetSneakingEvent) {
         val (player, sneaking) = event
-        if (sneaking && !player.isSpectator) {
+        if (this.mayRestart(player) && sneaking) {
             val last = this.stats.getOrCreateStat(player, GlideStats.LAST_SNEAK_TIME)
             if (abs(this.server.tickCount - last.value) < 7) {
                 this.respawnPlayer(event.player)
@@ -406,6 +350,10 @@ class GlideMinigame(
                 last.modify { this.server.tickCount }
             }
         }
+    }
+
+    private fun mayRestart(player: ServerPlayer): Boolean {
+        return !player.glide.finished && !player.isSpectator // TODO: Add solo check here
     }
 
     private fun respawnPlayer(player: ServerPlayer) {

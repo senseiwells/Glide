@@ -1,0 +1,72 @@
+package me.senseiwells.glide.gui
+
+import me.senseiwells.glide.font.GlideComponents
+import me.senseiwells.glide.font.GlideFont
+import me.senseiwells.glide.sound.GlideSounds
+import net.casual.arcade.scheduler.GlobalTickedScheduler
+import net.casual.arcade.utils.ComponentUtils.color
+import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.PlayerUtils.sendSound
+import net.casual.arcade.utils.TimeUtils.Seconds
+import net.casual.arcade.utils.time.MinecraftTimeDuration
+import net.casual.arcade.visuals.countdown.Countdown
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerPlayer
+
+// TODO:
+//   - When a player finishes another banner is displayed
+//     - Either displaying their time
+//     - Or 'personal best'
+//   - After X amount of players have finished 'hurry' starts
+//     - All not finished players displayed 'hurry' banner
+//     - Countdown for 1 minute begins
+//   - Once round ends all players shown banner either with
+//     their times/score, or DNF
+//   - If the round is the last round the previous banner is replaced
+//     with whoever won the round 'foobar won!'
+class GlideStartBanner: GlideBanner(), Countdown {
+    init {
+        this.setTitle(GlideComponents.STARTING.withShiftedDownFont(1))
+    }
+
+    override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
+        return GlideFont.Banner.elytraShield(frame).shadowless()
+    }
+
+    override fun getBannerText(player: ServerPlayer, frame: Int): Component {
+        return GlideComponents.NUMBERED_ROUND.generate("0000000")
+            .color(0x000000)
+            .withShiftedDownFont(4)
+    }
+
+    override fun getDelay(): Int {
+        return 10
+    }
+
+    override fun beforeCountdown(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration) {
+        for (player in players) {
+            this.addPlayer(player, shield = false)
+        }
+    }
+
+    override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {
+        this.setTitle(GlideComponents.STARTING_IN.generate(current).withShiftedDownFont(1))
+        for (player in players) {
+            player.sendSound(GlideSounds.COUNTDOWN_TICK)
+        }
+    }
+
+    override fun afterCountdown(players: Collection<ServerPlayer>) {
+        for (player in players) {
+            this.removePlayer(player, title = false)
+            player.sendSound(GlideSounds.COUNTDOWN_START)
+        }
+        this.setTitle(GlideComponents.STARTED.withShiftedDownFont(1))
+        GlobalTickedScheduler.schedule(2.Seconds) {
+            for (player in players) {
+                this.removePlayer(player)
+            }
+        }
+    }
+}

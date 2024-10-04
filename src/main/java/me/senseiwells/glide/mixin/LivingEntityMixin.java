@@ -3,13 +3,9 @@ package me.senseiwells.glide.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent;
 import me.senseiwells.glide.extension.PlayerGlideExtension;
-import me.senseiwells.glide.utils.EntityUtils;
 import net.casual.arcade.events.GlobalEventHandler;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
