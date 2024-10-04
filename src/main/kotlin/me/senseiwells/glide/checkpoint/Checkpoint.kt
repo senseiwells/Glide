@@ -95,7 +95,7 @@ class FinishLine(
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (player.glide.collideWithCheckpoint(this)) {
-            player.glide.collideWithFinishLine(this)
+            player.glide.collideWithFinishLine()
             glide.markPlayerFinished(player)
         }
     }

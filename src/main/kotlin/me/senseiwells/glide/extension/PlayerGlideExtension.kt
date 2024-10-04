@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointData
-import me.senseiwells.glide.checkpoint.FinishLine
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
@@ -75,7 +74,11 @@ class PlayerGlideExtension(
     var animationTick = 0
         private set
 
-    var finished = false
+    var finished: Boolean = false
+        private set
+    var finishedTime: MinecraftTimeDuration = MinecraftTimeDuration.ZERO
+        private set
+    var wasPersonalBest: Boolean = false
         private set
     var combo = 0
     var scoreIcon: Component = GlideFont.Score.GREY
@@ -117,7 +120,7 @@ class PlayerGlideExtension(
         return false
     }
 
-    fun collideWithFinishLine(finish: FinishLine): Boolean {
+    fun collideWithFinishLine(): Boolean {
         if (!this.finished) {
             this.finished = true
             return true
@@ -176,6 +179,9 @@ class PlayerGlideExtension(
         time: MinecraftTimeDuration,
         trails: List<GlideTrail>
     ): Boolean {
+        this.finishedTime = time
+
+        this.wasPersonalBest = true
         val bests = this.personalBests[id]
         if (bests == null) {
             this.personalBests[id] = when (mode) {
@@ -202,14 +208,19 @@ class PlayerGlideExtension(
                 return true
             }
         }
+        this.wasPersonalBest = false
         return false
     }
 
     fun tick(minigame: GlideMinigame, tick: Int) {
+        this.animationTick++
+        if (!minigame.players.isPlaying(this.player)) {
+            return
+        }
+
         if (minigame.isPhase(GlidePhase.Active)) {
             this.ghost?.tick(this.player, tick)
         }
-        this.animationTick++
 
         if (this.lastRespawnCheckpointTicks > 0) {
             this.lastRespawnCheckpointTicks--
@@ -264,8 +275,9 @@ class PlayerGlideExtension(
     }
 
     fun reset() {
-        this.animationTick = 0
+        this.resetAnimation()
         this.finished = false
+        this.finishedTime = MinecraftTimeDuration.ZERO
         this.lastRespawnCheckpointIndex = 0
         this.lastCheckpointIndex = 0
         this.lastSavedScore = 0
@@ -276,6 +288,10 @@ class PlayerGlideExtension(
         this.lastSavedRingType = RingType.Grey
         this.respawn()
         this.hideTrail()
+    }
+
+    fun resetAnimation() {
+        this.animationTick = 0
     }
 
     fun addProgressComponents(minigame: GlideMinigame, progressBar: MutableComponent, marker: Int) {

@@ -1,6 +1,16 @@
 {
   "glide.round.solo": "Solo Round!",
   "glide.round.numbered": "Round %s",
+  "glide.round.starting": "Starting",
+  "glide.round.starting.in": "Time to start: %s seconds",
+  "glide.round.started": "Round start!",
+
+  "glide.personalBest": "Personal Best!",
+  "glide.hurryUp": "Hurry Up",
+  "glide.dnf": "DNF",
+
+  "glide.checkpoint": "Checkpoint!",
+
   "glide.round.solo.negativeWidth": "\uDAFF\uDFC7",
-  "glide.round.numbered.negativeWidth": "\uDAFF\uDFD8"
+  "glide.round.numbered.negativeWidth": "\uDAFF\uDFDE"
 }
