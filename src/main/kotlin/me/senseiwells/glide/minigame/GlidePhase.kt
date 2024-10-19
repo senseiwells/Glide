@@ -22,7 +22,6 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Active("active") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.settings.canLookAroundWhenFrozen = false
             for (player in minigame.players) {
                 player.isNoGravity = false
             }
@@ -32,10 +31,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     Finish("finish") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
             minigame.settings.canTakeDamage.set(false)
-
-            minigame.scheduler.schedule(20.Seconds) {
-                minigame.complete()
-            }
+            minigame.endRound()
         }
     }
 }
