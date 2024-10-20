@@ -12,7 +12,7 @@ import net.minecraft.world.item.Items
 
 class GlideItem private constructor(): Item(Properties()), ArcadeModelledItem {
     override fun getPolymerItem(stack: ItemStack, player: ServerPlayer?): Item {
-        return Items.SNOWBALL
+        return Items.WHITE_STAINED_GLASS
     }
 
     override fun getModeller(): ItemModeller {
