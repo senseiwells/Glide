@@ -28,6 +28,7 @@ out vec2 texCoord2;
 out vec4 normal;
 out float isThermal;
 out float isBoost;
+out float isOmniBoost;
 out float isBeaconShell;
 out float isBeaconBeam;
 out float height;
@@ -66,8 +67,13 @@ void main() {
         }
     }
     isBoost = 0.0;
-    if (ivec4(texture(Sampler0, texCoord0) * 255.0 + 0.5) == ivec4(230, 100, 47, 255)) {
+    if (ivec4(texture(Sampler0, texCoord0) * 255.0 + 0.5) == ivec4(255, 185, 0, 255)) {
         isBoost = 1.0;
+        vec2 texel = 1.0 / textureSize(Sampler0, 0);
+    }
+    isOmniBoost = 0.0;
+    if (ivec4(texture(Sampler0, texCoord0) * 255.0 + 0.5) == ivec4(230, 100, 47, 255)) {
+        isOmniBoost = 1.0;
         vec2 texel = 1.0 / textureSize(Sampler0, 0);
     }
     isBeaconBeam = 0.0;
@@ -96,7 +102,10 @@ void main() {
         }
     }
     if (isBoost > 0.5) {
-        height = UV2.x / 16.0 + UV2.y;
+        height = UV2.x / 50.0 + UV2.y;
+    }
+    if (isOmniBoost > 0.5) {
+        height = UV2.x / 50.0 + UV2.y;
     }
     if (isBeaconBeam > 0.5) {
         height = UV2.x / 16.0 + UV2.y;
