@@ -17,6 +17,7 @@ in vec2 texCoord1;
 in vec4 normal;
 in float isThermal;
 in float isBoost;
+in float isOmniBoost;
 in float isBeaconShell;
 in float isBeaconBeam;
 in float height;
@@ -49,28 +50,38 @@ void main() {
             discard;
         }
     }
-    else if (isBoost > 0.5) {
+    else if (isBoost > 0.5 || isOmniBoost > 0.5) {
         if (mod(gl_FragCoord.x + gl_FragCoord.y, 2.0) < 0.5) {
             discard;
         }
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
-        uv.y *= 0.65;
+        uv.y *= 0.55;
         uv.y += GameTime * 32.0;
 
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
+        
 
         if (abs(normal.y) > 0.1) {
-            color.a /= max(vertexDistance / 10.0, 3.4);
+            color.a /= max(vertexDistance / 10.0, 1.7);
         } else {
-            color.a /= max(vertexDistance / 20.0, 3.2);
+            color.a /= max(vertexDistance / 20.0, 1.7);
         }
 
-        if (color.a < 0.2) {
+        if (color.a < 0.1) {
             discard;
         }
+
         if (color.r*255 == 230 && color.g*255 == 100 && color.b*255 == 47) {
             discard;
+        }
+        if (color.r*255 == 255 && color.g*255 == 185 && color.b*255 == 0) {
+            discard;
+        }
+        if (isOmniBoost > 0.5) {
+            color.rgb *= vec3(1,0.6,0);
+        } else {
+            color.rgb *= vec3(1,0.82,0);
         }
     }
     else if (isBeaconBeam > 0.5) {
