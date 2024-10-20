@@ -15,6 +15,7 @@ import net.casual.arcade.utils.component2
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.TranslatableContents
+import net.minecraft.util.Mth
 import kotlin.io.path.reader
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
@@ -227,9 +228,9 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             val right = this.get(frame * BOX_COUNT + 1)
             return Component.empty()
                 .append(left)
-                .append(ComponentUtils.space(-6))
+                .append(this.dynamicallySizedSpace(frame, 6))
                 .append(box)
-                .append(ComponentUtils.space(-6))
+                .append(this.dynamicallySizedSpace(frame, 6))
                 .append(right)
         }
 
@@ -245,13 +246,13 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val box = BOXES[FramedKey(key, frame)]
                     ?: throw IllegalStateException("Component ${contents.key} doesn't have a textbox!")
                 dynamic.append(box)
-                dynamic.append(ComponentUtils.space(-2))
+                dynamic.append(this.dynamicallySizedSpace(frame, 2))
                 for (arg in contents.args) {
                     dynamic.append(when (arg) {
                         is Component -> this.dynamicallySizedTextbox(arg, frame)
                         else -> this.dynamicallySizedTextbox(arg.toString(), frame)
                     })
-                    dynamic.append(ComponentUtils.space(-1))
+                    dynamic.append(this.dynamicallySizedSpace(frame))
                 }
                 return dynamic
             }
@@ -266,12 +267,23 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val width = 1 shl i
                 while (remaining >= width) {
                     dynamic.append(this.get(frame * BOX_COUNT + 2 + i))
-                    dynamic.append(ComponentUtils.space(-1))
+                    dynamic.append(this.dynamicallySizedSpace(frame))
                     // The textboxes are actually 1.125 (18/16) times bigger than a pixel
                     remaining -= width * 1.125
                 }
             }
             return dynamic
+        }
+
+        private fun dynamicallySizedSpace(frame: Int, size: Int = 1): MutableComponent {
+            require(size >= 1) { "Cannot have a non-positive size" }
+            val numerator = Mth.ceil(BOX_SIZES[frame].keyInt() * 75.0 / 18.0)
+            val space = ComponentUtils.space(-numerator, 75)
+            val component = Component.empty()
+            repeat(size) {
+                component.append(space)
+            }
+            return component
         }
 
         private fun registerTextbox(component: Component, file: (String) -> String) {
