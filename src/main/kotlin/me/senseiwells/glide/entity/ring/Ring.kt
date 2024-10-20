@@ -36,6 +36,7 @@ class Ring(
     level: Level,
     ringType: RingType = RingType.Blue
 ): Entity(type, level), PolymerEntity, GlideCollider {
+
     private var ringType: RingType? = null
 
     constructor(level: Level, type: RingType): this(GlideEntities.RING, level, type)
@@ -84,7 +85,7 @@ class Ring(
     }
 
     override fun makeBoundingBox(): AABB {
-        val size = this.getRingType().getSize().toDouble() - 1
+        val size = this.getRingType().getSize().toDouble() - 3
         val direction = Direction.orderedByNearest(this)[0]
         return AABB.ofSize(
             this.position(),
