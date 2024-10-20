@@ -73,6 +73,6 @@ enum class RingType(
     abstract fun getSound(combo: Int): SoundEvent
 
     fun getSize(): Int {
-        return this.points + 2
+        return 12 - this.points
     }
 }
