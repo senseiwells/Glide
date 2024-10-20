@@ -17,7 +17,7 @@ class TextboxGenerator(
     private val location: (String) -> Path,
 ): LanguageEntryGenerator {
     override fun run(font: Font, lang: String, consumer: Consumer<LanguageEntry>) {
-        val width = font.width(this.component) / 2
+        val width = (font.width(this.component) / 2.25).toInt()
 
         val image = BufferedImage(width, 8, BufferedImage.TYPE_INT_ARGB)
         val graphics = image.createGraphics()

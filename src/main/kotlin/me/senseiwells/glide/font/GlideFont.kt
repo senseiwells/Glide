@@ -220,27 +220,24 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             return this.get(BOX_SHIFT + frame * 3 + 2)
         }
 
-        fun textbox(component: Component, index: Int): Component {
+        fun textbox(component: Component, index: Int): MutableComponent {
             val frame = index.coerceIn(0, this.BOX_SIZES.lastIndex)
-            val negative = Component.empty()
-            val box = this.dynamicallySizedTextbox(component, frame, negative)
+            val box = this.dynamicallySizedTextbox(component, frame)
             val left = this.get(frame * BOX_COUNT)
             val right = this.get(frame * BOX_COUNT + 1)
-            val textbox = Component.empty()
-                .append(ComponentUtils.space(1))
+            return Component.empty()
                 .append(left)
-                .append(ComponentUtils.space(-1))
+                .append(ComponentUtils.space(-6))
                 .append(box)
-            if (frame == 8) {
-                textbox.append(negative)
-                textbox.append(ComponentUtils.space(-1))
-                textbox.append(component)
-                textbox.append(ComponentUtils.space(2))
-            }
-            return textbox.append(ComponentUtils.space(-2)).append(right)
+                .append(ComponentUtils.space(-6))
+                .append(right)
         }
 
-        private fun dynamicallySizedTextbox(component: Component, frame: Int, negative: MutableComponent): Component {
+        fun isLastTextboxFrame(index: Int): Boolean {
+            return index >= 8
+        }
+
+        private fun dynamicallySizedTextbox(component: Component, frame: Int): Component {
             val contents = component.contents
             val dynamic = Component.empty()
             if (contents is TranslatableContents) {
@@ -248,23 +245,21 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val box = BOXES[FramedKey(key, frame)]
                     ?: throw IllegalStateException("Component ${contents.key} doesn't have a textbox!")
                 dynamic.append(box)
-                dynamic.append(ComponentUtils.space(-1))
-                negative.append(ComponentUtils.negativeWidthOf(component))
+                dynamic.append(ComponentUtils.space(-2))
                 for (arg in contents.args) {
                     dynamic.append(when (arg) {
-                        is Component -> this.dynamicallySizedTextbox(arg, frame, negative)
-                        else -> this.dynamicallySizedTextbox(arg.toString(), frame, negative)
+                        is Component -> this.dynamicallySizedTextbox(arg, frame)
+                        else -> this.dynamicallySizedTextbox(arg.toString(), frame)
                     })
                     dynamic.append(ComponentUtils.space(-1))
                 }
                 return dynamic
             }
-            return this.dynamicallySizedTextbox(component.string, frame, negative)
+            return this.dynamicallySizedTextbox(component.string, frame)
         }
 
-        private fun dynamicallySizedTextbox(string: String, frame: Int, negative: MutableComponent): MutableComponent {
+        private fun dynamicallySizedTextbox(string: String, frame: Int): MutableComponent {
             val size = string.sumOf { CHAR_WIDTH_LOOKUP[it] }
-            negative.append(ComponentUtils.space(-size))
             var remaining = size / 2.0
             val dynamic = Component.empty()
             for (i in (0 until DYNAMIC_BOXES).reversed()) {

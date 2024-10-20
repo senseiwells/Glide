@@ -2,6 +2,7 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
+import me.senseiwells.glide.minigame.GlideRound
 import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils.color
@@ -25,33 +26,25 @@ import net.minecraft.server.level.ServerPlayer
 //     their times/score, or DNF
 //   - If the round is the last round the previous banner is replaced
 //     with whoever won the round 'foobar won!'
-class GlideStartBanner: GlideBanner(), Countdown {
+class GlideStartBanner(private val round: GlideRound): GlideBanner(), Countdown {
     init {
-        this.setTitle(GlideComponents.STARTING.withShiftedDownFont(1))
+        this.setTitle(GlideComponents.STARTING.withShiftedDownFont(12))
     }
 
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         return GlideFont.Banner.elytraShield(frame).shadowless()
     }
 
-    override fun getBannerText(player: ServerPlayer, frame: Int): Component {
-        return GlideComponents.NUMBERED_ROUND.generate("0000000")
-            .color(0x000000)
-            .withShiftedDownFont(4)
+    override fun getBannerText(player: ServerPlayer): Component {
+        return this.round.getStartBanner().color(0x000000).withShiftedDownFont(29)
     }
 
     override fun getDelay(): Int {
         return 10
     }
 
-    override fun beforeCountdown(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration) {
-        for (player in players) {
-            this.addPlayer(player, shield = false)
-        }
-    }
-
     override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {
-        this.setTitle(GlideComponents.STARTING_IN.generate(current).withShiftedDownFont(1))
+        this.setTitle(GlideComponents.STARTING_IN.generate(current).withShiftedDownFont(12))
         for (player in players) {
             player.sendSound(GlideSounds.COUNTDOWN_TICK)
         }
@@ -62,11 +55,9 @@ class GlideStartBanner: GlideBanner(), Countdown {
             this.removePlayer(player, title = false)
             player.sendSound(GlideSounds.COUNTDOWN_START)
         }
-        this.setTitle(GlideComponents.STARTED.withShiftedDownFont(1))
+        this.setTitle(GlideComponents.STARTED.withShiftedDownFont(12))
         GlobalTickedScheduler.schedule(2.Seconds) {
-            for (player in players) {
-                this.removePlayer(player)
-            }
+            super<GlideBanner>.afterCountdown(players)
         }
     }
 }

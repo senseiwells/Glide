@@ -7,13 +7,10 @@ import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.datagen.language.LanguageGenerator
-import net.casual.arcade.datagen.language.NegativeWidthGenerator
 import net.casual.arcade.datagen.resource.ArcadeResourceGenerator
 import net.casual.arcade.resources.ArcadeResourcePacks
 import net.casual.arcade.utils.JsonUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
-import java.nio.file.Path
 import kotlin.io.path.writer
 
 class GlideResourceGenerator: ArcadeResourceGenerator {
@@ -31,21 +28,21 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
     override fun run(client: Minecraft) {
         val fonts = this.getAssetsPath().resolve("textures").resolve("font")
         val generator = LanguageGenerator(GlideFont.SUPPORTED_LANGS).apply {
-            addTextboxAndNegativeWidth(GlideComponents.SOLO_ROUND) { lang ->
+            add(TextboxGenerator(GlideComponents.SOLO_ROUND) { lang ->
                 fonts.resolve(GlideComponents.soloRoundTextbox(lang))
-            }
-            addTextboxAndNegativeWidth(GlideComponents.NUMBERED_ROUND.generate("")) { lang ->
+            })
+            add(TextboxGenerator(GlideComponents.NUMBERED_ROUND.generate("")) { lang ->
                 fonts.resolve(GlideComponents.numberedRoundTextbox(lang))
-            }
-            addTextboxAndNegativeWidth(GlideComponents.PERSONAL_BEST) { lang ->
+            })
+            add(TextboxGenerator(GlideComponents.PERSONAL_BEST) { lang ->
                 fonts.resolve(GlideComponents.personalBestTextbox(lang))
-            }
-            addTextboxAndNegativeWidth(GlideComponents.HURRY_UP) { lang ->
+            })
+            add(TextboxGenerator(GlideComponents.HURRY_UP) { lang ->
                 fonts.resolve(GlideComponents.hurryUpTextbox(lang))
-            }
-            addTextboxAndNegativeWidth(GlideComponents.DNF) { lang ->
+            })
+            add(TextboxGenerator(GlideComponents.DNF) { lang ->
                 fonts.resolve(GlideComponents.dnfTextbox(lang))
-            }
+            })
         }
         generator.replaceLangs(client, this.getDataPath().resolve("lang"))
 
@@ -62,10 +59,5 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
         this.getDataPath().resolve("char_width_lookup.json").writer().use {
             JsonUtils.encode(array, it)
         }
-    }
-
-    private fun LanguageGenerator.addTextboxAndNegativeWidth(component: Component, file: (String) -> Path) {
-        add(TextboxGenerator(component, file))
-        add(NegativeWidthGenerator(component))
     }
 }

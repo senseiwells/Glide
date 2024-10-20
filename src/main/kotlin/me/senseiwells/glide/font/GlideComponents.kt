@@ -12,6 +12,9 @@ object GlideComponents {
     val STARTING by ComponentUtils.translatable("glide.round.starting")
     val STARTING_IN = ComponentUtils.translatableWithArgs("glide.round.starting.in")
     val STARTED by ComponentUtils.translatable("glide.round.started")
+    val REACH_THE_END = ComponentUtils.translatableWithArgs("glide.round.reachTheEnd")
+    val ROUND_END by ComponentUtils.translatable("glide.round.end")
+    val ENDING_IN = ComponentUtils.translatableWithArgs("glide.round.ending.in")
 
     val PERSONAL_BEST by ComponentUtils.translatable("glide.personalBest")
     val HURRY_UP by ComponentUtils.translatable("glide.hurryUp")

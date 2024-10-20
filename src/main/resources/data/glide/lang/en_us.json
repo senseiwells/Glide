@@ -4,13 +4,13 @@
   "glide.round.starting": "Starting",
   "glide.round.starting.in": "Time to start: %s seconds",
   "glide.round.started": "Round start!",
+  "glide.round.reachTheEnd": "%s seconds to reach the end!",
+  "glide.round.end": "Round end!",
+  "glide.round.ending.in": "Time to round end: %s seconds",
 
   "glide.personalBest": "Personal Best!",
   "glide.hurryUp": "Hurry Up",
   "glide.dnf": "DNF",
 
-  "glide.checkpoint": "Checkpoint!",
-
-  "glide.round.solo.negativeWidth": "\uDAFF\uDFC7",
-  "glide.round.numbered.negativeWidth": "\uDAFF\uDFDE"
+  "glide.checkpoint": "Checkpoint!"
 }

@@ -11,7 +11,7 @@ plugins {
 }
 
 val modVersion = "0.1.0"
-version = "${modVersion}+mc${libs.versions.minecraft.get()}"
+version = "${modVersion}+${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 
 repositories {
@@ -75,9 +75,7 @@ loom {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            groupId = "me.senseiwells"
             artifactId = "glide"
-            version = "${modVersion}+${libs.versions.minecraft.get()}"
             from(components["java"])
         }
     }
