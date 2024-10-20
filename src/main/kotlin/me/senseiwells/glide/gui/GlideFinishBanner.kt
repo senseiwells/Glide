@@ -7,6 +7,7 @@ import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
@@ -18,12 +19,16 @@ class GlideFinishBanner(mode: GlideMode): GlideEndBanner(mode) {
         return super.getBannerShield(player, frame)
     }
 
-    override fun getBannerText(player: ServerPlayer, frame: Int): Component {
+    override fun getBannerText(player: ServerPlayer,): Component {
         val component = when {
             !player.glide.finished -> GlideComponents.HURRY_UP
             player.glide.wasPersonalBest -> GlideComponents.PERSONAL_BEST
-            else -> return super.getBannerText(player, frame)
+            else -> return super.getBannerText(player)
         }
-        return component.color(0x000000).withShiftedDownFont(4)
+        return component.color(0x000000).withShiftedDownFont(29)
+    }
+
+    override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {
+        this.setTitle(GlideComponents.REACH_THE_END.generate(current).withShiftedDownFont(12))
     }
 }

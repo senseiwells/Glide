@@ -31,9 +31,11 @@ import net.casual.arcade.minigame.events.MinigameSetSpectatingEvent
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.serialization.MinigameCreationContext
 import net.casual.arcade.minigame.serialization.MinigameFactory
+import net.casual.arcade.minigame.utils.MinigameUtils.countdown
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
 import net.casual.arcade.utils.JsonUtils.booleanOrDefault
 import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.PlayerUtils.addToTeam
@@ -77,6 +79,7 @@ import kotlin.math.min
 
 class GlideMinigame(
     private val config: GlideAddonConfig,
+    private val round: GlideRound,
     private val mode: GlideMode,
     val level: ServerLevel,
     server: MinecraftServer
@@ -88,10 +91,10 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
-    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of(GlideComponents.CHECKPOINT))
+    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of(GlideComponents.CHECKPOINT.withShiftedDownFont(12)))
     private val startPos = this.config.spawn.get(this.level)
 
-    private val countdown = GlideStartBanner()
+    private val countdown = GlideStartBanner(this.round)
     private val finish = GlideFinishBanner(this.mode)
     private val end = GlideEndBanner(this.mode)
 
@@ -103,6 +106,8 @@ class GlideMinigame(
 
     private var placement = 1
     private var ticks = 0
+
+    private var roundEnding = false
 
     val checkpoints: CheckpointManager
         get() = this.config.checkpoints
@@ -169,7 +174,7 @@ class GlideMinigame(
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
         this.checkpointBossbar.addPlayer(player)
         // 2 Seconds, then 1 second fade
-        this.scheduler.schedule(3.Seconds) {
+        GlobalTickedScheduler.schedule(3.Seconds) {
             this.checkpointBossbar.removePlayer(player)
         }
     }
@@ -186,11 +191,46 @@ class GlideMinigame(
             }
         }
 
-        // TODO: If it's the last player we use end instead
+        val remaining = this.players.playingPlayerCount
+        if (remaining > 0) {
+            if (this.placement == 2) {
+                this.endingRound()
+            } else {
+                this.sendFinish(player)
+            }
+        } else {
+            this.setPhase(GlidePhase.Finish)
+        }
+    }
+
+    fun endRound() {
+        this.end.setTitle(GlideComponents.ROUND_END.withShiftedDownFont(12))
+        for (player in this.players) {
+            this.removeBannerUI(player)
+            player.glide.resetAnimation()
+            this.end.addPlayer(player)
+        }
+        this.scheduler.schedule(1.Seconds) {
+            this.end.countdown(this, 4.Seconds)
+        }
+    }
+
+    private fun endingRound() {
+        this.roundEnding = true
+        for (player in this.players) {
+            this.sendFinish(player)
+        }
+        this.finish.countdown(this, 60.Seconds).then {
+            this.setPhase(GlidePhase.Finish)
+        }
+    }
+
+    private fun sendFinish(player: ServerPlayer) {
+        this.removeBannerUI(player)
         player.glide.resetAnimation()
         this.finish.addPlayer(player)
-        this.scheduler.schedule(10.Seconds) {
-            this.finish.removePlayer(player)
+        this.scheduler.schedule(5.Seconds) {
+            this.finish.removePlayer(player, title = false)
         }
     }
 
@@ -245,7 +285,7 @@ class GlideMinigame(
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         this.effects.freeze(player)
 
-        this.checkpointBossbar.removePlayer(player)
+        this.removeBannerUI(player)
         this.sidebar.removePlayer(player)
 
         player.sendSound(GlideSounds.CRASH)
@@ -260,6 +300,9 @@ class GlideMinigame(
             this.effects.unfreeze(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
+            if (this.roundEnding) {
+                this.finish.addPlayer(player, shield = false)
+            }
         }
     }
 
@@ -294,7 +337,7 @@ class GlideMinigame(
 
         this.trackers.remove(player.uuid)
 
-        this.countdown.removePlayer(player)
+        this.removeBannerUI(player)
 
         if (player.team === this.team) {
             player.removeFromTeam()
@@ -342,7 +385,7 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING, during = During(phases = ["active"]))
     private fun onPlayerSneak(event: PlayerSetSneakingEvent) {
         val (player, sneaking) = event
-        if (this.mayRestart(player) && sneaking) {
+        if (this.round.mayPlayerRestart(player) && sneaking) {
             val last = this.stats.getOrCreateStat(player, GlideStats.LAST_SNEAK_TIME)
             if (abs(this.server.tickCount - last.value) < 7) {
                 this.respawnPlayer(event.player)
@@ -352,14 +395,17 @@ class GlideMinigame(
         }
     }
 
-    private fun mayRestart(player: ServerPlayer): Boolean {
-        return !player.glide.finished && !player.isSpectator // TODO: Add solo check here
-    }
-
     private fun respawnPlayer(player: ServerPlayer) {
         this.setPlayerPlayingState(player)
         player.sendSound(GlideSounds.RESPAWN, static = true)
         this.trackers[player.uuid]?.restart(this.ticks.Ticks)
+    }
+
+    private fun removeBannerUI(player: ServerPlayer) {
+        this.checkpointBossbar.removePlayer(player)
+        this.countdown.removePlayer(player)
+        this.finish.removePlayer(player)
+        this.end.removePlayer(player)
     }
 
     private fun setPlayerPlayingState(player: ServerPlayer) {
@@ -446,7 +492,7 @@ class GlideMinigame(
             }
 
             addon.extractWorld(server.getDimensionPath(level.dimension()))
-            return GlideMinigame(addon.config, mode, level, server)
+            return GlideMinigame(addon.config, SoloGlideRound(), mode, level, server)
         }
     }
 }
