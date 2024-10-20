@@ -1,5 +1,6 @@
 package me.senseiwells.glide.addon
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
 import kotlin.io.path.createDirectories
@@ -9,7 +10,7 @@ import kotlin.io.path.listDirectoryEntries
 object GlideAddons {
     private val path = FabricLoader.getInstance().configDir.resolve("glide-addons")
 
-    private val addons = HashMap<ResourceLocation, GlideAddon>()
+    private val addons = Object2ObjectOpenHashMap<ResourceLocation, GlideAddon>()
 
     fun load() {
         if (!this.path.exists()) {

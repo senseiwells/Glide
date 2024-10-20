@@ -28,11 +28,7 @@ open class Booster(
             player.setVelocityAndMark(velocity.x * 1.1, velocity.y, velocity.z * 1.1)
             return true
         }
-        return false
-    }
-
-    override fun canStartAccelerating(player: ServerPlayer): Boolean {
-        return super.canStartAccelerating(player) && player.deltaMovement.horizontalDistance() < this.targetVelocity
+        return this.intersects(player.boundingBox)
     }
 
     override fun getSound(): Sound {

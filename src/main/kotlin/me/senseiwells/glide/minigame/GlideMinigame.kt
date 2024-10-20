@@ -478,7 +478,7 @@ class GlideMinigame(
             val isScoreMode = context.parameters.booleanOrDefault("score")
             val rawId = context.parameters.stringOrNull("map")
             val id = if (rawId == null) GlideMod.id("temple") else ResourceLocation.parse(rawId)
-            val addon = GlideAddons.get(id) ?: throw IllegalArgumentException()
+            val addon = GlideAddons.get(id) ?: throw IllegalArgumentException() // TODO: Don't just throw
 
             val mode = if (isScoreMode) GlideMode.ScoreAttack else GlideMode.TimeAttack
             return this.create(context.server, addon, mode)

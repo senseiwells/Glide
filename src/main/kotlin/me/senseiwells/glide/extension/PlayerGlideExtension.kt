@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointData
@@ -51,7 +52,7 @@ class PlayerGlideExtension(
 ): PlayerExtension(player), DataExtension {
     private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
 
-    private val accelerators = Object2ObjectOpenHashMap<Accelerator, MutableInt>()
+    private val accelerators = Reference2ObjectOpenHashMap<Accelerator, MutableInt>()
 
     private val trails = IntArrayList()
     private var ghost: GlideGhost? = null

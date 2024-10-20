@@ -26,7 +26,7 @@ class DirectionalBooster(
             player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
             return true
         }
-        return false
+        return this.intersects(player.boundingBox)
     }
 
     override fun canStartAccelerating(player: ServerPlayer): Boolean {
