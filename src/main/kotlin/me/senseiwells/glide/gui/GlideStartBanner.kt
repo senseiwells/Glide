@@ -36,7 +36,7 @@ class GlideStartBanner(private val round: GlideRound): GlideBanner(), Countdown 
     }
 
     override fun getBannerText(player: ServerPlayer): Component {
-        return this.round.getStartBanner().color(0x000000).withShiftedDownFont(29)
+        return this.round.getStartBanner().color(0x444444).withShiftedDownFont(29)
     }
 
     override fun getDelay(): Int {

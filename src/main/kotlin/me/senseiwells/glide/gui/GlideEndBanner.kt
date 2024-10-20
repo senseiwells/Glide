@@ -20,7 +20,7 @@ open class GlideEndBanner(private val mode: GlideMode): GlideBanner() {
             !player.glide.finished -> GlideComponents.DNF
             else -> this.mode.getBannerScore(player)
         }
-        return component.color(0x000000).withShiftedDownFont(29)
+        return component.color(0x444444).withShiftedDownFont(29)
     }
 
     override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {
