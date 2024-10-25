@@ -3,6 +3,7 @@ package me.senseiwells.glide.tracker
 import eu.pb4.polymer.virtualentity.api.ElementHolder
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
 import me.senseiwells.glide.utils.VecUtils.rotationAnglesTowards
@@ -17,9 +18,9 @@ class GlideGhost(
     private val trails: List<GlideTrail>
 ): HolderAttachment {
     private val holder = ElementHolder()
-    private val ghost = ItemDisplayElement(GlideTrailItem.GHOST)
-    private val rightWing = ItemDisplayElement(GlideTrailItem.RIGHT_WING)
-    private val leftWing = ItemDisplayElement(GlideTrailItem.LEFT_WING)
+    private val ghost = ItemDisplayElement(GlideItems.GHOST)
+    private val rightWing = ItemDisplayElement(GlideItems.RIGHT_WING)
+    private val leftWing = ItemDisplayElement(GlideItems.LEFT_WING)
 
     private var currentIndex = 0
     private var currentPoint: Vec3
@@ -83,21 +84,21 @@ class GlideGhost(
             val blended = ColorUtils.blend(color, this.previousColor, 0.5F)
             val rotation = point.rotationAnglesTowards(this.currentPoint)
 
-            val ghostModel = GlideTrailItem.GHOST
+            val ghostModel = GlideItems.GHOST
             ghostModel.set(GlideTrailItem.TRAIL_COLOR, blended)
             this.ghost.yaw = rotation.y + 180
             this.ghost.pitch = -rotation.x
             this.ghost.teleportDuration = interval
             this.ghost.item = ghostModel
 
-            val rightModel = GlideTrailItem.RIGHT_WING
+            val rightModel = GlideItems.RIGHT_WING
             rightModel.set(GlideTrailItem.TRAIL_COLOR, blended)
             this.rightWing.yaw = rotation.y
             this.rightWing.pitch = rotation.x
             this.rightWing.teleportDuration = interval
             this.rightWing.item = rightModel
 
-            val leftModel = GlideTrailItem.LEFT_WING
+            val leftModel = GlideItems.LEFT_WING
             leftModel.set(GlideTrailItem.TRAIL_COLOR, blended)
             this.leftWing.yaw = rotation.y
             this.leftWing.pitch = rotation.x

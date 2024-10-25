@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
 import me.senseiwells.glide.utils.VecUtils.rotationTowards
@@ -30,7 +31,7 @@ class GlideTrail(
 
         for (current in iterator) {
             val length = previous.distanceTo(current) * 1.01
-            val stack = GlideTrailItem.TRAIL
+            val stack = GlideItems.TRAIL
             val speed = length / this.interval.ticks * 20
             val color = ColorUtils.blend(0xFF0000, 0xFFFF00, speed.toFloat() / 25.0F)
             val blended = ColorUtils.blend(previousColor, color, 0.5F)
@@ -57,7 +58,7 @@ class GlideTrail(
 
         private val POINTS_CODEC = Codec.BYTE_BUFFER.xmap(::deserializePoints, ::serializePoints)
 
-        val CODEC = RecordCodecBuilder.create { instance ->
+        val CODEC: Codec<GlideTrail> = RecordCodecBuilder.create { instance ->
             instance.group(
                 MinecraftTimeDuration.CODEC.fieldOf("start_time").forGetter(GlideTrail::start),
                 POINTS_CODEC.fieldOf("points").forGetter(GlideTrail::points),

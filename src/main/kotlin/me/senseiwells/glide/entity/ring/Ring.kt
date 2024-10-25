@@ -19,9 +19,11 @@ import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.util.Mth
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
@@ -29,6 +31,7 @@ import net.minecraft.world.item.component.FireworkExplosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import org.joml.Vector3f
+import xyz.nucleoid.packettweaker.PacketContext
 import kotlin.math.abs
 
 class Ring(
@@ -36,7 +39,6 @@ class Ring(
     level: Level,
     ringType: RingType = RingType.Blue
 ): Entity(type, level), PolymerEntity, GlideCollider {
-
     private var ringType: RingType? = null
 
     constructor(level: Level, type: RingType): this(GlideEntities.RING, level, type)
@@ -55,7 +57,7 @@ class Ring(
         return this.ringType ?: RingType.Grey
     }
 
-    override fun getPolymerEntityType(player: ServerPlayer?): EntityType<*> {
+    override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
         return EntityType.ITEM_DISPLAY
     }
 
@@ -93,6 +95,10 @@ class Ring(
             abs(abs(direction.stepY) - 1) * size + 1,
             abs(abs(direction.stepZ) - 1) * size + 1
         )
+    }
+
+    override fun hurtServer(serverLevel: ServerLevel, damageSource: DamageSource, f: Float): Boolean {
+        return false
     }
 
     override fun intersects(box: AABB): Boolean {
