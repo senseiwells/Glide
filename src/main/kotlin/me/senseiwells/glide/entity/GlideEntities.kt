@@ -10,6 +10,8 @@ import me.senseiwells.glide.entity.checkpoint.BeaconBeam
 import me.senseiwells.glide.entity.ring.Ring
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -44,9 +46,10 @@ object GlideEntities {
 
     }
 
-    private fun <T: Entity> register(key: String, builder: EntityType.Builder<T>): EntityType<T> {
+    private fun <T: Entity> register(path: String, builder: EntityType.Builder<T>): EntityType<T> {
+        val key = ResourceKey.create(Registries.ENTITY_TYPE, GlideMod.id(path))
         val type = builder.build(key)
-        Registry.register(BuiltInRegistries.ENTITY_TYPE, GlideMod.id(key), type)
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, key, type)
         PolymerEntityUtils.registerType(type)
         return type
     }

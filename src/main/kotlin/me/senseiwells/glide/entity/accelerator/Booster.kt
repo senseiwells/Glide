@@ -1,7 +1,7 @@
 package me.senseiwells.glide.entity.accelerator
 
 import me.senseiwells.glide.entity.GlideEntities
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.utils.impl.Sound
@@ -44,6 +44,6 @@ open class Booster(
     }
 
     override fun getModelItem(): ItemStack {
-        return GlideItem.OMNI_BOOST
+        return GlideItems.OMNI_BOOST
     }
 }

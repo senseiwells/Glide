@@ -6,26 +6,29 @@ import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideEntities
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.utils.EntityUtils
 import me.senseiwells.glide.utils.EntityUtils.createValue
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import org.joml.Vector3f
+import xyz.nucleoid.packettweaker.PacketContext
 
 class BeaconBeam(
     type: EntityType<*>,
     level: Level,
     length: Float = 10.0F
 ): Entity(type, level), PolymerEntity {
-    private val shell = ItemDisplayElement(GlideItem.FAKE_BEAM_SHELL)
+    private val shell = ItemDisplayElement(GlideItems.FAKE_BEAM_SHELL)
     private val holder = ElementHolder()
 
     constructor(level: Level, length: Float): this(GlideEntities.BEACON_BEAM, level, length)
@@ -49,7 +52,7 @@ class BeaconBeam(
         return this.entityData.get(LENGTH)
     }
 
-    override fun getPolymerEntityType(player: ServerPlayer?): EntityType<*> {
+    override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
         return EntityType.ITEM_DISPLAY
     }
 
@@ -69,6 +72,10 @@ class BeaconBeam(
 
     override fun tick() {
 
+    }
+
+    override fun hurtServer(serverLevel: ServerLevel, damageSource: DamageSource, f: Float): Boolean {
+        return false
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
@@ -92,7 +99,7 @@ class BeaconBeam(
         }
 
         if (initial) {
-            data.add(DisplayTrackedData.Item.ITEM.createValue(GlideItem.FAKE_BEAM))
+            data.add(DisplayTrackedData.Item.ITEM.createValue(GlideItems.FAKE_BEAM))
             data.add(DisplayTrackedData.BRIGHTNESS.createValue(this.getModelBrightness().pack()))
             data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
         }

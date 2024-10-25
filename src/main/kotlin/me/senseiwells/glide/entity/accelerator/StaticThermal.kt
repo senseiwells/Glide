@@ -3,7 +3,7 @@ package me.senseiwells.glide.entity.accelerator
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
 import net.casual.arcade.utils.contains
 import net.minecraft.nbt.CompoundTag
@@ -75,6 +75,6 @@ class StaticThermal(
     }
 
     override fun getModelItem(): ItemStack {
-        return GlideItem.STATIC_THERMAL
+        return GlideItems.STATIC_THERMAL
     }
 }

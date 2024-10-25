@@ -243,7 +243,7 @@ class GlideMinigame(
 
         if (this.players.isPlaying(player)) {
             if (player.verticalCollision) {
-                player.hurt(player.damageSources().flyIntoWall(), 2.0F)
+                player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
             }
 
             if (this.phase == GlidePhase.Active) {
@@ -258,7 +258,7 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerHorizontalFlyFallCollision(event: PlayerHorizontalFlyFallCollisionEvent) {
         val (player) = event
-        player.hurt(player.damageSources().flyIntoWall(), 2.0F)
+        player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
         player.playSound(player.fallSounds.small, 1.0F, 1.0F)
 
         event.cancel()
@@ -378,7 +378,7 @@ class GlideMinigame(
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
         if (updated != Pose.FALL_FLYING) {
-            player.kill()
+            player.kill(event.player.serverLevel())
         }
     }
 

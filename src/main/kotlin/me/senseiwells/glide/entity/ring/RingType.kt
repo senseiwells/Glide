@@ -1,7 +1,7 @@
 package me.senseiwells.glide.entity.ring
 
 import me.senseiwells.glide.font.GlideFont.Score
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvent
@@ -15,7 +15,7 @@ enum class RingType(
 ) {
     Blue(7, 0x63CECA, Score.BLUE) {
         override fun getModel(): ItemStack {
-            return GlideItem.BLUE_RING
+            return GlideItems.BLUE_RING
         }
 
         override fun getFade(delta: Int): Component {
@@ -28,7 +28,7 @@ enum class RingType(
     },
     Yellow(5, 0xDFBA25, Score.YELLOW) {
         override fun getModel(): ItemStack {
-            return GlideItem.YELLOW_RING
+            return GlideItems.YELLOW_RING
         }
 
         override fun getFade(delta: Int): Component {
@@ -41,7 +41,7 @@ enum class RingType(
     },
     Green(3, 0x49D671, Score.GREEN) {
         override fun getModel(): ItemStack {
-            return GlideItem.GREEN_RING
+            return GlideItems.GREEN_RING
         }
 
         override fun getFade(delta: Int): Component {
