@@ -3,7 +3,7 @@ package me.senseiwells.glide.entity.accelerator
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
 import net.casual.arcade.utils.contains
@@ -94,6 +94,6 @@ open class DynamicThermal(
         if (this.targetVelocity < 0) {
             return ItemStack.EMPTY
         }
-        return GlideItem.DYNAMIC_THERMAL
+        return GlideItems.DYNAMIC_THERMAL
     }
 }

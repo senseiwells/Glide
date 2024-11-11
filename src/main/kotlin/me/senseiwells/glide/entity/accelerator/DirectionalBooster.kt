@@ -1,7 +1,7 @@
 package me.senseiwells.glide.entity.accelerator
 
 import me.senseiwells.glide.entity.GlideEntities
-import me.senseiwells.glide.item.GlideItem
+import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EntityType
@@ -20,7 +20,7 @@ class DirectionalBooster(
 
     override fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean {
         val velocity = player.deltaMovement
-        val normal = this.direction.normal
+        val normal = this.direction.unitVec3i
         val horizontalVelocity = velocity.horizontalDistance()
         if (horizontalVelocity < this.targetVelocity) {
             player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
@@ -34,6 +34,6 @@ class DirectionalBooster(
     }
 
     override fun getModelItem(): ItemStack {
-        return GlideItem.BOOST
+        return GlideItems.BOOST
     }
 }
