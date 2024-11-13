@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddon
 import me.senseiwells.glide.addon.GlideAddonConfig
-import me.senseiwells.glide.addon.GlideAddons
 import me.senseiwells.glide.checkpoint.CheckpointManager
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
@@ -24,20 +23,13 @@ import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
-import net.casual.arcade.minigame.events.MinigameLoadPlayingEvent
-import net.casual.arcade.minigame.events.MinigameRemovePlayerEvent
-import net.casual.arcade.minigame.events.MinigameSetPlayingEvent
-import net.casual.arcade.minigame.events.MinigameSetSpectatingEvent
+import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.Phase
-import net.casual.arcade.minigame.serialization.MinigameCreationContext
-import net.casual.arcade.minigame.serialization.MinigameFactory
 import net.casual.arcade.minigame.utils.MinigameUtils.countdown
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
-import net.casual.arcade.utils.JsonUtils.booleanOrDefault
-import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.PlayerUtils.addToTeam
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
@@ -78,14 +70,16 @@ import kotlin.math.abs
 import kotlin.math.min
 
 class GlideMinigame(
+    server: MinecraftServer,
+    uuid: UUID,
     private val config: GlideAddonConfig,
     private val round: GlideRound,
     private val mode: GlideMode,
-    val level: ServerLevel,
-    server: MinecraftServer
-): Minigame<GlideMinigame>(server) {
+    val level: ServerLevel
+): Minigame(server, uuid) {
     override val id: ResourceLocation = ID
 
+    // TODO: Rework this
     private val team = this.server.scoreboard.getOrCreateTeam("Glide") {
         setSeeFriendlyInvisibles(true)
         collisionRule = Team.CollisionRule.NEVER
@@ -112,63 +106,8 @@ class GlideMinigame(
     val checkpoints: CheckpointManager
         get() = this.config.checkpoints
 
-    override fun getPhases(): Collection<Phase<GlideMinigame>> {
+    override fun phases(): Collection<Phase<GlideMinigame>> {
         return GlidePhase.entries
-    }
-
-    override fun initialize() {
-        super.initialize()
-
-        this.levels.add(this.level)
-        this.sidebar.addRow(PlayerSidebarTimerElement(GlobalSidebarTimerElement { this.ticks.Ticks }))
-        this.sidebar.addRow(SidebarElements.empty())
-        this.sidebar.addRow(SidebarVelocityElement)
-        if (this.mode == GlideMode.ScoreAttack) {
-            this.sidebar.addRow(SidebarElements.empty())
-            this.sidebar.addRow(SidebarScoreElement)
-        }
-        this.sidebar.addRow(SidebarElements.empty())
-        this.ui.setSidebar(this.sidebar)
-
-        this.ui.countdown = this.countdown
-
-        this.music.suppressGameMusic(true)
-        this.music.provider = GlideMusicProvider
-
-        this.settings.canLookAroundWhenFrozen = false
-        this.settings.tickFreezeOnPause.set(true)
-        this.settings.canGetHungry.set(false)
-        this.settings.canPvp.set(false)
-        this.setGameRules {
-            set(GameRules.RULE_KEEPINVENTORY, true)
-            set(GameRules.RULE_NATURAL_REGENERATION, false)
-            set(GameRules.RULE_DOMOBSPAWNING, false)
-            set(GameRules.RULE_RANDOMTICKING, 0)
-            set(GameRules.RULE_DOFIRETICK, false)
-            set(GameRules.RULE_WEATHER_CYCLE, false)
-            set(GameRules.RULE_DAYLIGHT, false)
-        }
-
-        this.effects.setInvisiblePredicate({ observee, observer ->
-            observer != observee && observee.distanceToSqr(observer) < 6 * 6
-        }, true)
-
-        for (booster in this.config.boosters) {
-            this.level.addFreshEntity(booster.create(this.level))
-        }
-        for (thermal in this.config.thermals) {
-            this.level.addFreshEntity(thermal.create(this.level))
-        }
-        for (checkpoint in this.checkpoints.all()) {
-            for (beam in checkpoint.createBeaconBeams(this.level)) {
-                this.level.addFreshEntity(beam)
-            }
-        }
-        if (this.mode == GlideMode.ScoreAttack) {
-            for (ring in this.config.rings) {
-                this.level.addFreshEntity(ring.create(this.level))
-            }
-        }
     }
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
@@ -231,6 +170,60 @@ class GlideMinigame(
         this.finish.addPlayer(player)
         this.scheduler.schedule(5.Seconds) {
             this.finish.removePlayer(player, title = false)
+        }
+    }
+
+    @Listener
+    private fun onInitialize(event: MinigameInitializeEvent) {
+        this.levels.add(this.level)
+        this.sidebar.addRow(PlayerSidebarTimerElement(GlobalSidebarTimerElement { this.ticks.Ticks }))
+        this.sidebar.addRow(SidebarElements.empty())
+        this.sidebar.addRow(SidebarVelocityElement)
+        if (this.mode == GlideMode.ScoreAttack) {
+            this.sidebar.addRow(SidebarElements.empty())
+            this.sidebar.addRow(SidebarScoreElement)
+        }
+        this.sidebar.addRow(SidebarElements.empty())
+        this.ui.setSidebar(this.sidebar)
+
+        this.ui.countdown = this.countdown
+
+        this.music.suppressGameMusic(true)
+        this.music.provider = GlideMusicProvider
+
+        this.settings.canLookAroundWhenFrozen = false
+        this.settings.tickFreezeOnPause.set(true)
+        this.settings.canGetHungry.set(false)
+        this.settings.canPvp.set(false)
+        this.levels.setGameRules {
+            set(GameRules.RULE_KEEPINVENTORY, true)
+            set(GameRules.RULE_NATURAL_REGENERATION, false)
+            set(GameRules.RULE_DOMOBSPAWNING, false)
+            set(GameRules.RULE_RANDOMTICKING, 0)
+            set(GameRules.RULE_DOFIRETICK, false)
+            set(GameRules.RULE_WEATHER_CYCLE, false)
+            set(GameRules.RULE_DAYLIGHT, false)
+        }
+
+        this.effects.setInvisiblePredicate({ observee, observer ->
+            observer != observee && observee.distanceToSqr(observer) < 6 * 6
+        }, true)
+
+        for (booster in this.config.boosters) {
+            this.level.addFreshEntity(booster.create(this.level))
+        }
+        for (thermal in this.config.thermals) {
+            this.level.addFreshEntity(thermal.create(this.level))
+        }
+        for (checkpoint in this.checkpoints.all()) {
+            for (beam in checkpoint.createBeaconBeams(this.level)) {
+                this.level.addFreshEntity(beam)
+            }
+        }
+        if (this.mode == GlideMode.ScoreAttack) {
+            for (ring in this.config.rings) {
+                this.level.addFreshEntity(ring.create(this.level))
+            }
         }
     }
 
@@ -471,20 +464,10 @@ class GlideMinigame(
         this.progressBar = progressBar
     }
 
-    companion object: MinigameFactory {
+    companion object {
         val ID = GlideMod.id("glide_minigame")
 
-        override fun create(context: MinigameCreationContext): Minigame<*> {
-            val isScoreMode = context.parameters.booleanOrDefault("score")
-            val rawId = context.parameters.stringOrNull("map")
-            val id = if (rawId == null) GlideMod.id("temple") else ResourceLocation.parse(rawId)
-            val addon = GlideAddons.get(id) ?: throw IllegalArgumentException() // TODO: Don't just throw
-
-            val mode = if (isScoreMode) GlideMode.ScoreAttack else GlideMode.TimeAttack
-            return this.create(context.server, addon, mode)
-        }
-
-        fun create(server: MinecraftServer, addon: GlideAddon, mode: GlideMode): GlideMinigame {
+        fun create(server: MinecraftServer, uuid: UUID, addon: GlideAddon, mode: GlideMode): GlideMinigame {
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
                 dimensionType(addon.dimensionType)
@@ -492,7 +475,7 @@ class GlideMinigame(
             }
 
             addon.extractWorld(server.getDimensionPath(level.dimension()))
-            return GlideMinigame(addon.config, SoloGlideRound(), mode, level, server)
+            return GlideMinigame(server, uuid, addon.config, SoloGlideRound(), mode, level)
         }
     }
 }

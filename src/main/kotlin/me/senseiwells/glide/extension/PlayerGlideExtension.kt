@@ -219,7 +219,7 @@ class PlayerGlideExtension(
             return
         }
 
-        if (minigame.isPhase(GlidePhase.Active)) {
+        if (minigame.phase == GlidePhase.Active) {
             this.ghost?.tick(this.player, tick)
         }
 
