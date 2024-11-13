@@ -1,5 +1,6 @@
 package me.senseiwells.glide.minigame
 
+import com.mojang.serialization.Codec
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.sound.GlideSounds
@@ -8,8 +9,9 @@ import net.casual.arcade.utils.TimeUtils.format
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.util.StringRepresentable
 
-enum class GlideMode {
+enum class GlideMode: StringRepresentable {
     TimeAttack,
     ScoreAttack;
 
@@ -32,5 +34,16 @@ enum class GlideMode {
             TimeAttack -> player.glide.finishedTime.format().literal()
             ScoreAttack -> player.glide.score.toString().literal()
         }
+    }
+
+    override fun getSerializedName(): String {
+        return when (this) {
+            TimeAttack -> "time_attack"
+            ScoreAttack -> "score_attack"
+        }
+    }
+
+    companion object {
+        val CODEC: Codec<GlideMode> = StringRepresentable.fromEnum(GlideMode::values)
     }
 }
