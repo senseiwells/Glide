@@ -21,7 +21,7 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
     override fun resources(): Collection<ResourcePackCreator> {
         return listOf(
             GlideMod.resourcePack.getCreator(),
-            ArcadeResourcePacks.SPACES_FONT_PACK.getCreator()
+            ArcadeResourcePacks.SPACING_FONT_PACK.getCreator()
         )
     }
 

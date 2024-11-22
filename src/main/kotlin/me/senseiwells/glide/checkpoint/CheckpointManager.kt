@@ -4,7 +4,7 @@ import com.google.common.collect.HashMultimap
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
@@ -66,7 +66,7 @@ class CheckpointManager(
     }
 
     private fun createProgressBar(): Component {
-        val progressBar = GlideFont.Progressbar.BACKGROUND.append(ComponentUtils.space(-306))
+        val progressBar = GlideFont.Progressbar.BACKGROUND.append(SpacingFontResources.spaced(-306))
         var lastOffset = 0
         for (checkpoint in this.all()) {
             if (!checkpoint.shouldMarkOnProgressBar) {
@@ -76,11 +76,11 @@ class CheckpointManager(
             val distance = this.getPercentageDistance(checkpoint.index)
             val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
 
-            progressBar.append(ComponentUtils.space(offset - lastOffset))
+            progressBar.append(SpacingFontResources.spaced(offset - lastOffset))
             progressBar.append(GlideFont.Progressbar.getCheckpoint(0))
             lastOffset = offset + 3
         }
-        progressBar.append(ComponentUtils.space(306 - lastOffset))
+        progressBar.append(SpacingFontResources.spaced(306 - lastOffset))
         return progressBar.shadowless()
     }
 

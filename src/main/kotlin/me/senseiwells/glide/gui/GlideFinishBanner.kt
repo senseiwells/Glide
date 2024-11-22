@@ -7,6 +7,7 @@ import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -14,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer
 class GlideFinishBanner(mode: GlideMode): GlideEndBanner(mode) {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         if (!player.glide.finished) {
-            return GlideFont.Banner.stopwatchShield(frame).shadowless()
+            return GlideFont.Banner.stopwatchShield(frame).wrap().shadowless()
         }
         return super.getBannerShield(player, frame)
     }

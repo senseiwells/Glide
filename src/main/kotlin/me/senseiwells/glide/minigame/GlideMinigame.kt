@@ -26,10 +26,11 @@ import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.countdown
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.scheduler.GlobalTickedScheduler
-import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.PlayerUtils.addToTeam
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
@@ -48,7 +49,7 @@ import net.casual.arcade.utils.set
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.elements.ComponentElements
 import net.casual.arcade.visuals.elements.SidebarElements
-import net.casual.arcade.visuals.sidebar.Sidebar
+import net.casual.arcade.visuals.sidebar.FixedSidebar
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -92,7 +93,7 @@ class GlideMinigame(
     private val finish = GlideFinishBanner(this.mode)
     private val end = GlideEndBanner(this.mode)
 
-    private val sidebar = Sidebar(ComponentElements.empty())
+    private val sidebar = FixedSidebar(ComponentElements.empty())
     private var progressBar: Component = Component.empty()
 
     private val trackers = HashMap<UUID, GlideTrailTracker>()
@@ -284,8 +285,8 @@ class GlideMinigame(
         player.sendSound(GlideSounds.CRASH)
         player.setTitleAnimation(10.Ticks, 1.Seconds)
         player.sendTitle(
-            GlideFont.YOU_CRASHED.shadowless(),
-            GlideFont.YOU_CRASHED_BACKGROUND.shadowless(),
+            GlideFont.YOU_CRASHED.wrap().shadowless(),
+            GlideFont.YOU_CRASHED_BACKGROUND.wrap().shadowless(),
         )
         player.sendSystemMessage(Component.empty(), true)
 
@@ -425,27 +426,27 @@ class GlideMinigame(
         val progressBar = Component.empty().append(this.progressBar)
         player.glide.addProgressComponents(this, progressBar, index)
 
-        progressBar.append(ComponentUtils.space(-171)).append(ComponentUtils.space(-1, 2))
+        progressBar.append(SpacingFontResources.spaced(-171)).append(SpacingFontResources.spaced(-0.5F))
 
         val fullHearts = Mth.floor(player.health / 2.0)
         for (i in 0..< min(fullHearts, 3)) {
-            progressBar.append(GlideFont.FULL_HEART.shadowless())
-            progressBar.append(ComponentUtils.space(-2))
+            progressBar.append(GlideFont.FULL_HEART.wrap().shadowless())
+            progressBar.append(SpacingFontResources.spaced(-2))
         }
         if (fullHearts < 3) {
             var empty = 3 - fullHearts
             if (player.health - fullHearts * 2 >= 1.0) {
-                progressBar.append(GlideFont.HALF_HEART.shadowless())
-                progressBar.append(ComponentUtils.space(-2))
+                progressBar.append(GlideFont.HALF_HEART.wrap().shadowless())
+                progressBar.append(SpacingFontResources.spaced(-2))
                 empty--
             }
             for (i in 0..< empty) {
-                progressBar.append(GlideFont.EMPTY_HEART.shadowless())
-                progressBar.append(ComponentUtils.space(-2))
+                progressBar.append(GlideFont.EMPTY_HEART.wrap().shadowless())
+                progressBar.append(SpacingFontResources.spaced(-2))
             }
         }
 
-        progressBar.append(ComponentUtils.space(145))
+        progressBar.append(SpacingFontResources.spaced(145))
         player.sendSystemMessage(progressBar, true)
     }
 
@@ -455,12 +456,12 @@ class GlideMinigame(
         for ((i, player) in this.players.playing.withIndex()) {
             val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
 
-            progressBar.append(ComponentUtils.space(offset - lastOffset))
-            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i).shadowless())
+            progressBar.append(SpacingFontResources.spaced(offset - lastOffset))
+            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i).wrap().shadowless())
             lastOffset = offset + 6
         }
 
-        progressBar.append(ComponentUtils.space(309 - lastOffset))
+        progressBar.append(SpacingFontResources.spaced(309 - lastOffset))
         this.progressBar = progressBar
     }
 

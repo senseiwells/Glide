@@ -21,10 +21,10 @@ import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
 import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
 import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
 import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
-import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.codec.CodecProvider.Companion.register
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -46,7 +46,7 @@ object GlideMod: ModInitializer {
         addFont(GlideFont.Banner)
         addSounds(GlideSounds)
         addLangsFromData(MOD_ID)
-        packDescription = "GlidePack".literal()
+        packDescription = Component.literal("GlidePack")
     }
 
     fun id(path: String): ResourceLocation {
@@ -68,7 +68,7 @@ object GlideMod: ModInitializer {
 
         val host = PackHost(null)
         val glidePack by host.addPack(packDir, resourcePack).toPackInfo()
-        val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACES_FONT_PACK).toPackInfo()
+        val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()
         val noShadowPack by host.addPack(packDir, ArcadeResourcePacks.NO_SHADOW_PACK).toPackInfo()
         val shiftedPack by host.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
         host.start()

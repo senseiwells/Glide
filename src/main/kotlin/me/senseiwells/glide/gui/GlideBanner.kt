@@ -3,6 +3,7 @@ package me.senseiwells.glide.gui
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.countdown.Countdown
@@ -84,7 +85,7 @@ abstract class GlideBanner: Countdown {
             return CommonComponents.EMPTY
         }
         val component = this.getBannerText(player)
-        return GlideFont.Banner.textbox(component, frame).shadowless()
+        return GlideFont.Banner.textbox(component, frame).wrap().shadowless()
     }
 
     private fun textTitle(player: ServerPlayer): Component {

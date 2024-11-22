@@ -5,8 +5,8 @@ import it.unimi.dsi.fastutil.ints.IntIntPair
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
-import net.casual.arcade.resources.font.IndexedBitmapFontResources
-import net.casual.arcade.utils.ComponentUtils
+import net.casual.arcade.resources.font.IndexedFontResources
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.JsonUtils
 import net.casual.arcade.utils.JsonUtils.int
 import net.casual.arcade.utils.JsonUtils.objects
@@ -15,7 +15,6 @@ import net.casual.arcade.utils.component2
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.TranslatableContents
-import net.minecraft.util.Mth
 import kotlin.io.path.reader
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
@@ -25,14 +24,14 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
 
     val SUPPORTED_LANGS = listOf("en_us")
 
-    val YOU_CRASHED by translatable("glide.you_crashed") {
+    val YOU_CRASHED = translatable("glide.you_crashed") {
         bitmap("en_us", at("crash/you_crashed_en_us.png"), 3, 3)
     }
-    val YOU_CRASHED_BACKGROUND by bitmap(at("crash/you_crashed_background_2.png"), 500, 1000)
+    val YOU_CRASHED_BACKGROUND = bitmap(at("crash/you_crashed_background_2.png"), 500, 1000)
 
-    val FULL_HEART by bitmap(at("heart/full.png"), 18 + SHIFT, 9)
-    val HALF_HEART by bitmap(at("heart/half.png"), 18 + SHIFT, 9)
-    val EMPTY_HEART by bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
+    val FULL_HEART = bitmap(at("heart/full.png"), 18 + SHIFT, 9)
+    val HALF_HEART = bitmap(at("heart/half.png"), 18 + SHIFT, 9)
+    val EMPTY_HEART = bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
 
     init {
         CHAR_WIDTH_LOOKUP.defaultReturnValue(6)
@@ -44,116 +43,116 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
         }
     }
 
-    object Progressbar: IndexedBitmapFontResources(GlideMod.id("progressbar")) {
-        private val BG_1 by bitmap(at("progressbar/progressbar_0.png"), 5 + SHIFT, 10)
-        private val BG_2 by bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
+    object Progressbar: IndexedFontResources(GlideMod.id("progressbar")) {
+        private val BG_1 = bitmap(at("progressbar/progressbar_0.png"), 5 + SHIFT, 10)
+        private val BG_2 = bitmap(at("progressbar/progressbar_1.png"), 5 + SHIFT, 10)
 
         val BACKGROUND: MutableComponent
-            get() = Component.empty().append(BG_1).append(ComponentUtils.space(-1)).append(BG_2)
+            get() = Component.empty().append(BG_1).append(SpacingFontResources.spaced(-1)).append(BG_2)
 
-        val CURRENT by bitmap(at("progressbar/player_marker/current.png"), 4 + SHIFT, 7)
+        val CURRENT = bitmap(at("progressbar/player_marker/current.png"), 4 + SHIFT, 7)
 
         init {
             for (i in 1..16) {
-                indexed(at("progressbar/player_marker/$i.png"), 3 + SHIFT, 5)
+                indexed { bitmap(at("progressbar/player_marker/$i.png"), 3 + SHIFT, 5) }
             }
             for (i in 0..5) {
-                indexed(at("progressbar/checkpoint_$i.png"), 12 + SHIFT, 24)
+                indexed { bitmap(at("progressbar/checkpoint_$i.png"), 12 + SHIFT, 24) }
             }
         }
 
-        fun getPlayerMarker(index: Int): MutableComponent {
+        fun getPlayerMarker(index: Int): Component {
             require(index in 0..15) { "Index must be between 0 and 15" }
             return this.get(index)
         }
 
-        fun getCheckpoint(index: Int): MutableComponent {
+        fun getCheckpoint(index: Int): Component {
             require(index in 0..5) { "Index must be between 0 and 5" }
             return this.get(index + 16)
         }
     }
 
-    object Speedometer: IndexedBitmapFontResources(GlideMod.id("speedometer")) {
-        val SPEEDOMETER by bitmap(at("speedometer/speedometer.png"), 8, 16)
+    object Speedometer: IndexedFontResources(GlideMod.id("speedometer")) {
+        val SPEEDOMETER = bitmap(at("speedometer/speedometer.png"), 8, 16)
 
         init {
             for (i in 0..11) {
-                indexed(at("speedometer/needle_$i.png"), 8, 16)
+                indexed { bitmap(at("speedometer/needle_$i.png"), 8, 16) }
             }
         }
 
-        fun getNeedle(index: Int): MutableComponent {
+        fun getNeedle(index: Int): Component {
             require(index in 0..11) { "Index must be between 0 and 11" }
             return this.get(index)
         }
     }
 
-    object Timer: IndexedBitmapFontResources(GlideMod.id("timer")) {
-        val TIMER by bitmap(at("timer/clock.png"), 8, 16)
+    object Timer: IndexedFontResources(GlideMod.id("timer")) {
+        val TIMER = bitmap(at("timer/clock.png"), 8, 16)
 
         init {
             for (i in 0..11) {
-                indexed(at("timer/seconds_$i.png"), 8, 16)
+                indexed { bitmap(at("timer/seconds_$i.png"), 8, 16) }
             }
             for (i in 0..11) {
-                indexed(at("timer/minutes_$i.png"), 8, 16)
+                indexed { bitmap(at("timer/minutes_$i.png"), 8, 16) }
             }
         }
 
-        fun getSecondsHand(index: Int): MutableComponent {
+        fun getSecondsHand(index: Int): Component {
             require(index in 0..11) { "Index must be between 0 and 11" }
             return this.get(index)
         }
 
-        fun getMinutesHand(index: Int): MutableComponent {
+        fun getMinutesHand(index: Int): Component {
             require(index in 0..11) { "Index must be between 0 and 11" }
             return this.get(index + 12)
         }
     }
 
-    object Score: IndexedBitmapFontResources(GlideMod.id("score")) {
-        val GREY by bitmap(at("score/grey.png"), 8, 16)
-        val GREEN by bitmap(at("score/green.png"), 8, 16)
-        val YELLOW by bitmap(at("score/yellow.png"), 8, 16)
-        val BLUE by bitmap(at("score/blue.png"), 8, 16)
+    object Score: IndexedFontResources(GlideMod.id("score")) {
+        val GREY = bitmap(at("score/grey.png"), 8, 16)
+        val GREEN = bitmap(at("score/green.png"), 8, 16)
+        val YELLOW = bitmap(at("score/yellow.png"), 8, 16)
+        val BLUE = bitmap(at("score/blue.png"), 8, 16)
 
         init {
             for (i in 0..20) {
-                indexed(at("score/grey_fade_$i.png"), 8, 16)
+                indexed { bitmap(at("score/grey_fade_$i.png"), 8, 16) }
             }
             for (i in 0..20) {
-                indexed(at("score/green_fade_$i.png"), 8, 16)
+                indexed { bitmap(at("score/green_fade_$i.png"), 8, 16) }
             }
             for (i in 0..20) {
-                indexed(at("score/yellow_fade_$i.png"), 8, 16)
+                indexed { bitmap(at("score/yellow_fade_$i.png"), 8, 16) }
             }
             for (i in 0..20) {
-                indexed(at("score/blue_fade_$i.png"), 8, 16)
+                indexed { bitmap(at("score/blue_fade_$i.png"), 8, 16) }
             }
         }
 
-        fun getGreyFade(index: Int): MutableComponent {
+        fun getGreyFade(index: Int): Component {
             require(index in 0..20) { "Index must be between 0 and 20" }
             return this.get(index)
         }
 
-        fun getGreenFade(index: Int): MutableComponent {
+        fun getGreenFade(index: Int): Component {
             require(index in 0..20) { "Index must be between 0 and 20" }
             return this.get(index + 21)
         }
 
-        fun getYellowFade(index: Int): MutableComponent {
+        fun getYellowFade(index: Int): Component {
             require(index in 0..20) { "Index must be between 0 and 20" }
             return this.get(index + 42)
         }
 
-        fun getBlueFade(index: Int): MutableComponent {
+        fun getBlueFade(index: Int): Component {
             require(index in 0..20) { "Index must be between 0 and 20" }
             return this.get(index + 63)
         }
     }
 
-    object Banner: IndexedBitmapFontResources(GlideMod.id("banner_font")) {
+    object Banner: IndexedFontResources(GlideMod.id("banner_font")) {
         private val BOXES = Object2ObjectOpenHashMap<FramedKey, Component>()
 
         private const val DYNAMIC_BOXES = 5
@@ -187,16 +186,16 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
 
         init {
             for ((height, ascent) in this.BOX_SIZES) {
-                indexed(at("banner/textbox/left.png"), ascent, height)
-                indexed(at("banner/textbox/right.png"), ascent, height)
+                indexed { bitmap(at("banner/textbox/left.png"), ascent, height) }
+                indexed { bitmap(at("banner/textbox/right.png"), ascent, height) }
                 for (i in 0 until DYNAMIC_BOXES) {
-                    indexed(at("banner/textbox/${1 shl i}.png"), ascent, height)
+                    indexed { bitmap(at("banner/textbox/${1 shl i}.png"), ascent, height) }
                 }
             }
             for ((height, ascent) in this.SHIELD_SIZES) {
-                indexed(at("banner/elytra_shield.png"), ascent, height)
-                indexed(at("banner/stopwatch_shield.png"), ascent, height)
-                indexed(at("banner/score_shield.png"), ascent, height)
+                indexed { bitmap(at("banner/elytra_shield.png"), ascent, height) }
+                indexed { bitmap(at("banner/stopwatch_shield.png"), ascent, height) }
+                indexed { bitmap(at("banner/score_shield.png"), ascent, height) }
             }
 
             registerTextbox(GlideComponents.SOLO_ROUND, GlideComponents::soloRoundTextbox)
@@ -206,22 +205,22 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             registerTextbox(GlideComponents.DNF, GlideComponents::dnfTextbox)
         }
 
-        fun elytraShield(index: Int): MutableComponent {
+        fun elytraShield(index: Int): Component {
             val frame = index.coerceIn(0, this.SHIELD_SIZES.lastIndex)
             return this.get(BOX_SHIFT + frame * 3)
         }
 
-        fun stopwatchShield(index: Int): MutableComponent {
+        fun stopwatchShield(index: Int): Component {
             val frame = index.coerceIn(0, this.SHIELD_SIZES.lastIndex)
             return this.get(BOX_SHIFT + frame * 3 + 1)
         }
 
-        fun scoreShield(index: Int): MutableComponent {
+        fun scoreShield(index: Int): Component {
             val frame = index.coerceIn(0, this.SHIELD_SIZES.lastIndex)
             return this.get(BOX_SHIFT + frame * 3 + 2)
         }
 
-        fun textbox(component: Component, index: Int): MutableComponent {
+        fun textbox(component: Component, index: Int): Component {
             val frame = index.coerceIn(0, this.BOX_SIZES.lastIndex)
             val box = this.dynamicallySizedTextbox(component, frame)
             val left = this.get(frame * BOX_COUNT)
@@ -275,15 +274,9 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             return dynamic
         }
 
-        private fun dynamicallySizedSpace(frame: Int, size: Int = 1): MutableComponent {
+        private fun dynamicallySizedSpace(frame: Int, size: Int = 1): Component {
             require(size >= 1) { "Cannot have a non-positive size" }
-            val numerator = Mth.ceil(BOX_SIZES[frame].keyInt() * 75.0 / 18.0)
-            val space = ComponentUtils.space(-numerator, 75)
-            val component = Component.empty()
-            repeat(size) {
-                component.append(space)
-            }
-            return component
+            return SpacingFontResources.composed(size * (BOX_SIZES[frame].keyInt() / 18.0F))
         }
 
         private fun registerTextbox(component: Component, file: (String) -> String) {
@@ -291,7 +284,7 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val key = GlideComponents.textboxKey(component, size.keyInt())
                 val textbox = translatable(key) {
                     SUPPORTED_LANGS.forEach { bitmap(it, at(file(it)), size.valueInt(), size.keyInt()) }
-                }.generate()
+                }
                 this.BOXES[FramedKey(key, i)] = textbox
             }
         }
