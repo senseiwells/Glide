@@ -1,8 +1,7 @@
 package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.utils.ComponentUtils
-import net.casual.arcade.utils.ComponentUtils.literal
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.TimeUtils.format
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.visuals.elements.UniversalElement
@@ -19,13 +18,13 @@ class GlobalSidebarTimerElement(
         val minutesHandIndex = (elapsed.minutes / 5) % 11
         val stopwatch = Component.empty()
             .append(GlideFont.Timer.TIMER)
-            .append(ComponentUtils.space(-16))
+            .append(SpacingFontResources.spaced(-16))
             .append(GlideFont.Timer.getSecondsHand(secondsHandIndex))
-            .append(ComponentUtils.space(-16))
+            .append(SpacingFontResources.spaced(-16))
             .append(GlideFont.Timer.getMinutesHand(minutesHandIndex))
         return SidebarComponent.withCustomScore(
-            elapsed.format().literal(),
-            Component.empty().append(stopwatch).append(ComponentUtils.space(5))
+            Component.literal(elapsed.format()),
+            Component.empty().append(stopwatch).append(SpacingFontResources.spaced(5))
         )
     }
 }

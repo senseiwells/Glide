@@ -4,8 +4,8 @@ import com.mojang.serialization.Codec
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.sound.GlideSounds
-import net.casual.arcade.utils.ComponentUtils.literal
 import net.casual.arcade.utils.TimeUtils.format
+import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
@@ -22,7 +22,7 @@ enum class GlideMode: StringRepresentable {
         }
     }
 
-    fun getBannerShield(frame: Int): MutableComponent {
+    fun getBannerShield(frame: Int): Component {
         return when (this) {
             TimeAttack -> GlideFont.Banner.stopwatchShield(frame)
             ScoreAttack -> GlideFont.Banner.scoreShield(frame)
@@ -31,8 +31,8 @@ enum class GlideMode: StringRepresentable {
 
     fun getBannerScore(player: ServerPlayer): MutableComponent {
         return when (this) {
-            TimeAttack -> player.glide.finishedTime.format().literal()
-            ScoreAttack -> player.glide.score.toString().literal()
+            TimeAttack -> Component.literal(player.glide.finishedTime.format())
+            ScoreAttack -> Component.literal(player.glide.score.toString())
         }
     }
 

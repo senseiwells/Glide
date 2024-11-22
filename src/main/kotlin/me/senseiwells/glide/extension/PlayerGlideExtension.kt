@@ -23,9 +23,14 @@ import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
-import net.casual.arcade.utils.*
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.ComponentUtils.wrap
+import net.casual.arcade.utils.getLocation
+import net.casual.arcade.utils.getVec3
 import net.casual.arcade.utils.impl.Location
+import net.casual.arcade.utils.putLocation
+import net.casual.arcade.utils.putVec3
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.Util
 import net.minecraft.nbt.*
@@ -42,6 +47,19 @@ import org.apache.commons.lang3.mutable.MutableInt
 import java.io.IOException
 import java.nio.file.Path
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.List
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.flatMap
+import kotlin.collections.isNotEmpty
+import kotlin.collections.iterator
+import kotlin.collections.last
+import kotlin.collections.map
+import kotlin.collections.mapTo
+import kotlin.collections.set
+import kotlin.collections.toIntArray
+import kotlin.collections.toList
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
 import kotlin.math.abs
@@ -246,7 +264,7 @@ class PlayerGlideExtension(
 
             this.scoreIcon = Component.empty()
                 .append(base)
-                .append(ComponentUtils.space(-15))
+                .append(SpacingFontResources.spaced(-15))
                 .append(fade)
 
             if (++this.ringTypeTicks > 20) {
@@ -297,10 +315,10 @@ class PlayerGlideExtension(
 
     fun addProgressComponents(minigame: GlideMinigame, progressBar: MutableComponent, marker: Int) {
         val playerOffset = Mth.clamp(Math.round(this.progress * 300).toInt(), 0, 300) - 1
-        progressBar.append(ComponentUtils.space(playerOffset - 309))
-        progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker % 16).shadowless())
-        progressBar.append(ComponentUtils.space(-7))
-        progressBar.append(GlideFont.Progressbar.CURRENT.shadowless())
+        progressBar.append(SpacingFontResources.spaced(playerOffset - 309))
+        progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker % 16).wrap().shadowless())
+        progressBar.append(SpacingFontResources.spaced(-7))
+        progressBar.append(GlideFont.Progressbar.CURRENT.wrap().shadowless())
 
         var lastOffset = playerOffset + 6
         if (this.lastRespawnCheckpointIndex != 0 && this.lastRespawnCheckpointTicks in 0..CHECKPOINT_TICKS) {
@@ -309,12 +327,12 @@ class PlayerGlideExtension(
             val index = 5 - 5 * abs(2.0F * this.lastRespawnCheckpointTicks - CHECKPOINT_TICKS) / CHECKPOINT_TICKS
             val checkpointOffset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
 
-            progressBar.append(ComponentUtils.space(checkpointOffset - (playerOffset + 4)))
-            progressBar.append(GlideFont.Progressbar.getCheckpoint(index.roundToInt()).shadowless())
+            progressBar.append(SpacingFontResources.spaced(checkpointOffset - (playerOffset + 4)))
+            progressBar.append(GlideFont.Progressbar.getCheckpoint(index.roundToInt()).wrap().shadowless())
             lastOffset = checkpointOffset + 5
         }
 
-        progressBar.append(ComponentUtils.space(309 - lastOffset))
+        progressBar.append(SpacingFontResources.spaced(309 - lastOffset))
     }
 
     private fun addRingType(type: RingType) {

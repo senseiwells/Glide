@@ -5,7 +5,7 @@ fabric-loader        = "0.16.7"
 parchment            = "1.21:2024.07.28"
 fabric-api           = "0.106.1+1.21.3"
 fabric-kotlin        = "1.11.0+kotlin.2.0.0"
-arcade               = "0.3.1-alpha.16+1.21.3"
+arcade               = "0.3.1-alpha.41+1.21.3"
 polymer              = "0.10.0+1.21.2"
 zip4j                = "2.11.5"
 

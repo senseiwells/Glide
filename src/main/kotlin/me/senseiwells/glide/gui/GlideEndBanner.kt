@@ -6,13 +6,14 @@ import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
 open class GlideEndBanner(private val mode: GlideMode): GlideBanner() {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
-        return this.mode.getBannerShield(frame).shadowless()
+        return this.mode.getBannerShield(frame).wrap().shadowless()
     }
 
     override fun getBannerText(player: ServerPlayer): Component {

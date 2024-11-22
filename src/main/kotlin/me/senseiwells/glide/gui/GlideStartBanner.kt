@@ -8,6 +8,7 @@ import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
+import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.time.MinecraftTimeDuration
@@ -32,7 +33,7 @@ class GlideStartBanner(private val round: GlideRound): GlideBanner(), Countdown 
     }
 
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
-        return GlideFont.Banner.elytraShield(frame).shadowless()
+        return GlideFont.Banner.elytraShield(frame).wrap().shadowless()
     }
 
     override fun getBannerText(player: ServerPlayer): Component {
