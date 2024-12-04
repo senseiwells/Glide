@@ -227,9 +227,9 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             val right = this.get(frame * BOX_COUNT + 1)
             return Component.empty()
                 .append(left)
-                .append(this.dynamicallySizedSpace(frame, 6))
+                .append(this.dynamicallySizedSpace(frame, -6))
                 .append(box)
-                .append(this.dynamicallySizedSpace(frame, 6))
+                .append(this.dynamicallySizedSpace(frame, -6))
                 .append(right)
         }
 
@@ -245,13 +245,11 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val box = BOXES[FramedKey(key, frame)]
                     ?: throw IllegalStateException("Component ${contents.key} doesn't have a textbox!")
                 dynamic.append(box)
-                dynamic.append(this.dynamicallySizedSpace(frame, 2))
                 for (arg in contents.args) {
                     dynamic.append(when (arg) {
                         is Component -> this.dynamicallySizedTextbox(arg, frame)
                         else -> this.dynamicallySizedTextbox(arg.toString(), frame)
                     })
-                    dynamic.append(this.dynamicallySizedSpace(frame))
                 }
                 return dynamic
             }
@@ -266,7 +264,6 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                 val width = 1 shl i
                 while (remaining >= width) {
                     dynamic.append(this.get(frame * BOX_COUNT + 2 + i))
-                    dynamic.append(this.dynamicallySizedSpace(frame))
                     // The textboxes are actually 1.125 (18/16) times bigger than a pixel
                     remaining -= width * 1.125
                 }
@@ -275,7 +272,6 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
         }
 
         private fun dynamicallySizedSpace(frame: Int, size: Int = 1): Component {
-            require(size >= 1) { "Cannot have a non-positive size" }
             return SpacingFontResources.composed(size * (BOX_SIZES[frame].keyInt() / 18.0F))
         }
 

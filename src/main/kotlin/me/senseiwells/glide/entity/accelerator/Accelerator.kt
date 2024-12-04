@@ -89,8 +89,7 @@ abstract class Accelerator(
         compound.putDouble("TargetVelocity", this.targetVelocity)
     }
 
-    override fun makeBoundingBox(): AABB {
-        val position = this.position()
+    override fun makeBoundingBox(position: Vec3): AABB {
         val size = this.getSize()
         return AABB.ofSize(position, size.x, size.y, size.z)
     }

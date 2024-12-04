@@ -41,10 +41,9 @@ open class DynamicThermal(
         compound.putDouble("LiftForceModifier", this.liftForceModifier)
     }
 
-    override fun makeBoundingBox(): AABB {
+    override fun makeBoundingBox(position: Vec3): AABB {
         val size = this.getSize()
-        val position = this.position().add(0.0, size.y / 2, 0.0)
-        return AABB.ofSize(position, size.x, size.y, size.z)
+        return AABB.ofSize(position.add(0.0, size.y / 2, 0.0), size.x, size.y, size.z)
     }
 
     override fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean {

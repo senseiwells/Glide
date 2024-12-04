@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "glide:item/trail/ghost_wing_left",
+    "tints": [
+      {
+        "type": "minecraft:dye",
+        "default": 0
+      }
+    ]
+  }
+}

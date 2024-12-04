@@ -17,6 +17,7 @@ import net.casual.arcade.resources.ArcadeResourcePacks
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
 import net.casual.arcade.resources.utils.ResourcePackUtils.addFont
 import net.casual.arcade.resources.utils.ResourcePackUtils.addLangsFromData
+import net.casual.arcade.resources.utils.ResourcePackUtils.addMissingItemModels
 import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
 import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
 import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
@@ -46,6 +47,7 @@ object GlideMod: ModInitializer {
         addFont(GlideFont.Banner)
         addSounds(GlideSounds)
         addLangsFromData(MOD_ID)
+        addMissingItemModels(MOD_ID)
         packDescription = Component.literal("GlidePack")
     }
 
@@ -69,7 +71,6 @@ object GlideMod: ModInitializer {
         val host = PackHost(null)
         val glidePack by host.addPack(packDir, resourcePack).toPackInfo()
         val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()
-        val noShadowPack by host.addPack(packDir, ArcadeResourcePacks.NO_SHADOW_PACK).toPackInfo()
         val shiftedPack by host.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
         host.start()
 
@@ -80,7 +81,6 @@ object GlideMod: ModInitializer {
         GlobalEventHandler.register<PlayerJoinEvent> { (player) ->
             player.sendResourcePack(glidePack)
             player.sendResourcePack(spacesPack)
-            player.sendResourcePack(noShadowPack)
             player.sendResourcePack(shiftedPack)
         }
     }

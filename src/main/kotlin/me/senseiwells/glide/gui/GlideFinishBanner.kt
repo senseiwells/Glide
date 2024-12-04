@@ -26,7 +26,7 @@ class GlideFinishBanner(mode: GlideMode): GlideEndBanner(mode) {
             player.glide.wasPersonalBest -> GlideComponents.PERSONAL_BEST
             else -> return super.getBannerText(player)
         }
-        return component.color(0x444444).withShiftedDownFont(29)
+        return component.color(0x444444).shadowless().withShiftedDownFont(29)
     }
 
     override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {

@@ -30,6 +30,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.FireworkExplosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import xyz.nucleoid.packettweaker.PacketContext
 import kotlin.math.abs
@@ -86,11 +87,11 @@ class Ring(
         compound.putByte("RingType", this.getRingType().ordinal.toByte())
     }
 
-    override fun makeBoundingBox(): AABB {
+    override fun makeBoundingBox(position: Vec3): AABB {
         val size = this.getRingType().getSize().toDouble() - 3
         val direction = Direction.orderedByNearest(this)[0]
         return AABB.ofSize(
-            this.position(),
+            position,
             abs(abs(direction.stepX) - 1) * size + 1,
             abs(abs(direction.stepY) - 1) * size + 1,
             abs(abs(direction.stepZ) - 1) * size + 1
