@@ -10,7 +10,7 @@ plugins {
     java
 }
 
-val modVersion = "0.1.0"
+val modVersion = "0.1.1"
 version = "${modVersion}+${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 
@@ -37,7 +37,6 @@ dependencies {
     modImplementation(libs.fabric.kotlin)
 
     modImplementation(libs.arcade)
-    modImplementation(libs.polymer.core)
     modImplementation(libs.polymer.virtual.entity)
 
     modImplementation(libs.arcade.datagen)
