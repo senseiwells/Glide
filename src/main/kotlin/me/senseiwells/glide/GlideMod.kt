@@ -9,8 +9,8 @@ import me.senseiwells.glide.minigame.GlideMinigameFactory
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
-import net.casual.arcade.events.player.PlayerJoinEvent
 import net.casual.arcade.events.server.ServerStoppingEvent
+import net.casual.arcade.events.server.player.PlayerJoinEvent
 import net.casual.arcade.host.PackHost
 import net.casual.arcade.minigame.utils.MinigameRegistries
 import net.casual.arcade.resources.ArcadeResourcePacks
