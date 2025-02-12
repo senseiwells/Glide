@@ -240,7 +240,7 @@ class GlideMinigame(
         val glide = player.glide
         glide.tick(this, this.ticks)
 
-        if (this.players.isPlaying(player)) {
+        if (this.players.isPlaying(player) && this.phase > GlidePhase.Countdown) {
             if (player.verticalCollision) {
                 player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
             }
@@ -281,6 +281,7 @@ class GlideMinigame(
         }
         event.cancel()
         player.setGameMode(GameType.SPECTATOR)
+        player.pose = Pose.STANDING
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         this.effects.freeze(player)
 
@@ -351,6 +352,7 @@ class GlideMinigame(
         player.glide.reset()
         this.setPlayerPlayingState(player)
         if (this.phase < GlidePhase.Active) {
+            player.verticalCollision = false
             player.isNoGravity = true
 
             this.countdown.addPlayer(player)
@@ -376,7 +378,7 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
-        if (updated != Pose.FALL_FLYING) {
+        if (updated != Pose.FALL_FLYING && !player.isSpectator) {
             player.kill(event.player.serverLevel())
         }
     }
@@ -423,6 +425,8 @@ class GlideMinigame(
 
         // Ensure the player has loaded the chunks
         GlobalTickedScheduler.schedule(1.Ticks) {
+            player.teleportTo(player.glide.respawnLocation)
+            player.setVelocityAndMark(0.0, 0.0, 0.0)
             player.startFallFlying()
         }
     }
