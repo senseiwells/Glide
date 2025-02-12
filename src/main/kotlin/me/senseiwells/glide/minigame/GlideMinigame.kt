@@ -17,8 +17,8 @@ import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
 import net.casual.arcade.dimensions.utils.getDimensionPath
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
-import net.casual.arcade.events.player.*
 import net.casual.arcade.events.server.ServerTickEvent
+import net.casual.arcade.events.server.player.*
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
@@ -70,6 +70,11 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 
+// FIXME:
+//   - Issues when joining minigame; taking damage and falling below spawn point
+//   - Being able to continue to progress after round ends
+//   - Implement rounds system
+//   - Player color changing when other players finish
 class GlideMinigame(
     server: MinecraftServer,
     uuid: UUID,

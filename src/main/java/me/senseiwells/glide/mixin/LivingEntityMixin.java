@@ -19,7 +19,7 @@ public class LivingEntityMixin {
 	private float onFlyFallHorizontalCollision(float original) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerHorizontalFlyFallCollisionEvent event = new PlayerHorizontalFlyFallCollisionEvent(player, original);
-			GlobalEventHandler.broadcast(event);
+			GlobalEventHandler.Server.broadcast(event);
 			if (event.isCancelled()) {
 				return -1.0F;
 			}
