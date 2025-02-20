@@ -3,6 +3,7 @@ package me.senseiwells.glide.entity.accelerator
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
+import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
@@ -23,7 +24,11 @@ class DirectionalBooster(
         val normal = this.direction.unitVec3i
         val horizontalVelocity = velocity.horizontalDistance()
         if (horizontalVelocity < this.targetVelocity) {
-            player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
+            if (!this.intersects(player.boundingBox)) {
+                player.setVelocityAndMark(velocity.x * 1.1, velocity.y, velocity.z * 1.1)
+            } else {
+                player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
+            }
             return true
         }
         return this.intersects(player.boundingBox)
