@@ -7,7 +7,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
-import me.senseiwells.glide.utils.VecUtils.rotationTowards
+import net.casual.arcade.utils.MathUtils.rotationTowards
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.util.Brightness
 import net.minecraft.world.phys.Vec3

@@ -5,7 +5,7 @@ import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
-import me.senseiwells.glide.utils.EntityUtils.addVelocityAndMark
+import net.casual.arcade.utils.addVelocityAndMark
 import net.casual.arcade.utils.contains
 import net.casual.arcade.utils.impl.Sound
 import net.minecraft.nbt.CompoundTag

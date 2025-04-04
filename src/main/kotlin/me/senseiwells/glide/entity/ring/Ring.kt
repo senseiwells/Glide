@@ -6,12 +6,12 @@ import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
-import me.senseiwells.glide.utils.EntityUtils
-import me.senseiwells.glide.utils.EntityUtils.createValue
-import net.casual.arcade.utils.PlayerUtils.location
 import net.casual.arcade.utils.PlayerUtils.sendSound
+import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.contains
+import net.casual.arcade.utils.createValue
+import net.casual.arcade.utils.math.location.LocationWithLevel.Companion.locationWithLevel
 import net.casual.arcade.visuals.firework.VirtualFireworkBuilder
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
@@ -111,10 +111,10 @@ class Ring(
             player.glide.score += this.getRingType().points
             player.sendSound(this.getRingType().getSound(player.glide.combo), static = true)
 
-            val builder = VirtualFireworkBuilder()
+            val builder = VirtualFireworkBuilder(player.serverLevel())
             builder.duration(0.Ticks)
 
-            builder.location(player.location)
+            builder.location(player.locationWithLevel)
             builder.explosion {
                 addPrimaryColours(getRingType().color)
                 shape(FireworkExplosion.Shape.LARGE_BALL)
@@ -129,7 +129,7 @@ class Ring(
         player: ServerPlayer?,
         initial: Boolean
     ) {
-        EntityUtils.replaceSynchedData(data, TYPE) { _, consumer ->
+        SynchedDataUtils.replaceSynchedData(data, TYPE) { _, consumer ->
             consumer.accept(DisplayTrackedData.Item.ITEM.createValue(this.getModelItem()))
         }
 

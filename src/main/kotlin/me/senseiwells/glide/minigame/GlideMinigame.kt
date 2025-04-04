@@ -13,7 +13,6 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.*
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
-import me.senseiwells.glide.utils.EntityUtils.setVelocityAndMark
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
 import net.casual.arcade.dimensions.utils.getDimensionPath
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
@@ -41,11 +40,12 @@ import net.casual.arcade.utils.PlayerUtils.resetHealth
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.sendTitle
 import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
-import net.casual.arcade.utils.PlayerUtils.teleportTo
 import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.set
+import net.casual.arcade.utils.setVelocityAndMark
+import net.casual.arcade.utils.teleportTo
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.elements.ComponentElements
 import net.casual.arcade.visuals.elements.SidebarElements
@@ -92,7 +92,7 @@ class GlideMinigame(
     }
 
     private val checkpointBossbar = SuppliedBossbar(ComponentElements.of(GlideComponents.CHECKPOINT.withShiftedDownFont(12)))
-    private val startPos = this.config.spawn.get(this.level)
+    private val startPos = this.config.spawn
 
     private val countdown = GlideStartBanner(this.round)
     private val finish = GlideFinishBanner(this.mode)
@@ -417,7 +417,7 @@ class GlideMinigame(
         player.boostHealth(-0.7)
         player.resetHealth()
         player.clearFire()
-        player.teleportTo(player.glide.respawnLocation)
+        player.teleportTo(player.glide.respawnLocation.with(this.level))
         player.setVelocityAndMark(0.0, 0.0, 0.0)
         val elytra = ItemStack(Items.ELYTRA)
         elytra.set(DataComponents.UNBREAKABLE, Unbreakable(true))
@@ -425,7 +425,7 @@ class GlideMinigame(
 
         // Ensure the player has loaded the chunks
         GlobalTickedScheduler.schedule(1.Ticks) {
-            player.teleportTo(player.glide.respawnLocation)
+            player.teleportTo(player.glide.respawnLocation.with(this.level))
             player.setVelocityAndMark(0.0, 0.0, 0.0)
             player.startFallFlying()
         }
