@@ -35,7 +35,8 @@ class DirectionalBooster(
     }
 
     override fun canStartAccelerating(player: ServerPlayer): Boolean {
-        return player.direction == this.direction && super.canStartAccelerating(player)
+        val diff = Mth.abs(Mth.wrapDegrees(player.yRot - this.direction.toYRot()))
+        return diff < 90 && super.canStartAccelerating(player)
     }
 
     override fun getModelItem(): ItemStack {
