@@ -18,7 +18,6 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
-import me.senseiwells.glide.utils.VecUtils.projectionScalar
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
@@ -26,9 +25,10 @@ import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.wrap
+import net.casual.arcade.utils.MathUtils.projectionScalar
 import net.casual.arcade.utils.getLocation
 import net.casual.arcade.utils.getVec3
-import net.casual.arcade.utils.impl.Location
+import net.casual.arcade.utils.math.location.Location
 import net.casual.arcade.utils.putLocation
 import net.casual.arcade.utils.putVec3
 import net.casual.arcade.utils.time.MinecraftTimeDuration
@@ -47,19 +47,9 @@ import org.apache.commons.lang3.mutable.MutableInt
 import java.io.IOException
 import java.nio.file.Path
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.flatMap
-import kotlin.collections.isNotEmpty
-import kotlin.collections.iterator
-import kotlin.collections.last
-import kotlin.collections.map
-import kotlin.collections.mapTo
 import kotlin.collections.set
-import kotlin.collections.toIntArray
-import kotlin.collections.toList
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
 import kotlin.math.abs
@@ -107,7 +97,7 @@ class PlayerGlideExtension(
     var liftForceModifier = 1.0
         private set
 
-    var respawnLocation = Location.of()
+    var respawnLocation: Location = Location.DEFAULT
 
     init {
         this.deserializeAdditionalData()
@@ -453,7 +443,7 @@ class PlayerGlideExtension(
         this.lastSavedRings.addAll(element.getList("last_saved_rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
         this.score = element.getInt("score")
         this.lastSavedScore = element.getInt("last_saved_score")
-        this.respawnLocation = element.getLocation("respawn_location", this.player.server)
+        this.respawnLocation = element.getLocation("respawn_location")
     }
 
     override fun serialize(): CompoundTag? {

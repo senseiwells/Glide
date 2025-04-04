@@ -9,13 +9,14 @@ import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
 import me.senseiwells.glide.checkpoint.*
 import me.senseiwells.glide.entity.ring.RingType
-import net.casual.arcade.minigame.template.location.ExactLocationTemplate
 import net.casual.arcade.utils.JsonUtils
 import net.casual.arcade.utils.JsonUtils.array
 import net.casual.arcade.utils.JsonUtils.obj
 import net.casual.arcade.utils.JsonUtils.objects
 import net.casual.arcade.utils.JsonUtils.string
 import net.casual.arcade.utils.JsonUtils.stringOrNull
+import net.casual.arcade.utils.math.location.Location
+import net.casual.arcade.utils.math.location.Location.Companion.withRotation
 import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i
@@ -31,7 +32,7 @@ import kotlin.io.path.reader
 import kotlin.io.path.writer
 
 interface GlideGRFVisitor {
-    fun visitSpawn(spawn: ExactLocationTemplate)
+    fun visitSpawn(spawn: Location)
 
     fun visitCheckpoint(checkpoint: Checkpoint)
 
@@ -54,7 +55,7 @@ class GlideGRFConverter(
     private val checkpoints = ArrayList<Checkpoint>()
     private val rings = ArrayList<RingTemplate>()
 
-    private var spawn = ExactLocationTemplate()
+    private var spawn = Location.DEFAULT
 
     fun convert(): GlideAddonConfig {
         return GlideAddonConfig(
@@ -71,7 +72,7 @@ class GlideGRFConverter(
         )
     }
 
-    override fun visitSpawn(spawn: ExactLocationTemplate) {
+    override fun visitSpawn(spawn: Location) {
         this.spawn = spawn
     }
 
@@ -207,7 +208,7 @@ object GlideGRFReader {
             return
         }
 
-        var spawn: ExactLocationTemplate? = null
+        var spawn: Location? = null
         val beacons = ArrayList<BeaconBeamTemplate>()
         for (child in children.objects()) {
             val childParams = child.obj("parameters")
@@ -239,16 +240,16 @@ object GlideGRFReader {
             else -> throw IllegalArgumentException("Unknown beam direction")
         }
         val spawnPos = Vec3.atCenterOf(Vec3i(x, y, z))
-        return BeaconBeamTemplate(length, ExactLocationTemplate(spawnPos, rotation))
+        return BeaconBeamTemplate(length, spawnPos.withRotation(rotation))
     }
 
-    private fun readRespawnPoint(json: JsonObject): ExactLocationTemplate {
+    private fun readRespawnPoint(json: JsonObject): Location {
         val x = json.string("spawnX").toDouble()
         val y = json.string("spawnY").toDouble()
         val z = json.string("spawnZ").toDouble()
         val yRot = json.string("yRot").toFloat()
         val xRot = json.string("xRot").toFloat()
-        return ExactLocationTemplate(Vec3(x, y, z), Vec2(xRot, yRot))
+        return Location(x, y, z, yRot, xRot)
     }
 
     private fun readAABB(json: JsonObject): AABB {

@@ -5,8 +5,6 @@ import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
-import me.senseiwells.glide.utils.EntityUtils
-import me.senseiwells.glide.utils.EntityUtils.createValue
 import net.casual.arcade.utils.*
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.impl.Sound
@@ -117,7 +115,7 @@ abstract class Accelerator(
         player: ServerPlayer?,
         initial: Boolean
     ) {
-        EntityUtils.replaceSynchedData(data, SIZE) { _, consumer ->
+        SynchedDataUtils.replaceSynchedData(data, SIZE) { _, consumer ->
             consumer.accept(DisplayTrackedData.SCALE.createValue(this.getModelScale()))
             consumer.accept(DisplayTrackedData.BRIGHTNESS.createValue(this.getModelBrightness().pack()))
         }

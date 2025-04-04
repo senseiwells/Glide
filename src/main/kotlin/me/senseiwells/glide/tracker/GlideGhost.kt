@@ -6,7 +6,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
-import me.senseiwells.glide.utils.VecUtils.rotationAnglesTowards
+import net.casual.arcade.utils.MathUtils.rotationAnglesTowards
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl

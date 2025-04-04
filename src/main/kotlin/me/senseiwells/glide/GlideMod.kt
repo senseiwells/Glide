@@ -9,9 +9,9 @@ import me.senseiwells.glide.minigame.GlideMinigameFactory
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
-import net.casual.arcade.events.server.ServerStoppingEvent
+import net.casual.arcade.events.ListenerRegistry.Companion.register
 import net.casual.arcade.events.server.player.PlayerJoinEvent
-import net.casual.arcade.host.PackHost
+import net.casual.arcade.host.GlobalPackHost
 import net.casual.arcade.minigame.utils.MinigameRegistries
 import net.casual.arcade.resources.ArcadeResourcePacks
 import net.casual.arcade.resources.creator.NamedResourcePackCreator
@@ -65,20 +65,12 @@ object GlideMod: ModInitializer {
 
         GlideMinigameFactory.register(MinigameRegistries.MINIGAME_FACTORY)
 
-        // TODO: For testing purposes
         val packDir = FabricLoader.getInstance().gameDir.resolve("glide_packs")
+        val glidePack by GlobalPackHost.addPack(packDir, resourcePack).toPackInfo()
+        val spacesPack by GlobalPackHost.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()
+        val shiftedPack by GlobalPackHost.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
 
-        val host = PackHost(null)
-        val glidePack by host.addPack(packDir, resourcePack).toPackInfo()
-        val spacesPack by host.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()
-        val shiftedPack by host.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
-        host.start()
-
-        GlobalEventHandler.register<ServerStoppingEvent> {
-            host.stop()
-        }
-
-        GlobalEventHandler.register<PlayerJoinEvent> { (player) ->
+        GlobalEventHandler.Server.register<PlayerJoinEvent> { (player) ->
             player.sendResourcePack(glidePack)
             player.sendResourcePack(spacesPack)
             player.sendResourcePack(shiftedPack)

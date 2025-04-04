@@ -8,7 +8,7 @@ import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
 import me.senseiwells.glide.checkpoint.Checkpoint
 import me.senseiwells.glide.checkpoint.CheckpointManager
-import net.casual.arcade.minigame.template.location.ExactLocationTemplate
+import net.casual.arcade.utils.math.location.Location
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.resources.ResourceLocation
@@ -19,7 +19,7 @@ class GlideAddonConfig(
     description: Component,
     authors: List<String>,
     version: String,
-    val spawn: ExactLocationTemplate,
+    val spawn: Location,
     val boosters: List<BoosterTemplate>,
     val thermals: List<ThermalTemplate>,
     private val allCheckpoints: List<Checkpoint>,
@@ -35,7 +35,7 @@ class GlideAddonConfig(
                 ComponentSerialization.CODEC.fieldOf("description").forGetter(GlideAddonConfig::description),
                 Codec.STRING.listOf().fieldOf("authors").forGetter(GlideAddonConfig::authors),
                 Codec.STRING.fieldOf("version").forGetter(GlideAddonConfig::version),
-                ExactLocationTemplate.CODEC.fieldOf("spawn").forGetter(GlideAddonConfig::spawn),
+                Location.CODEC.fieldOf("spawn").forGetter(GlideAddonConfig::spawn),
                 BoosterTemplate.CODEC.listOf().fieldOf("boosters").forGetter(GlideAddonConfig::boosters),
                 ThermalTemplate.CODEC.listOf().fieldOf("thermals").forGetter(GlideAddonConfig::thermals),
                 Checkpoint.CODEC.listOf().fieldOf("checkpoints").forGetter(GlideAddonConfig::allCheckpoints),

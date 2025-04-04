@@ -7,8 +7,8 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
-import me.senseiwells.glide.utils.EntityUtils
-import me.senseiwells.glide.utils.EntityUtils.createValue
+import net.casual.arcade.utils.SynchedDataUtils
+import net.casual.arcade.utils.createValue
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -93,7 +93,7 @@ class BeaconBeam(
         player: ServerPlayer?,
         initial: Boolean
     ) {
-        EntityUtils.replaceSynchedData(data, LENGTH) { _, consumer ->
+        SynchedDataUtils.replaceSynchedData(data, LENGTH) { _, consumer ->
             consumer.accept(DisplayTrackedData.SCALE.createValue(this.getModelScale()))
             consumer.accept(DisplayTrackedData.TRANSLATION.createValue(this.getModelTranslation()))
         }

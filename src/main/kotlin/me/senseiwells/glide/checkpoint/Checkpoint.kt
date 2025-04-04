@@ -10,11 +10,11 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
-import net.casual.arcade.minigame.template.location.ExactLocationTemplate
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.codec.ArcadeExtraCodecs
 import net.casual.arcade.utils.codec.CodecProvider
 import net.casual.arcade.utils.codec.CodecProvider.Companion.register
+import net.casual.arcade.utils.math.location.Location
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
@@ -114,7 +114,7 @@ class FinishLine(
 
 class BeaconBeamTemplate(
     val length: Float,
-    val location: ExactLocationTemplate
+    val location: Location
 ) {
     fun create(level: ServerLevel): BeaconBeam {
         val beam = BeaconBeam(level, this.length)
@@ -128,7 +128,7 @@ class BeaconBeamTemplate(
         val CODEC: Codec<BeaconBeamTemplate> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.FLOAT.fieldOf("length").forGetter(BeaconBeamTemplate::length),
-                ExactLocationTemplate.CODEC.fieldOf("location").forGetter(BeaconBeamTemplate::location)
+                Location.CODEC.fieldOf("location").forGetter(BeaconBeamTemplate::location)
             ).apply(instance, ::BeaconBeamTemplate)
         }
     }
@@ -137,7 +137,7 @@ class BeaconBeamTemplate(
 class RespawnCheckpoint(
     override val index: Int,
     override val boundingBox: AABB,
-    private val spawn: ExactLocationTemplate,
+    private val spawn: Location,
     private val beacons: List<BeaconBeamTemplate>
 ): Checkpoint {
     override val shouldMarkOnProgressBar: Boolean = true
@@ -154,7 +154,7 @@ class RespawnCheckpoint(
         if (player.glide.collideWithCheckpoint(this)) {
             player.sendSound(GlideSounds.CHECKPOINT, static = true)
             glide.displayCheckpointNotificationTo(player)
-            player.glide.collideWithRespawnCheckpoint(this, this.spawn.get(glide.level))
+            player.glide.collideWithRespawnCheckpoint(this, this.spawn)
         }
     }
 
@@ -165,7 +165,7 @@ class RespawnCheckpoint(
             instance.group(
                 Codec.INT.fieldOf("id").forGetter(RespawnCheckpoint::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(RespawnCheckpoint::boundingBox),
-                ExactLocationTemplate.CODEC.fieldOf("respawn_location").forGetter(RespawnCheckpoint::spawn),
+                Location.CODEC.fieldOf("respawn_location").forGetter(RespawnCheckpoint::spawn),
                 BeaconBeamTemplate.CODEC.listOf().fieldOf("beacon_beams").forGetter(RespawnCheckpoint::beacons)
             ).apply(instance, ::RespawnCheckpoint)
         }
