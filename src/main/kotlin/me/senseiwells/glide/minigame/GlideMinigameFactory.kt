@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation
 
 class GlideMinigameFactory(
     private val map: ResourceLocation,
+    private val round: GlideRoundMode.Provider,
     private val mode: GlideMode
 ): MinigameFactory {
     override fun codec(): MapCodec<out MinigameFactory> {
@@ -21,7 +22,7 @@ class GlideMinigameFactory(
 
     override fun create(context: MinigameCreationContext): Minigame {
         val addon = GlideAddons.get(this.map) ?: throw MinigameCreationException("No such map ${this.map} available")
-        return GlideMinigame.create(context.server, context.uuid, addon, this.mode)
+        return GlideMinigame.create(context.server, context.uuid, addon, this.round.create(), this.mode)
     }
 
     companion object: CodecProvider<GlideMinigameFactory> {
@@ -32,6 +33,7 @@ class GlideMinigameFactory(
         override val CODEC: MapCodec<out GlideMinigameFactory> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 ResourceLocation.CODEC.optionalFieldOf("map", DEFAULT_MAP).forGetter(GlideMinigameFactory::map),
+                GlideRoundMode.Provider.CODEC.optionalFieldOf("round", SoloGlideRoundMode).forGetter(GlideMinigameFactory::round),
                 GlideMode.CODEC.optionalFieldOf("mode", GlideMode.TimeAttack).forGetter(GlideMinigameFactory::mode)
             ).apply(instance, ::GlideMinigameFactory)
         }

@@ -35,7 +35,7 @@ class GlideScorePersonalBest(
     override val trails: List<GlideTrail>
 ): GlidePersonalBest {
     companion object {
-        val DEFAULT = GlideScorePersonalBest(0, listOf())
+        val DEFAULT = GlideScorePersonalBest(-1, listOf())
 
         val CODEC: Codec<GlideScorePersonalBest> = RecordCodecBuilder.create { instance ->
             instance.group(

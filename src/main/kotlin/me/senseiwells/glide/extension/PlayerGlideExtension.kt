@@ -182,40 +182,22 @@ class PlayerGlideExtension(
         }
     }
 
-    fun checkForBest(
+    fun updateBests(
         id: ResourceLocation,
-        mode: GlideMode,
+        glide: GlideMinigame,
         time: MinecraftTimeDuration,
         trails: List<GlideTrail>
     ): Boolean {
         this.finishedTime = time
 
-        this.wasPersonalBest = true
         val bests = this.personalBests[id]
-        if (bests == null) {
-            this.personalBests[id] = when (mode) {
-                GlideMode.ScoreAttack -> GlidePersonalBests(
-                    id, GlideTimePersonalBest.DEFAULT, GlideScorePersonalBest(this.score, trails)
-                )
-                GlideMode.TimeAttack -> GlidePersonalBests(
-                    id, GlideTimePersonalBest(time, trails), GlideScorePersonalBest.DEFAULT
-                )
-            }
-            this.serializeAdditionalData()
-            return true
-        }
+            ?: GlidePersonalBests(id, GlideTimePersonalBest.DEFAULT, GlideScorePersonalBest.DEFAULT)
 
-        when (mode) {
-            GlideMode.ScoreAttack -> if (this.score > bests.score.score) {
-                this.personalBests[id] = bests.copy(score = GlideScorePersonalBest(this.score, trails))
-                this.serializeAdditionalData()
-                return true
-            }
-            GlideMode.TimeAttack -> if (time < bests.time.time) {
-                this.personalBests[id] = bests.copy(time = GlideTimePersonalBest(time, trails))
-                this.serializeAdditionalData()
-                return true
-            }
+        val updated = glide.mode.updateBests(glide, this.player, bests, time, this.score, trails)
+        if (updated != null) {
+            this.personalBests[id] = updated
+            this.wasPersonalBest = true
+            return true
         }
         this.wasPersonalBest = false
         return false

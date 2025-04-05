@@ -11,6 +11,7 @@
   "glide.personalBest": "Personal Best!",
   "glide.hurryUp": "Hurry Up",
   "glide.dnf": "DNF",
+  "glide.playerWon": "%s won!",
 
   "glide.checkpoint": "Checkpoint!"
 }

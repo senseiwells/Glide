@@ -1,5 +1,6 @@
 package me.senseiwells.glide.minigame
 
+import com.mojang.authlib.GameProfile
 import it.unimi.dsi.fastutil.objects.Object2IntFunction
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import me.senseiwells.glide.GlideMod
@@ -50,6 +51,7 @@ import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.elements.ComponentElements
 import net.casual.arcade.visuals.elements.SidebarElements
 import net.casual.arcade.visuals.sidebar.FixedSidebar
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -79,8 +81,8 @@ class GlideMinigame(
     server: MinecraftServer,
     uuid: UUID,
     private val config: GlideAddonConfig,
-    private val round: GlideRound,
-    private val mode: GlideMode,
+    val round: GlideRoundMode,
+    val mode: GlideMode,
     val level: ServerLevel
 ): Minigame(server, uuid) {
     override val id: ResourceLocation = ID
@@ -95,8 +97,8 @@ class GlideMinigame(
     private val startPos = this.config.spawn
 
     private val countdown = GlideStartBanner(this.round)
-    private val finish = GlideFinishBanner(this.mode)
-    private val end = GlideEndBanner(this.mode)
+    private val finish = GlideFinishBanner(this)
+    private val end = GlideEndBanner(this)
 
     private val sidebar = FixedSidebar(ComponentElements.empty())
     private var progressBar: Component = Component.empty()
@@ -108,9 +110,14 @@ class GlideMinigame(
     private var ticks = 0
 
     private var roundEnding = false
+    private var winning: GameProfile? = null
 
     val checkpoints: CheckpointManager
         get() = this.config.checkpoints
+
+    fun getWinner(): String {
+        return this.winning?.name ?: "Unknown"
+    }
 
     override fun phases(): Collection<Phase<GlideMinigame>> {
         return GlidePhase.entries
@@ -129,8 +136,8 @@ class GlideMinigame(
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
         val tracker = this.trackers.remove(player.uuid) ?: return
-        val best = player.glide.checkForBest(this.config.id, this.mode, this.ticks.Ticks, tracker.finish())
-        if (best) {
+        val updated = player.glide.updateBests(this.config.id, this, this.ticks.Ticks, tracker.finish())
+        if (updated) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
             }
@@ -149,14 +156,32 @@ class GlideMinigame(
     }
 
     fun endRound() {
+        this.winning = this.mode.getUpdatedWinner(this, this.winning)
+
         this.end.setTitle(GlideComponents.ROUND_END.withShiftedDownFont(12))
         for (player in this.players) {
+            this.players.setSpectating(player)
             this.removeBannerUI(player)
             player.glide.resetAnimation()
             this.end.addPlayer(player)
         }
         this.scheduler.schedule(1.Seconds) {
-            this.end.countdown(this, 4.Seconds)
+            this.end.countdown(this, 4.Seconds).then {
+                this.round.onRoundFinished(this)
+            }
+        }
+    }
+
+    fun restart() {
+        this.placement = 1
+        this.ticks = 0
+        this.roundEnding = false
+        this.trackers.clear()
+
+        this.setPhase(GlidePhase.Waiting)
+
+        for (player in this.players) {
+            this.players.setPlaying(player)
         }
     }
 
@@ -477,7 +502,13 @@ class GlideMinigame(
     companion object {
         val ID = GlideMod.id("glide_minigame")
 
-        fun create(server: MinecraftServer, uuid: UUID, addon: GlideAddon, mode: GlideMode): GlideMinigame {
+        fun create(
+            server: MinecraftServer,
+            uuid: UUID,
+            addon: GlideAddon,
+            round: GlideRoundMode,
+            mode: GlideMode
+        ): GlideMinigame {
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
                 dimensionType(addon.dimensionType)
@@ -485,7 +516,7 @@ class GlideMinigame(
             }
 
             addon.extractWorld(server.getDimensionPath(level.dimension()))
-            return GlideMinigame(server, uuid, addon.config, SoloGlideRound(), mode, level)
+            return GlideMinigame(server, uuid, addon.config, round, mode, level)
         }
     }
 }

@@ -15,7 +15,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Countdown("countdown") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.ui.countdown.countdown(minigame, 5.Seconds).then {
+            minigame.ui.countdown.countdown(minigame, minigame.round.getCountdownTime()).then {
                 minigame.setPhase(Active)
             }
         }

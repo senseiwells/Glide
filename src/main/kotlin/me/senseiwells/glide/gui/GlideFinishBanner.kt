@@ -3,6 +3,7 @@ package me.senseiwells.glide.gui
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
@@ -12,7 +13,7 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-class GlideFinishBanner(mode: GlideMode): GlideEndBanner(mode) {
+class GlideFinishBanner(glide: GlideMinigame): GlideEndBanner(glide) {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         if (!player.glide.finished) {
             return GlideFont.Banner.stopwatchShield(frame).wrap().shadowless()

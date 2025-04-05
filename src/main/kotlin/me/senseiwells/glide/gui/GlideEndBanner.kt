@@ -2,6 +2,7 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.utils.ComponentUtils.color
 import net.casual.arcade.utils.ComponentUtils.shadowless
@@ -11,15 +12,18 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-open class GlideEndBanner(private val mode: GlideMode): GlideBanner() {
+open class GlideEndBanner(
+    private val glide: GlideMinigame
+): GlideBanner() {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
-        return this.mode.getBannerShield(frame).wrap().shadowless()
+        return this.glide.mode.getBannerShield(frame).wrap().shadowless()
     }
 
     override fun getBannerText(player: ServerPlayer): Component {
         val component = when {
+            this.glide.round.shouldDisplayWinner() -> GlideComponents.PLAYER_WON.generate(this.glide.getWinner())
             !player.glide.finished -> GlideComponents.DNF
-            else -> this.mode.getBannerScore(player)
+            else -> this.glide.mode.getBannerScore(player)
         }
         return component.color(0x444444).shadowless().withShiftedDownFont(29)
     }

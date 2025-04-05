@@ -203,6 +203,7 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             registerTextbox(GlideComponents.PERSONAL_BEST, GlideComponents::personalBestTextbox)
             registerTextbox(GlideComponents.HURRY_UP, GlideComponents::hurryUpTextbox)
             registerTextbox(GlideComponents.DNF, GlideComponents::dnfTextbox)
+            registerTextbox(GlideComponents.PLAYER_WON.generate(), GlideComponents::playerWonTextbox)
         }
 
         fun elytraShield(index: Int): Component {

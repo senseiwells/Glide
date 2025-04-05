@@ -1,15 +1,26 @@
 package me.senseiwells.glide.minigame
 
+import com.mojang.authlib.GameProfile
 import com.mojang.serialization.Codec
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.sound.GlideSounds
+import me.senseiwells.glide.tracker.GlidePersonalBests
+import me.senseiwells.glide.tracker.GlideScorePersonalBest
+import me.senseiwells.glide.tracker.GlideTimePersonalBest
+import me.senseiwells.glide.tracker.GlideTrail
+import net.casual.arcade.minigame.stats.StatType
 import net.casual.arcade.utils.TimeUtils.format
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.StringRepresentable
+import java.util.Comparator
+import java.util.UUID
+import kotlin.math.max
+import kotlin.math.min
 
 enum class GlideMode: StringRepresentable {
     TimeAttack,
@@ -34,6 +45,51 @@ enum class GlideMode: StringRepresentable {
             TimeAttack -> Component.literal(player.glide.finishedTime.format())
             ScoreAttack -> Component.literal(player.glide.score.toString())
         }
+    }
+
+    fun updateBests(
+        glide: GlideMinigame,
+        player: ServerPlayer,
+        bests: GlidePersonalBests,
+        time: MinecraftTimeDuration,
+        score: Int,
+        trails: List<GlideTrail>
+    ): GlidePersonalBests? {
+        when (this) {
+            ScoreAttack -> {
+                glide.stats.getOrCreateStat(player, GlideStats.BEST_SCORE).modify { v -> max(v, score) }
+                if (score > bests.score.score) {
+                    return bests.copy(score = GlideScorePersonalBest(score, trails))
+                }
+            }
+            TimeAttack -> {
+                glide.stats.getOrCreateStat(player, GlideStats.BEST_TIME).modify { v -> min(v, time.ticks) }
+                if (time < bests.time.time) {
+                    return bests.copy(time = GlideTimePersonalBest(time, trails))
+                }
+            }
+        }
+        return null
+    }
+
+    fun getUpdatedWinner(glide: GlideMinigame, leading: GameProfile?): GameProfile? {
+        val comparator = when (this) {
+            TimeAttack -> Comparator.comparingInt {
+                glide.stats.getOrCreateStat(it.id, GlideStats.BEST_TIME).value
+            }
+            ScoreAttack -> Comparator.comparingInt<GameProfile> {
+                glide.stats.getOrCreateStat(it.id, GlideStats.BEST_SCORE).value
+            }.reversed()
+        }
+
+        val current = glide.players.playing.minWithOrNull(
+            Comparator.comparing(ServerPlayer::getGameProfile, comparator)
+        )?.gameProfile ?: return leading
+
+        if (leading == null) {
+            return current
+        }
+        return listOf(current, leading).minWith(comparator)
     }
 
     override fun getSerializedName(): String {
