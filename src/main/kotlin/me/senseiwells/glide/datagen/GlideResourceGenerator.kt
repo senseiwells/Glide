@@ -43,6 +43,9 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
             add(TextboxGenerator(GlideComponents.DNF) { lang ->
                 fonts.resolve(GlideComponents.dnfTextbox(lang))
             })
+            add(TextboxGenerator(GlideComponents.PLAYER_WON.generate("")) { lang ->
+                fonts.resolve(GlideComponents.playerWonTextbox(lang))
+            })
         }
         generator.replaceLangs(client, this.getDataPath().resolve("lang"))
 

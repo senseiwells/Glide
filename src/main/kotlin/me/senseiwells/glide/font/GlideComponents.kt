@@ -19,6 +19,7 @@ object GlideComponents {
     val PERSONAL_BEST by ComponentUtils.translatable("glide.personalBest")
     val HURRY_UP by ComponentUtils.translatable("glide.hurryUp")
     val DNF by ComponentUtils.translatable("glide.dnf")
+    val PLAYER_WON = ComponentUtils.translatableWithArgs("glide.playerWon")
 
     val CHECKPOINT by ComponentUtils.translatable("glide.checkpoint")
 
@@ -27,6 +28,7 @@ object GlideComponents {
     fun personalBestTextbox(lang: String) = "$TEXTBOX/personal_best_$lang.png"
     fun hurryUpTextbox(lang: String) = "$TEXTBOX/hurry_up_$lang.png"
     fun dnfTextbox(lang: String) = "$TEXTBOX/dnf_$lang.png"
+    fun playerWonTextbox(lang: String) = "$TEXTBOX/player_won_$lang.png"
 
     fun textboxKey(component: Component, size: Int): String {
         val key = getTranslationKeyOf(component)

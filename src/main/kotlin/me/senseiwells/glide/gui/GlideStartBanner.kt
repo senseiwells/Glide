@@ -2,7 +2,7 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
-import me.senseiwells.glide.minigame.GlideRound
+import me.senseiwells.glide.minigame.GlideRoundMode
 import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.ComponentUtils.color
@@ -27,7 +27,7 @@ import net.minecraft.server.level.ServerPlayer
 //     their times/score, or DNF
 //   - If the round is the last round the previous banner is replaced
 //     with whoever won the round 'foobar won!'
-class GlideStartBanner(private val round: GlideRound): GlideBanner(), Countdown {
+class GlideStartBanner(private val round: GlideRoundMode): GlideBanner(), Countdown {
     init {
         this.setTitle(GlideComponents.STARTING.withShiftedDownFont(12))
     }
