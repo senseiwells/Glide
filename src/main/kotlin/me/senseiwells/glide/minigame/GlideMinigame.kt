@@ -511,6 +511,7 @@ class GlideMinigame(
         ): GlideMinigame {
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
+                spoofedDimensionKey(addon.config.id)
                 dimensionType(addon.dimensionType)
                 chunkGenerator(VoidChunkGenerator(server))
             }
