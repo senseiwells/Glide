@@ -330,7 +330,7 @@ class GlideMinigame(
 
     @Listener
     private fun onServerTick(event: ServerTickEvent) {
-        if (this.phase == GlidePhase.Active && !this.paused) {
+        if (this.phase == GlidePhase.Active && !this.paused && this.level.tickRateManager().runsNormally()) {
             this.ticks++
         }
 
