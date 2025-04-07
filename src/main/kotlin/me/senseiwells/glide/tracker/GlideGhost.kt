@@ -1,5 +1,6 @@
 package me.senseiwells.glide.tracker
 
+import com.mojang.math.Axis
 import eu.pb4.polymer.virtualentity.api.ElementHolder
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
@@ -29,8 +30,10 @@ class GlideGhost(
     init {
         this.currentPoint = this.trails.firstOrNull()?.points?.firstOrNull() ?: Vec3.ZERO
 
-        this.rightWing.translation = Vector3f(0.55F, 0.180F, 0.05F)
-        this.leftWing.translation = Vector3f(-0.55F, 0.180F, 0.05F)
+        this.ghost.leftRotation = Axis.XP.rotationDegrees(90F)
+
+        this.rightWing.translation = Vector3f(0.55F, 0.110F, -0.4F)
+        this.leftWing.translation =  Vector3f(-0.55F, 0.110F, -0.4F)
 
         this.rightWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, ELYTRA_Y_ROT, ELYTRA_Z_ROT)
         this.leftWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, -ELYTRA_Y_ROT, -ELYTRA_Z_ROT)

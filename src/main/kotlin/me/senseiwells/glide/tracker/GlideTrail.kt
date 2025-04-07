@@ -42,7 +42,7 @@ class GlideTrail(
             // We use quaternions because we get more precision with them
             item.leftRotation = previous.rotationTowards(current)
             item.overridePos = previous
-            item.scale = Vector3f(0.3F, 0.1F, length.toFloat())
+            item.scale = Vector3f(0.3F, 0.01F, length.toFloat())
             item.translation = current.subtract(previous).scale(0.5).toVector3f()
             item.brightness = Brightness.FULL_BRIGHT
             elements.add(item)
