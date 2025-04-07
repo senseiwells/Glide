@@ -479,6 +479,7 @@ class GlideMinigame(
         }
 
         progressBar.append(SpacingFontResources.spaced(145))
+        this.round.addToProgressBar(progressBar)
         player.sendSystemMessage(progressBar, true)
     }
 

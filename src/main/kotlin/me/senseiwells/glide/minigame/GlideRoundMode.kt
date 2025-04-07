@@ -5,8 +5,11 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
+import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.time.MinecraftTimeDuration
+import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.ExtraCodecs
@@ -18,6 +21,8 @@ sealed interface GlideRoundMode {
     fun getStartBanner(): MutableComponent
 
     fun shouldDisplayWinner(): Boolean
+
+    fun addToProgressBar(progress: MutableComponent)
 
     fun mayPlayerRestart(player: ServerPlayer): Boolean
 
@@ -56,6 +61,10 @@ data object SoloGlideRoundMode: GlideRoundMode, GlideRoundMode.Provider {
         return false
     }
 
+    override fun addToProgressBar(progress: MutableComponent) {
+
+    }
+
     override fun mayPlayerRestart(player: ServerPlayer): Boolean {
         return !player.glide.finished && !player.isSpectator
     }
@@ -86,6 +95,15 @@ class MultiGlideRoundMode(private val rounds: Int): GlideRoundMode {
 
     override fun shouldDisplayWinner(): Boolean {
         return this.round >= this.rounds
+    }
+
+    override fun addToProgressBar(progress: MutableComponent) {
+        val completed = "${this.round}/${this.rounds}"
+        val shift = completed.length * 6
+        val margin = 10
+        progress.append(SpacingFontResources.spaced(margin))
+        progress.append(Component.literal(completed).withShiftedDownFont(38))
+        progress.append(SpacingFontResources.spaced(-margin - shift))
     }
 
     override fun mayPlayerRestart(player: ServerPlayer): Boolean {
