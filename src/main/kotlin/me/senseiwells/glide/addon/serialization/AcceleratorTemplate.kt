@@ -21,6 +21,7 @@ class BoosterTemplate(
         val booster = if (this.isDirectional) DirectionalBooster(level, size) else Booster(level, size)
         booster.setPos(this.boundingBox.center)
         booster.yRot = this.direction.toYRot()
+        booster.targetVelocity = this.targetVelocity
         return booster
     }
 
