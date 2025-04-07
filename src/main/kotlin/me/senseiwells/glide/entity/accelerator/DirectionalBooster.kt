@@ -23,14 +23,19 @@ class DirectionalBooster(
         val normal = this.direction.unitVec3i
         val horizontalVelocity = velocity.horizontalDistance()
         if (horizontalVelocity < this.targetVelocity) {
-            player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
+            if (!this.intersects(player.boundingBox)) {
+                player.setVelocityAndMark(velocity.x * 1.1, velocity.y, velocity.z * 1.1)
+            } else {
+                player.addVelocityAndMark(abs(velocity.x) * normal.x * 0.1, 0.0, abs(velocity.z) * normal.z * 0.1)
+            }
             return true
         }
         return this.intersects(player.boundingBox)
     }
 
     override fun canStartAccelerating(player: ServerPlayer): Boolean {
-        return player.direction == this.direction && super.canStartAccelerating(player)
+        val diff = Mth.abs(Mth.wrapDegrees(player.yRot - this.direction.toYRot()))
+        return diff < 90 && super.canStartAccelerating(player)
     }
 
     override fun getModelItem(): ItemStack {
