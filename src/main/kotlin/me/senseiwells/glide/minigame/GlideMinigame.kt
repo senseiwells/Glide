@@ -71,11 +71,6 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 
-// FIXME:
-//   - Issues when joining minigame; taking damage and falling below spawn point
-//   - Being able to continue to progress after round ends
-//   - Implement rounds system
-//   - Player color changing when other players finish
 class GlideMinigame(
     server: MinecraftServer,
     uuid: UUID,
@@ -490,11 +485,12 @@ class GlideMinigame(
     private fun tickProgress() {
         val progressBar = Component.empty().append(this.checkpoints.progressBar)
         var lastOffset = 309
-        for ((i, player) in this.players.playing.withIndex()) {
+        for (player in this.players.playing) {
+            val index = this.playerIndices.getInt(player.uuid) % 16
             val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
 
             progressBar.append(SpacingFontResources.spaced(offset - lastOffset))
-            progressBar.append(GlideFont.Progressbar.getPlayerMarker(i).wrap().shadowless())
+            progressBar.append(GlideFont.Progressbar.getPlayerMarker(index).wrap().shadowless())
             lastOffset = offset + 6
         }
 
