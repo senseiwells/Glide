@@ -247,6 +247,7 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
                     ?: throw IllegalStateException("Component ${contents.key} doesn't have a textbox!")
                 dynamic.append(box)
                 for (arg in contents.args) {
+                    dynamic.append(SpacingFontResources.composed(-1))
                     dynamic.append(when (arg) {
                         is Component -> this.dynamicallySizedTextbox(arg, frame)
                         else -> this.dynamicallySizedTextbox(arg.toString(), frame)
@@ -264,14 +265,24 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
             for (i in (0 until DYNAMIC_BOXES).reversed()) {
                 val width = 1 shl i
                 while (remaining >= width) {
+                    // We shift a little more to the left than we have to
+                    // otherwise because of floating point there may be a slight gap
+                    dynamic.append(SpacingFontResources.composed(-1.2F))
                     dynamic.append(this.get(frame * BOX_COUNT + 2 + i))
                     // The textboxes are actually 1.125 (18/16) times bigger than a pixel
-                    remaining -= width * 1.125
+                    // We compensate for the error above here
+                    remaining -= (width * 1.125) - 0.2F
                 }
+            }
+            if (remaining < 1) {
+                // To fix any small values, we use spacing to get the desired precision
+                dynamic.append(SpacingFontResources.composed(-1 - remaining.toFloat()))
+                dynamic.append(this.get(frame * BOX_COUNT + 3))
             }
             return dynamic
         }
 
+        @Suppress("SameParameterValue")
         private fun dynamicallySizedSpace(frame: Int, size: Int = 1): Component {
             return SpacingFontResources.composed(size * (BOX_SIZES[frame].keyInt() / 18.0F))
         }

@@ -37,6 +37,7 @@ class GlideStartBanner(private val round: GlideRoundMode): GlideBanner(), Countd
     }
 
     override fun getBannerText(player: ServerPlayer): Component {
+        // return Component.literal("foo bar xyz").color(0x444444).shadowless().withShiftedDownFont(29)
         return this.round.getStartBanner().color(0x444444).shadowless().withShiftedDownFont(29)
     }
 

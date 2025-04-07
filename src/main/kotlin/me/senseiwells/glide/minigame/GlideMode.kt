@@ -9,7 +9,6 @@ import me.senseiwells.glide.tracker.GlidePersonalBests
 import me.senseiwells.glide.tracker.GlideScorePersonalBest
 import me.senseiwells.glide.tracker.GlideTimePersonalBest
 import me.senseiwells.glide.tracker.GlideTrail
-import net.casual.arcade.minigame.stats.StatType
 import net.casual.arcade.utils.TimeUtils.format
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
@@ -17,8 +16,6 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.StringRepresentable
-import java.util.Comparator
-import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
 
@@ -82,7 +79,7 @@ enum class GlideMode: StringRepresentable {
             }.reversed()
         }
 
-        val current = glide.players.playing.minWithOrNull(
+        val current = glide.players.all.minWithOrNull(
             Comparator.comparing(ServerPlayer::getGameProfile, comparator)
         )?.gameProfile ?: return leading
 

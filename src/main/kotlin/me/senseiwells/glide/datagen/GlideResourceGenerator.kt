@@ -50,7 +50,7 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
         generator.replaceLangs(client, this.getDataPath().resolve("lang"))
 
         val array = JsonArray()
-        for (char in '!'..'~') {
+        for (char in ' '..'~') {
             val width = client.font.width(char.toString())
             if (width != 6) {
                 val json = JsonObject()
