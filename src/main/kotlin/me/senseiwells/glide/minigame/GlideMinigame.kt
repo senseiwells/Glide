@@ -51,7 +51,6 @@ import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.elements.ComponentElements
 import net.casual.arcade.visuals.elements.SidebarElements
 import net.casual.arcade.visuals.sidebar.FixedSidebar
-import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -222,7 +221,6 @@ class GlideMinigame(
         this.music.suppressGameMusic(true)
         this.music.provider = GlideMusicProvider
 
-        this.settings.canLookAroundWhenFrozen = false
         this.settings.tickFreezeOnPause.set(true)
         this.settings.canGetHungry.set(false)
         this.settings.canPvp.set(false)
@@ -265,16 +263,20 @@ class GlideMinigame(
         val glide = player.glide
         glide.tick(this, this.ticks)
 
-        if (this.players.isPlaying(player) && this.phase > GlidePhase.Countdown) {
-            if (player.verticalCollision) {
-                player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
-            }
-
-            if (this.phase == GlidePhase.Active) {
-                val tracker = this.trackers[player.uuid] ?: return
-                if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
-                    tracker.update(player.position())
+        if (this.players.isPlaying(player)) {
+            if (this.phase > GlidePhase.Countdown) {
+                if (player.verticalCollision) {
+                    player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
                 }
+
+                if (this.phase == GlidePhase.Active) {
+                    val tracker = this.trackers[player.uuid] ?: return
+                    if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
+                        tracker.update(player.position())
+                    }
+                }
+            } else {
+                player.teleportTo(this.startPos.x, this.startPos.y, this.startPos.z)
             }
         }
     }
@@ -444,12 +446,13 @@ class GlideMinigame(
         player.clearFire()
         player.teleportTo(player.glide.respawnLocation.with(this.level))
         player.setVelocityAndMark(0.0, 0.0, 0.0)
-        val elytra = ItemStack(Items.ELYTRA)
-        elytra.set(DataComponents.UNBREAKABLE, Unbreakable(true))
-        player.setItemSlot(EquipmentSlot.CHEST, elytra)
 
         // Ensure the player has loaded the chunks
         GlobalTickedScheduler.schedule(1.Ticks) {
+            val elytra = ItemStack(Items.ELYTRA)
+            elytra.set(DataComponents.UNBREAKABLE, Unbreakable(true))
+            player.setItemSlot(EquipmentSlot.CHEST, elytra)
+
             player.teleportTo(player.glide.respawnLocation.with(this.level))
             player.setVelocityAndMark(0.0, 0.0, 0.0)
             player.startFallFlying()
