@@ -18,6 +18,7 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
+import me.senseiwells.glide.entity.accelerator.StaticThermal
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
@@ -58,6 +59,10 @@ import kotlin.math.roundToInt
 class PlayerGlideExtension(
     player: ServerPlayer
 ): PlayerExtension(player), DataExtension {
+    var thermalDeltaMovement: Double = 0.0
+    var initialEntryVelocity: Vec3 = Vec3(.00,0.0,0.0)
+    var isStaticLift = false
+
     private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
 
     private val accelerators = Reference2ObjectOpenHashMap<Accelerator, MutableInt>()
@@ -104,6 +109,9 @@ class PlayerGlideExtension(
     }
 
     fun collideWithAccelerator(accelerator: Accelerator): Boolean {
+        if (accelerator is StaticThermal) {
+            this.isStaticLift = true
+        } else {this.isStaticLift = false}
         if (!this.accelerators.containsKey(accelerator)) {
             this.accelerators[accelerator] = MutableInt()
             return true
@@ -197,6 +205,7 @@ class PlayerGlideExtension(
         if (updated != null) {
             this.personalBests[id] = updated
             this.wasPersonalBest = true
+            this.serializeAdditionalData()
             return true
         }
         this.wasPersonalBest = false
@@ -249,6 +258,7 @@ class PlayerGlideExtension(
     }
 
     fun respawn() {
+        this.thermalDeltaMovement = 0.0
         this.oldPosition = null
         this.liftForceModifier = 1.0
         this.lastCrossedCheckpoint = CheckpointData(this.lastRespawnCheckpointIndex, this.respawnLocation.position)
