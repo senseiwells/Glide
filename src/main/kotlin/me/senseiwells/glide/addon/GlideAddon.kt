@@ -13,6 +13,7 @@ import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isReadable
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.notExists
 
 // TODO: None of the default glide maps use custom dimensions,
 //   but we should support this in the future...
@@ -33,11 +34,11 @@ class GlideAddon(
             }
             try {
                 val archive = ReadableArchive.zip(path)
-                if (archive.resolve("world").isDirectory()) {
+                if (archive.resolve("world").notExists()) {
                     throw IllegalArgumentException("lemaddon didn't contain a world directory")
                 }
 
-                val addonsPath = archive.resolve("addons.json")
+                val addonsPath = archive.resolve("addon.json")
                 if (!addonsPath.isReadable()) {
                     throw IllegalArgumentException("lemaddon didn't contain addon.json")
                 }
