@@ -41,8 +41,6 @@ dependencies {
     modImplementation(libs.polymer.virtual.entity)
 
     modImplementation(libs.arcade.datagen)
-
-    include(implementation(libs.zip4j.get())!!)
 }
 
 tasks {
