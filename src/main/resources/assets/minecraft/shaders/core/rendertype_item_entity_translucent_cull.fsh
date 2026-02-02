@@ -1,17 +1,17 @@
 #version 150
 
 #moj_import <minecraft:fog.glsl>
+#moj_import <minecraft:dynamictransforms.glsl>
 
 uniform sampler2D Sampler0;
 
-uniform vec4 ColorModulator;
-uniform float FogStart;
-uniform float FogEnd;
-uniform vec4 FogColor;
 uniform float GameTime;
 
 in float vertexDistance;
+in float sphericalVertexDistance;
+in float cylindricalVertexDistance;
 in vec4 vertexColor;
+in vec4 spectatorVertexColor;
 in vec2 texCoord0;
 in vec2 texCoord1;
 in vec4 normal;
@@ -55,7 +55,7 @@ void main() {
         uv.y += GameTime * 32.0;
 
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
-        
+
 
         if (abs(normal.y) > 0.1) {
             color.a /= max(vertexDistance / 20.0, 1.7);
@@ -72,9 +72,9 @@ void main() {
         }
 
         if (isOmniBoost > 0.5) {
-            color.rgb *= vec3(1,0.6,0);
+            color.rgb *= vec3(1, (133.0 / 255.0), 0);
         } else {
-            color.rgb *= vec3(1,0.82,0);
+            color.rgb *= vec3(1, (210.0 / 255.0), 0);
         }
         color.a /= 2.1;
         if (color.a < 0.1) {
@@ -106,5 +106,12 @@ void main() {
             discard;
         }
     }
-    fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
+    else  {
+        color = texture(Sampler0, texCoord0) * spectatorVertexColor * ColorModulator;
+        if (vertexDistance < 16.0) { //Start of fadeout / Not a UI element. TODO: Add additional check for if it is a ring
+            if (color.a < 0.1) {discard;} // Most players have a transparent second layer.
+            color.a = (vertexDistance / 16.0); // Change divisor to match start of fade out.
+        }
+    }
+    fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 }
