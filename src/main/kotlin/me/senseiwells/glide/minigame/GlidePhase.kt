@@ -1,6 +1,5 @@
 package me.senseiwells.glide.minigame
 
-import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.unrestrictMovement
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.launch
 import net.casual.arcade.resources.utils.ResourcePackUtils
@@ -26,7 +25,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
             minigame.settings.canLookAroundWhenFrozen = false
             for (player in minigame.players) {
-                player.unrestrictMovement()
+                minigame.unfreezePlayer(player)
             }
             minigame.music.start()
         }
