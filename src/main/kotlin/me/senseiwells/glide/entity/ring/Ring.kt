@@ -9,13 +9,10 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.TimeUtils.Ticks
-import net.casual.arcade.utils.contains
 import net.casual.arcade.utils.createValue
 import net.casual.arcade.utils.math.location.LocationWithLevel.Companion.locationWithLevel
-import net.casual.arcade.visuals.firework.VirtualFireworkBuilder
+import net.casual.arcade.visuals.entity.firework.VirtualFireworkBuilder
 import net.minecraft.core.Direction
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -29,6 +26,8 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.FireworkExplosion
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
@@ -76,15 +75,15 @@ class Ring(
         builder.define(TYPE, -1)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        if (compound.contains("RingType", Tag.TAG_ANY_NUMERIC)) {
-            val type = Mth.clamp(compound.getInt("RingType"), 0, 2)
-            this.setRingType(RingType.entries[type])
+    override fun readAdditionalSaveData(input: ValueInput) {
+        val type = input.getInt("RingType").map { Mth.clamp(it, 0, 2) }
+        if (type.isPresent) {
+            this.setRingType(RingType.entries[type.get()])
         }
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        compound.putByte("RingType", this.getRingType().ordinal.toByte())
+    override fun addAdditionalSaveData(output: ValueOutput) {
+        output.putInt("RingType", this.getRingType().ordinal)
     }
 
     override fun makeBoundingBox(position: Vec3): AABB {
@@ -111,7 +110,7 @@ class Ring(
             player.glide.score += this.getRingType().points
             player.sendSound(this.getRingType().getSound(player.glide.combo), static = true)
 
-            val builder = VirtualFireworkBuilder(player.serverLevel())
+            val builder = VirtualFireworkBuilder(player.level())
             builder.duration(0.Ticks)
 
             builder.location(player.locationWithLevel)

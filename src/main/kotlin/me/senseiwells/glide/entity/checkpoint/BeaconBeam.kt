@@ -9,7 +9,6 @@ import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
 import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.createValue
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -20,6 +19,8 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import org.joml.Vector3f
 import xyz.nucleoid.packettweaker.PacketContext
 
@@ -78,14 +79,12 @@ class BeaconBeam(
         return false
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        if (compound.contains("BeamLength", 99)) {
-            this.setLength(compound.getFloat("BeamLength"))
-        }
+    override fun readAdditionalSaveData(input: ValueInput) {
+        this.setLength(input.getFloatOr("BeamLength", this.getLength()))
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        compound.putFloat("BeamLength", this.getLength())
+    override fun addAdditionalSaveData(output: ValueOutput) {
+        output.putFloat("BeamLength", this.getLength())
     }
 
     override fun modifyRawTrackedData(
