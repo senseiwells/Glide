@@ -1,5 +1,7 @@
 package me.senseiwells.glide.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent;
 import me.senseiwells.glide.extension.PlayerGlideExtension;
 import net.casual.arcade.events.GlobalEventHandler;
@@ -30,14 +32,14 @@ public class LivingEntityMixin {
 	}
 
 
-	@Redirect(
+	@WrapOperation(
 		method = "travelFallFlying",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/entity/LivingEntity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
 		)
 	)
-	private void onMove(LivingEntity instance, MoverType moverType, Vec3 vec3) {
+	private void onMove(LivingEntity instance, MoverType moverType, Vec3 vec3, Operation<Void> original) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
 			double thermalDeltaMovement = glide.getThermalDeltaMovement();
@@ -46,12 +48,13 @@ public class LivingEntityMixin {
 				Vec3 delta = player.getDeltaMovement();
 				if (delta.length() > initial.length()) {
 					delta = new Vec3(
-							Mth.clamp(delta.x, -initial.length(), initial.length()),
-							Mth.clamp(delta.y, -initial.length(), initial.y),
-							Mth.clamp(delta.z, -initial.length(), initial.length()));
+						Mth.clamp(delta.x, -initial.length(), initial.length()),
+						Mth.clamp(delta.y, -initial.length(), initial.y),
+						Mth.clamp(delta.z, -initial.length(), initial.length())
+					);
 				}
 				Vec3 thermalDelta = new Vec3(delta.x, (thermalDeltaMovement * glide.getLiftForceModifier()), delta.z);
-				player.move(moverType, thermalDelta);
+				original.call(player, moverType, thermalDelta);
 				player.setDeltaMovement(delta.x, 0.0, delta.z);
 				player.connection.send(
 					new ClientboundSetEntityMotionPacket(player.getId(), thermalDelta)
@@ -59,6 +62,6 @@ public class LivingEntityMixin {
 				return;
 			}
 		}
-		instance.move(moverType, vec3);
+		original.call(instance, moverType, vec3);
 	}
 }

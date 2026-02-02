@@ -22,7 +22,7 @@ repositories {
     maven("https://ueaj.dev/maven")
     maven("https://maven.nucleoid.xyz")
     maven("https://maven.maxhenkel.de/repository/public")
-    maven("https://maven.andante.dev/releases/")
+    maven("https://maven.mcbrawls.net/releases/")
     mavenCentral()
 }
 
