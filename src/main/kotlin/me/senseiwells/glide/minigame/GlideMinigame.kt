@@ -24,8 +24,6 @@ import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.events.*
-import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.restrictMovement
-import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.unrestrictMovement
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.launch
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
@@ -47,6 +45,7 @@ import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.coroutine.delay
+import net.casual.arcade.utils.isOf
 import net.casual.arcade.utils.set
 import net.casual.arcade.utils.setVelocityAndMark
 import net.casual.arcade.utils.teleportTo
@@ -73,6 +72,7 @@ import net.minecraft.world.scores.Team
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class GlideMinigame(
     server: MinecraftServer,
@@ -179,6 +179,18 @@ class GlideMinigame(
         for (player in this.players) {
             this.players.setPlaying(player)
         }
+    }
+
+    fun freezePlayer(player: ServerPlayer) {
+        player.isNoGravity = true
+        this.scheduler.schedule(1.Ticks) {
+            this.effects.tickFreeze(player)
+        }
+    }
+
+    fun unfreezePlayer(player: ServerPlayer) {
+        this.effects.tickUnfreeze(player)
+        player.isNoGravity = false
     }
 
     private fun endingRound() {
@@ -291,12 +303,12 @@ class GlideMinigame(
     @Listener
     private fun onPlayerDamage(event: PlayerDamageEvent) {
         val (player, source, amount) = event
-        if (this.players.isSpectating(player)) {
+        if (this.players.isSpectating(player) || this.phase < GlidePhase.Active) {
             event.cancel()
             return
         }
 
-        if (source.`is`(DamageTypes.FALL) || source.`is`(DamageTypes.FLY_INTO_WALL)) {
+        if (source.isOf(DamageTypes.FALL) || source.isOf(DamageTypes.FLY_INTO_WALL)) {
             if (player.health > 2.0F) {
                 event.amount = 2.0F
                 return
@@ -308,7 +320,7 @@ class GlideMinigame(
         player.setGameMode(GameType.SPECTATOR)
         player.pose = Pose.STANDING
         player.setVelocityAndMark(0.0, 0.0, 0.0)
-        player.restrictMovement()
+        this.freezePlayer(player)
 
         this.removeBannerUI(player)
         this.sidebar.removePlayer(player)
@@ -322,7 +334,7 @@ class GlideMinigame(
         player.sendSystemMessage(Component.empty(), true)
 
         this.scheduler.schedule(1.Seconds) {
-            player.unrestrictMovement()
+            this.unfreezePlayer(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
             if (this.roundEnding) {
@@ -378,7 +390,7 @@ class GlideMinigame(
         this.setPlayerPlayingState(player)
         if (this.phase < GlidePhase.Active) {
             player.verticalCollision = false
-            player.restrictMovement()
+            this.freezePlayer(player)
 
             this.countdown.addPlayer(player)
         }
@@ -404,7 +416,7 @@ class GlideMinigame(
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
         if (updated != Pose.FALL_FLYING && !player.isSpectator) {
-            player.kill(event.player.level())
+            player.hurtServer(event.player.level(), player.damageSources().flyIntoWall(), 10.0F)
         }
     }
 
@@ -491,7 +503,7 @@ class GlideMinigame(
         var lastOffset = 309
         for (player in this.players.playing) {
             val index = this.playerIndices.getInt(player.uuid) % 16
-            val offset = Mth.clamp(Math.round(player.glide.progress * 300).toInt(), 0, 300)
+            val offset = Mth.clamp((player.glide.progress * 300).roundToInt(), 0, 300)
 
             progressBar.append(SpacingFontResources.spaced(offset - lastOffset))
             progressBar.append(GlideFont.Progressbar.getPlayerMarker(index).wrap().shadowless())
