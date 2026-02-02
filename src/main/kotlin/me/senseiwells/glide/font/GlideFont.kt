@@ -10,6 +10,7 @@ import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.JsonUtils
 import net.casual.arcade.utils.JsonUtils.int
 import net.casual.arcade.utils.JsonUtils.objects
+import net.casual.arcade.utils.component.LiteralWidthResolver
 import net.casual.arcade.utils.component1
 import net.casual.arcade.utils.component2
 import net.minecraft.network.chat.Component
@@ -18,8 +19,6 @@ import net.minecraft.network.chat.contents.TranslatableContents
 import kotlin.io.path.reader
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
-    private val CHAR_WIDTH_LOOKUP = Char2IntOpenHashMap()
-
     private const val SHIFT = -35
 
     val SUPPORTED_LANGS = listOf("en_us")
@@ -32,16 +31,6 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
     val FULL_HEART = bitmap(at("heart/full.png"), 18 + SHIFT, 9)
     val HALF_HEART = bitmap(at("heart/half.png"), 18 + SHIFT, 9)
     val EMPTY_HEART = bitmap(at("heart/empty.png"), 18 + SHIFT, 9)
-
-    init {
-        CHAR_WIDTH_LOOKUP.defaultReturnValue(6)
-
-        GlideMod.container.findPath("data/glide/char_width_lookup.json").get().reader().use {
-            for (element in JsonUtils.decodeToJsonArray(it).objects()) {
-                CHAR_WIDTH_LOOKUP[element.int("char").toChar()] = element.int("width")
-            }
-        }
-    }
 
     object Progressbar: IndexedFontResources(GlideMod.id("progressbar")) {
         private val BG_1 = bitmap(at("progressbar/progressbar_0.png"), 5 + SHIFT, 10)
@@ -259,7 +248,7 @@ object GlideFont: FontResources(GlideMod.id("glide_font")) {
         }
 
         private fun dynamicallySizedTextbox(string: String, frame: Int): MutableComponent {
-            val size = string.sumOf { CHAR_WIDTH_LOOKUP[it] }
+            val size = LiteralWidthResolver.width(string)
             var remaining = size / 2.0
             val dynamic = Component.empty()
             for (i in (0 until DYNAMIC_BOXES).reversed()) {

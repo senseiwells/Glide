@@ -50,7 +50,7 @@ class GlideStartBanner(private val round: GlideRoundMode): GlideBanner() {
         total: Int,
         remaining: MinecraftTimeDuration
     ) {
-        this.setTitle(GlideComponents.STARTING_IN.generate(current).withShiftedDownFont(12))
+        this.setTitle(GlideComponents.STARTING_IN.generate(total - current).withShiftedDownFont(12))
         for (player in players) {
             player.sendSound(GlideSounds.COUNTDOWN_TICK)
         }
