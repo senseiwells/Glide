@@ -18,7 +18,8 @@ uniform sampler2D Sampler2;
 
 uniform int FogShape;
 
-out float vertexDistance;
+out float sphericalVertexDistance;
+out float cylindricalVertexDistance;
 out vec4 vertexColor;
 out vec4 spectatorVertexColor;
 out vec2 texCoord0;
@@ -38,8 +39,8 @@ out vec3 cornerTex3;
 
 void main() {
     vec3 pos = Position;
-
-    vertexDistance = fog_spherical_distance(pos);
+    sphericalVertexDistance = fog_spherical_distance(pos);
+    cylindricalVertexDistance = fog_cylindrical_distance(pos);
     vertexColor = texelFetch(Sampler2, UV2 / 16, 0);
     spectatorVertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color) * texelFetch(Sampler2, UV2 / 16, 0);
     texCoord0 = UV0;
