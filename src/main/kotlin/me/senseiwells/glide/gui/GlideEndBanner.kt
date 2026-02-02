@@ -33,6 +33,6 @@ open class GlideEndBanner(
         total: Int,
         remaining: MinecraftTimeDuration
     ) {
-        this.setTitle(GlideComponents.ENDING_IN.generate(current).withShiftedDownFont(12))
+        this.setTitle(GlideComponents.ENDING_IN.generate(total - current).withShiftedDownFont(12))
     }
 }

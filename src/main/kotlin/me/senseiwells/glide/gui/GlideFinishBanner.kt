@@ -35,6 +35,6 @@ class GlideFinishBanner(glide: GlideMinigame): GlideEndBanner(glide) {
         total: Int,
         remaining: MinecraftTimeDuration
     ) {
-        this.setTitle(GlideComponents.REACH_THE_END.generate(current).withShiftedDownFont(12))
+        this.setTitle(GlideComponents.REACH_THE_END.generate(total - current).withShiftedDownFont(12))
     }
 }
