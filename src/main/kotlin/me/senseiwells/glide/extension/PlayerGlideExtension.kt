@@ -48,9 +48,6 @@ import org.apache.commons.lang3.mutable.MutableInt
 import java.io.IOException
 import java.nio.file.Path
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
 import kotlin.math.abs
@@ -95,6 +92,8 @@ class PlayerGlideExtension(
     var score = 0
     var progress = 0.0
 
+    var initialEntryVelocity = Vec3(0.0, 0.0, 0.0)
+    var thermalDeltaMovement = 0.0
     var liftForceModifier = 1.0
         private set
 
@@ -198,6 +197,7 @@ class PlayerGlideExtension(
         if (updated != null) {
             this.personalBests[id] = updated
             this.wasPersonalBest = true
+            this.serializeAdditionalData()
             return true
         }
         this.wasPersonalBest = false
@@ -250,6 +250,7 @@ class PlayerGlideExtension(
     }
 
     fun respawn() {
+        this.thermalDeltaMovement = 0.0
         this.oldPosition = null
         this.liftForceModifier = 1.0
         this.lastCrossedCheckpoint = CheckpointData(this.lastRespawnCheckpointIndex, this.respawnLocation.position)
