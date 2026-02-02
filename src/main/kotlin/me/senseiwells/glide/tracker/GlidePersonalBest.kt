@@ -4,17 +4,17 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.time.MinecraftTimeDuration
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 data class GlidePersonalBests(
-    val map: ResourceLocation,
+    val map: Identifier,
     val time: GlideTimePersonalBest,
     val score: GlideScorePersonalBest
 ) {
     companion object {
         val CODEC: Codec<GlidePersonalBests> = RecordCodecBuilder.create { instance ->
             instance.group(
-                ResourceLocation.CODEC.fieldOf("map").forGetter(GlidePersonalBests::map),
+                Identifier.CODEC.fieldOf("map").forGetter(GlidePersonalBests::map),
                 GlideTimePersonalBest.CODEC.fieldOf("time").forGetter(GlidePersonalBests::time),
                 GlideScorePersonalBest.CODEC.fieldOf("score").forGetter(GlidePersonalBests::score)
             ).apply(instance, ::GlidePersonalBests)

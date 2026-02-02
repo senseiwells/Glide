@@ -113,11 +113,11 @@ open class DynamicThermal(
 
     override fun getModelScale(): Vector3f {
         val size = this.getDisplaySize()
-        return Vector3f(size.x, 1.0F, size.z)
+        return Vector3f(size.x(), 1.0F, size.z())
     }
 
     override fun getModelBrightness(): Brightness {
-        val height = this.getDisplaySize().y.toInt()
+        val height = this.getDisplaySize().y().toInt()
         return Brightness(height % 16, height / 16)
     }
 

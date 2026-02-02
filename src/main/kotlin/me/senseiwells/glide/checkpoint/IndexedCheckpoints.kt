@@ -1,16 +1,18 @@
 package me.senseiwells.glide.checkpoint
 
 import com.google.common.collect.HashMultimap
+import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
 import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.utils.ComponentUtils.shadowless
+import net.casual.arcade.utils.component.shadowless
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
+import kotlin.math.roundToInt
 
-class CheckpointManager(
+class IndexedCheckpoints(
     private val checkpoints: List<Checkpoint>
 ) {
     private val lastIndex = this.checkpoints.maxOf { it.index }
@@ -74,7 +76,7 @@ class CheckpointManager(
             }
 
             val distance = this.getPercentageDistance(checkpoint.index)
-            val offset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
+            val offset = Mth.clamp((distance * 300).roundToInt(), 0, 300)
 
             progressBar.append(SpacingFontResources.spaced(offset - lastOffset))
             progressBar.append(GlideFont.Progressbar.getCheckpoint(0))
@@ -110,5 +112,9 @@ class CheckpointManager(
         for (checkpoint in this.get(this.lastIndex)) {
             require(checkpoint is FinishLine) { "Last checkpoints should be finish lines!" }
         }
+    }
+
+    companion object {
+        val CODEC: Codec<IndexedCheckpoints> = Checkpoint.CODEC.listOf().xmap(::IndexedCheckpoints, IndexedCheckpoints::checkpoints)
     }
 }

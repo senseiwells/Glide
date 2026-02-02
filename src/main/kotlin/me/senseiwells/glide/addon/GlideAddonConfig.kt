@@ -6,15 +6,14 @@ import me.senseiwells.common.addon.AddonConfig
 import me.senseiwells.glide.addon.serialization.BoosterTemplate
 import me.senseiwells.glide.addon.serialization.RingTemplate
 import me.senseiwells.glide.addon.serialization.ThermalTemplate
-import me.senseiwells.glide.checkpoint.Checkpoint
-import me.senseiwells.glide.checkpoint.CheckpointManager
+import me.senseiwells.glide.checkpoint.IndexedCheckpoints
 import net.casual.arcade.utils.math.location.Location
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 class GlideAddonConfig(
-    id: ResourceLocation,
+    id: Identifier,
     name: Component,
     description: Component,
     authors: List<String>,
@@ -22,15 +21,13 @@ class GlideAddonConfig(
     val spawn: Location,
     val boosters: List<BoosterTemplate>,
     val thermals: List<ThermalTemplate>,
-    private val allCheckpoints: List<Checkpoint>,
+    val checkpoints: IndexedCheckpoints,
     val rings: List<RingTemplate>
 ): AddonConfig(id, name, description, authors, version) {
-    val checkpoints by lazy { CheckpointManager(this.allCheckpoints) }
-
     companion object {
         val CODEC: Codec<GlideAddonConfig> = RecordCodecBuilder.create { instance ->
             instance.group(
-                ResourceLocation.CODEC.fieldOf("id").forGetter(GlideAddonConfig::id),
+                Identifier.CODEC.fieldOf("id").forGetter(GlideAddonConfig::id),
                 ComponentSerialization.CODEC.fieldOf("name").forGetter(GlideAddonConfig::name),
                 ComponentSerialization.CODEC.fieldOf("description").forGetter(GlideAddonConfig::description),
                 Codec.STRING.listOf().fieldOf("authors").forGetter(GlideAddonConfig::authors),
@@ -38,7 +35,7 @@ class GlideAddonConfig(
                 Location.CODEC.fieldOf("spawn").forGetter(GlideAddonConfig::spawn),
                 BoosterTemplate.CODEC.listOf().fieldOf("boosters").forGetter(GlideAddonConfig::boosters),
                 ThermalTemplate.CODEC.listOf().fieldOf("thermals").forGetter(GlideAddonConfig::thermals),
-                Checkpoint.CODEC.listOf().fieldOf("checkpoints").forGetter(GlideAddonConfig::allCheckpoints),
+                IndexedCheckpoints.CODEC.fieldOf("checkpoints").forGetter(GlideAddonConfig::checkpoints),
                 RingTemplate.CODEC.listOf().fieldOf("rings").forGetter(GlideAddonConfig::rings)
             ).apply(instance, ::GlideAddonConfig)
         }

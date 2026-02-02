@@ -10,7 +10,7 @@ plugins {
     java
 }
 
-val modVersion = "0.1.1"
+val modVersion = "0.2.0"
 version = "${modVersion}+${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 

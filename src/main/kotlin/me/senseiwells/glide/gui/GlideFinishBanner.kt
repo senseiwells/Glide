@@ -4,11 +4,10 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
-import me.senseiwells.glide.minigame.GlideMode
-import net.casual.arcade.utils.ComponentUtils.color
-import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
-import net.casual.arcade.utils.ComponentUtils.wrap
+import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.utils.component.color
+import net.casual.arcade.utils.component.shadowless
+import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -30,7 +29,12 @@ class GlideFinishBanner(glide: GlideMinigame): GlideEndBanner(glide) {
         return component.color(0x444444).shadowless().withShiftedDownFont(29)
     }
 
-    override fun sendCountdown(players: Collection<ServerPlayer>, current: Int, remaining: MinecraftTimeDuration) {
+    override fun updateTransition(
+        players: Collection<ServerPlayer>,
+        current: Int,
+        total: Int,
+        remaining: MinecraftTimeDuration
+    ) {
         this.setTitle(GlideComponents.REACH_THE_END.generate(current).withShiftedDownFont(12))
     }
 }

@@ -6,6 +6,7 @@ import me.senseiwells.glide.extension.GlideExtensions
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigameFactory
+import me.senseiwells.glide.minigame.GlideStats
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.events.GlobalEventHandler
@@ -22,11 +23,12 @@ import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
 import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
 import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
 import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
-import net.casual.arcade.utils.codec.CodecProvider.Companion.register
+import net.casual.arcade.utils.Identifier
+import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -51,11 +53,12 @@ object GlideMod: ModInitializer {
         packDescription = Component.literal("GlidePack")
     }
 
-    fun id(path: String): ResourceLocation {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
+    fun id(path: String): Identifier {
+        return Identifier(MOD_ID, path)
     }
 
     override fun onInitialize() {
+        GlideStats.noop()
         GlideItems.noop()
         GlideEntities.noop()
 

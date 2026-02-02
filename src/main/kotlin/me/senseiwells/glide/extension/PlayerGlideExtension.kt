@@ -18,30 +18,31 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
-import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
-import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
+import net.casual.arcade.extensions.SerializableExtension
+import net.casual.arcade.extensions.utils.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.MathUtils.projectionScalar
 import net.casual.arcade.utils.PlayerUtils.levelServer
+import net.casual.arcade.utils.PlayerUtils.server
+import net.casual.arcade.utils.component.shadowless
+import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.math.location.Location
 import net.casual.arcade.utils.time.MinecraftTimeDuration
-import net.minecraft.Util
 import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.IntArrayTag
 import net.minecraft.nbt.NbtIo
-import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
+import net.minecraft.util.Util
 import net.minecraft.world.level.storage.LevelResource
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
@@ -55,8 +56,8 @@ import kotlin.math.roundToInt
 
 class PlayerGlideExtension(
     player: ServerPlayer
-): PlayerExtension(player), DataExtension {
-    private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
+): PlayerExtension(player), SerializableExtension {
+    private val personalBests = Object2ObjectOpenHashMap<Identifier, GlidePersonalBests>()
 
     private val accelerators = Reference2ObjectOpenHashMap<Accelerator, MutableInt>()
 
@@ -151,7 +152,7 @@ class PlayerGlideExtension(
         }
     }
 
-    fun showTrailFor(id: ResourceLocation, mode: GlideMode, tick: Int) {
+    fun showTrailFor(id: Identifier, mode: GlideMode, tick: Int) {
         val bests = this.personalBests[id] ?: return
         val best = when (mode) {
             GlideMode.ScoreAttack -> bests.score
@@ -183,7 +184,7 @@ class PlayerGlideExtension(
     }
 
     fun updateBests(
-        id: ResourceLocation,
+        id: Identifier,
         glide: GlideMinigame,
         time: MinecraftTimeDuration,
         trails: List<GlideTrail>
@@ -288,7 +289,7 @@ class PlayerGlideExtension(
     }
 
     fun addProgressComponents(minigame: GlideMinigame, progressBar: MutableComponent, marker: Int) {
-        val playerOffset = Mth.clamp(Math.round(this.progress * 300).toInt(), 0, 300) - 1
+        val playerOffset = Mth.clamp((this.progress * 300).roundToInt(), 0, 300) - 1
         progressBar.append(SpacingFontResources.spaced(playerOffset - 309))
         progressBar.append(GlideFont.Progressbar.getPlayerMarker(marker % 16).wrap().shadowless())
         progressBar.append(SpacingFontResources.spaced(-7))
@@ -408,47 +409,44 @@ class PlayerGlideExtension(
         return false
     }
 
-    override fun getName(): String {
-        return "glide_extension"
+    override fun id(): Identifier {
+        return GlideMod.id("glide_extension")
     }
 
-    override fun deserialize(element: Tag) {
-        element as CompoundTag
-        this.finished = element.getBooleanOr("finished", false)
-        this.lastRespawnCheckpointIndex = element.getIntOr("last_respawn_checkpoint_index", 0)
-        this.lastCheckpointIndex = element.getIntOr("last_checkpoint_index", 0)
+    override fun deserialize(input: ValueInput) {
+        this.finished = input.getBooleanOr("finished", false)
+        this.lastRespawnCheckpointIndex = input.getIntOr("last_respawn_checkpoint_index", 0)
+        this.lastCheckpointIndex = input.getIntOr("last_checkpoint_index", 0)
         this.lastCrossedCheckpoint = CheckpointData(
-            element.getIntOr("last_crossed_checkpoint_index", 0),
-            element.read("last_crossed_checkpoint_position", Vec3.CODEC).orElse(Vec3.ZERO)
+            input.getIntOr("last_crossed_checkpoint_index", 0),
+            input.read("last_crossed_checkpoint_position", Vec3.CODEC).orElse(Vec3.ZERO)
         )
-        this.ringTypes.addAll(element.getIntArray("ring_types").orElseGet(::intArrayOf).map { RingType.entries[it] })
-        this.lastSavedRingType = element.getInt("last_saved_ring_type").map { RingType.entries[it] }.orElse(RingType.Grey)
-        this.rings.addAll(element.read("rings", UUIDUtil.CODEC_SET).orElse(setOf()))
-        this.lastSavedRings.addAll(element.read("last_saved_rings", UUIDUtil.CODEC_SET).orElse(setOf()))
-        this.score = element.getIntOr("score", 0)
-        this.lastSavedScore = element.getIntOr("last_saved_score", 0)
-        this.respawnLocation = element.read("respawn_location", Location.CODEC).orElse(this.respawnLocation)
+        this.ringTypes.addAll(input.getIntArray("ring_types").orElseGet(::intArrayOf).map { RingType.entries[it] })
+        this.lastSavedRingType = input.getInt("last_saved_ring_type").map { RingType.entries[it] }.orElse(RingType.Grey)
+        this.rings.addAll(input.read("rings", UUIDUtil.CODEC_SET).orElse(setOf()))
+        this.lastSavedRings.addAll(input.read("last_saved_rings", UUIDUtil.CODEC_SET).orElse(setOf()))
+        this.score = input.getIntOr("score", 0)
+        this.lastSavedScore = input.getIntOr("last_saved_score", 0)
+        this.respawnLocation = input.read("respawn_location", Location.CODEC).orElse(this.respawnLocation)
     }
 
-    override fun serialize(): CompoundTag? {
+    override fun serialize(output: ValueOutput) {
         if (this.player.getMinigame() !is GlideMinigame) {
-            return null
+            return
         }
 
-        val tag = CompoundTag()
-        tag.putBoolean("finished", this.finished)
-        tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
-        tag.putInt("last_checkpoint_index", this.lastCheckpointIndex)
-        tag.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
-        tag.store("last_crossed_checkpoint_position", Vec3.CODEC, this.lastCrossedCheckpoint.position)
-        tag.put("ring_types", IntArrayTag(this.ringTypes.map { it.ordinal }.toIntArray()))
-        tag.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
-        tag.store("rings", UUIDUtil.CODEC_SET, this.rings)
-        tag.store("last_saved_rings", UUIDUtil.CODEC_SET, this.lastSavedRings)
-        tag.putInt("score", this.score)
-        tag.putInt("last_saved_score", this.lastSavedScore)
-        tag.store("respawn_location", Location.CODEC, this.respawnLocation)
-        return tag
+        output.putBoolean("finished", this.finished)
+        output.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
+        output.putInt("last_checkpoint_index", this.lastCheckpointIndex)
+        output.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
+        output.store("last_crossed_checkpoint_position", Vec3.CODEC, this.lastCrossedCheckpoint.position)
+        output.putIntArray("ring_types", this.ringTypes.map { it.ordinal }.toIntArray())
+        output.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
+        output.store("rings", UUIDUtil.CODEC_SET, this.rings)
+        output.store("last_saved_rings", UUIDUtil.CODEC_SET, this.lastSavedRings)
+        output.putInt("score", this.score)
+        output.putInt("last_saved_score", this.lastSavedScore)
+        output.store("respawn_location", Location.CODEC, this.respawnLocation)
     }
 
     // Additional data that may be large,
@@ -489,7 +487,7 @@ class PlayerGlideExtension(
     }
 
     private fun getAdditionalDataPath(): Path {
-        val root = this.player.levelServer.getWorldPath(LevelResource.ROOT)
+        val root = this.player.server.getWorldPath(LevelResource.ROOT)
         return root.resolve("glide").resolve(this.player.stringUUID + ".nbt")
     }
 
@@ -497,7 +495,7 @@ class PlayerGlideExtension(
         private const val CHECKPOINT_TICKS = 12
 
         @JvmStatic
-        val ServerPlayer.glide
-            get() = this.getExtension<PlayerGlideExtension>()
+        val ServerPlayer.glide: PlayerGlideExtension
+            get() = this.getExtension()
     }
 }

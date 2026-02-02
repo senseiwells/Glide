@@ -8,11 +8,11 @@ import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.exception.MinigameCreationException
 import net.casual.arcade.minigame.serialization.MinigameCreationContext
 import net.casual.arcade.minigame.serialization.MinigameFactory
-import net.casual.arcade.utils.codec.CodecProvider
-import net.minecraft.resources.ResourceLocation
+import net.casual.arcade.utils.serialization.codec.CodecProvider
+import net.minecraft.resources.Identifier
 
 class GlideMinigameFactory(
-    private val map: ResourceLocation,
+    private val map: Identifier,
     private val round: GlideRoundMode.Provider,
     private val mode: GlideMode
 ): MinigameFactory {
@@ -28,11 +28,11 @@ class GlideMinigameFactory(
     companion object: CodecProvider<GlideMinigameFactory> {
         private val DEFAULT_MAP = GlideMod.id("temple")
 
-        override val ID: ResourceLocation = GlideMinigame.ID
+        override val ID = GlideMinigame.ID
 
         override val CODEC: MapCodec<out GlideMinigameFactory> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
-                ResourceLocation.CODEC.optionalFieldOf("map", DEFAULT_MAP).forGetter(GlideMinigameFactory::map),
+                Identifier.CODEC.optionalFieldOf("map", DEFAULT_MAP).forGetter(GlideMinigameFactory::map),
                 GlideRoundMode.Provider.CODEC.optionalFieldOf("round", SoloGlideRoundMode).forGetter(GlideMinigameFactory::round),
                 GlideMode.CODEC.optionalFieldOf("mode", GlideMode.TimeAttack).forGetter(GlideMinigameFactory::mode)
             ).apply(instance, ::GlideMinigameFactory)

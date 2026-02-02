@@ -2,7 +2,7 @@ package me.senseiwells.glide.addon
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
@@ -10,7 +10,7 @@ import kotlin.io.path.listDirectoryEntries
 object GlideAddons {
     private val path = FabricLoader.getInstance().configDir.resolve("glide-addons")
 
-    private val addons = Object2ObjectOpenHashMap<ResourceLocation, GlideAddon>()
+    private val addons = Object2ObjectOpenHashMap<Identifier, GlideAddon>()
 
     fun load() {
         if (!this.path.exists()) {
@@ -23,7 +23,7 @@ object GlideAddons {
         }
     }
 
-    fun get(id: ResourceLocation): GlideAddon? {
+    fun get(id: Identifier): GlideAddon? {
         return this.addons[id]
     }
 }

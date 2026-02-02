@@ -2,17 +2,17 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.wrap
+import net.casual.arcade.utils.component.shadowless
+import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
-import net.casual.arcade.visuals.countdown.Countdown
-import net.casual.arcade.visuals.elements.ComponentElements
+import net.casual.arcade.visuals.transition.Transition
+import net.casual.arcade.visuals.utils.elements.ComponentElements
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-abstract class GlideBanner: Countdown {
+abstract class GlideBanner: Transition {
     private val titleBossbar = SuppliedBossbar()
     private val shieldBossbar = SuppliedBossbar()
     private val textboxBossbar = SuppliedBossbar()
@@ -50,13 +50,13 @@ abstract class GlideBanner: Countdown {
         this.titleBossbar.setTitle(ComponentElements.of(component))
     }
 
-    override fun beforeCountdown(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration) {
+    override fun beforeTransition(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration, updates: Int) {
         for (player in players) {
             this.addPlayer(player, shield = false)
         }
     }
 
-    override fun afterCountdown(players: Collection<ServerPlayer>) {
+    override fun afterTransition(players: Collection<ServerPlayer>) {
         for (player in players) {
             this.removePlayer(player)
         }

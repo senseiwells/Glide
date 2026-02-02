@@ -1,5 +1,7 @@
 package me.senseiwells.glide.mixin;
 
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent;
@@ -12,13 +14,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
-	@ModifyVariable(
+	@Expression("(float) (? * 10.0 - 3.0)")
+	@ModifyExpressionValue(
 		method = "handleFallFlyingCollisions",
-		at = @At("STORE")
+		at = @At("MIXINEXTRAS:EXPRESSION")
 	)
 	private float onFlyFallHorizontalCollision(float original) {
 		if ((Object) this instanceof ServerPlayer player) {
