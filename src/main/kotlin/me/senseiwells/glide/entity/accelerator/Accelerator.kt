@@ -106,6 +106,7 @@ abstract class Accelerator(
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
         if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
+            player.glide.initialEntryVelocity = player.deltaMovement
             player.sendSound(this.getSound())
         }
     }
