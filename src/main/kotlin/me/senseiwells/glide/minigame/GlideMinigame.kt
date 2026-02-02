@@ -416,7 +416,7 @@ class GlideMinigame(
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
         if (updated != Pose.FALL_FLYING && !player.isSpectator) {
-            player.hurtServer(event.player.level(), player.damageSources().flyIntoWall(), 10.0F)
+            player.kill(player.level())
         }
     }
 
