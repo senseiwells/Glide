@@ -7,7 +7,6 @@ uniform sampler2D Sampler0;
 
 uniform float GameTime;
 
-in float vertexDistance;
 in float sphericalVertexDistance;
 in float cylindricalVertexDistance;
 in vec4 vertexColor;
@@ -42,13 +41,12 @@ void main() {
         uv.y *= height / 8.0;
         uv.y += GameTime * 64.0;
         color = texture(Sampler0, mod(uv, maxUV) + minUV) * vec4(vec3(1.0), 2.0) * ColorModulator;
-        color.a *= min((texCoord0.y - minUV.y) * height / (vertexDistance/ 20.0), 1.0);
+        color.a *= min((texCoord0.y - minUV.y) * height / (sphericalVertexDistance / 20.0), 1.0);
         color.a /= 2.1;
         if (color.a < 0.1) {
             discard;
         }
-    }
-    else if (isBoost > 0.5 || isOmniBoost > 0.5) {
+    } else if (isBoost > 0.5 || isOmniBoost > 0.5) {
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
         uv.y *= 0.55;
@@ -58,9 +56,9 @@ void main() {
 
 
         if (abs(normal.y) > 0.1) {
-            color.a /= max(vertexDistance / 20.0, 1.7);
+            color.a /= max(sphericalVertexDistance / 20.0, 1.7);
         } else {
-            color.a /= max(vertexDistance / 20.0, 1.7);
+            color.a /= max(sphericalVertexDistance / 20.0, 1.7);
         }
 
 
@@ -80,8 +78,7 @@ void main() {
         if (color.a < 0.1) {
             discard;
         }
-    }
-    else if (isBeaconBeam > 0.5) {
+    } else if (isBeaconBeam > 0.5) {
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
         uv.y *= height / 8;
@@ -92,8 +89,7 @@ void main() {
         if (color.r*255 == 0 && color.g*255 == 255 && color.b*255 == 0) {
             discard;
         }
-    }
-    else if (isBeaconShell > 0.5) {
+    } else if (isBeaconShell > 0.5) {
         maxUV -= minUV;
         vec2 uv = texCoord0 - minUV;
         uv.y *= height / 8;
@@ -105,12 +101,11 @@ void main() {
         if (color.r*255 == 0 && color.g*255 == 83 && color.b*255 == 255) {
             discard;
         }
-    }
-    else  {
+    } else {
         color = texture(Sampler0, texCoord0) * spectatorVertexColor * ColorModulator;
-        if (vertexDistance < 16.0) { //Start of fadeout / Not a UI element. TODO: Add additional check for if it is a ring
+        if (sphericalVertexDistance < 16.0) { // Start of fadeout / Not a UI element. TODO: Add additional check for if it is a ring
             if (color.a < 0.1) {discard;} // Most players have a transparent second layer.
-            color.a = (vertexDistance / 16.0); // Change divisor to match start of fade out.
+            color.a = (sphericalVertexDistance / 16.0); // Change divisor to match start of fade out.
         }
     }
     fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
