@@ -51,15 +51,17 @@ open class DynamicThermal(
         player.glide.setLiftForceModifier(this.liftForceModifier)
         val vel = this.getVelocityClamped(player)
 
-        if (this.targetVelocity == 0.0) { // Why do dynamic thermals behave in two different ways...
+        // Why do dynamic thermals behave in two different ways...?
+        if (this.targetVelocity == 0.0) {
             if (this.hasLift(player)) {
-                player.setVelocityAndMark(vel.x, vel.y+(0.025*this.liftForceModifier), vel.z)
+                player.setVelocityAndMark(vel.x, vel.y + (0.025 * this.liftForceModifier), vel.z)
                 return true
             } else {
                 return false
             }
-        } else { //Normal thermal logic & sometimes dynamic??????
-            player.isNoGravity = hasNoGravity()
+        } else {
+            // Normal thermal logic & sometimes dynamic??????
+            player.isNoGravity = this.hasNoGravity()
             if (this.hasLift(player)) {
                 if (player.glide.thermalDeltaMovement == 0.0 && player.deltaMovement.y != 0.0) {
                     player.glide.thermalDeltaMovement = (player.deltaMovement.y / this.liftForceModifier)
@@ -105,7 +107,7 @@ open class DynamicThermal(
     }
 
     open fun hasNoGravity(): Boolean {
-        return false;
+        return false
     }
 
     override fun getSound(): Sound {

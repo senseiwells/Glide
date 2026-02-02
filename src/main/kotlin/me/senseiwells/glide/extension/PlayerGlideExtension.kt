@@ -18,7 +18,6 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
-import me.senseiwells.glide.entity.accelerator.StaticThermal
 import net.casual.arcade.extensions.DataExtension
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.event.PlayerExtensionEvent.Companion.getExtension
@@ -48,9 +47,6 @@ import org.apache.commons.lang3.mutable.MutableInt
 import java.io.IOException
 import java.nio.file.Path
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
 import kotlin.math.abs
@@ -59,10 +55,6 @@ import kotlin.math.roundToInt
 class PlayerGlideExtension(
     player: ServerPlayer
 ): PlayerExtension(player), DataExtension {
-    var thermalDeltaMovement: Double = 0.0
-    var initialEntryVelocity: Vec3 = Vec3(.00,0.0,0.0)
-    var isStaticLift = false
-
     private val personalBests = Object2ObjectOpenHashMap<ResourceLocation, GlidePersonalBests>()
 
     private val accelerators = Reference2ObjectOpenHashMap<Accelerator, MutableInt>()
@@ -99,6 +91,8 @@ class PlayerGlideExtension(
     var score = 0
     var progress = 0.0
 
+    var initialEntryVelocity = Vec3(0.0, 0.0, 0.0)
+    var thermalDeltaMovement = 0.0
     var liftForceModifier = 1.0
         private set
 
@@ -109,9 +103,6 @@ class PlayerGlideExtension(
     }
 
     fun collideWithAccelerator(accelerator: Accelerator): Boolean {
-        if (accelerator is StaticThermal) {
-            this.isStaticLift = true
-        } else {this.isStaticLift = false}
         if (!this.accelerators.containsKey(accelerator)) {
             this.accelerators[accelerator] = MutableInt()
             return true
