@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddon
 import me.senseiwells.glide.addon.GlideAddonConfig
-import me.senseiwells.glide.checkpoint.CheckpointManager
+import me.senseiwells.glide.checkpoint.IndexedCheckpoints
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
@@ -27,12 +27,10 @@ import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.restrictMovement
 import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.unrestrictMovement
 import net.casual.arcade.minigame.phase.Phase
-import net.casual.arcade.minigame.utils.MinigameUtils.countdown
+import net.casual.arcade.minigame.utils.MinigameUtils.launch
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.resources.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
-import net.casual.arcade.utils.ComponentUtils.shadowless
-import net.casual.arcade.utils.ComponentUtils.withShiftedDownFont
-import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.PlayerUtils.addToTeam
 import net.casual.arcade.utils.PlayerUtils.boostHealth
 import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
@@ -46,16 +44,19 @@ import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
 import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
+import net.casual.arcade.utils.component.shadowless
+import net.casual.arcade.utils.component.wrap
+import net.casual.arcade.utils.coroutine.delay
 import net.casual.arcade.utils.set
 import net.casual.arcade.utils.setVelocityAndMark
 import net.casual.arcade.utils.teleportTo
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
-import net.casual.arcade.visuals.elements.ComponentElements
-import net.casual.arcade.visuals.elements.SidebarElements
 import net.casual.arcade.visuals.sidebar.FixedSidebar
+import net.casual.arcade.visuals.utils.elements.ComponentElements
+import net.casual.arcade.visuals.utils.elements.SidebarElements
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -66,9 +67,8 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.world.item.component.Unbreakable
-import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.GameType
+import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.scores.Team
 import java.util.*
 import kotlin.math.abs
@@ -82,7 +82,7 @@ class GlideMinigame(
     val mode: GlideMode,
     val level: ServerLevel
 ): Minigame(server, uuid) {
-    override val id: ResourceLocation = ID
+    override val id: Identifier = ID
 
     // TODO: Rework this
     private val team = this.server.scoreboard.getOrCreateTeam("Glide") {
@@ -109,7 +109,7 @@ class GlideMinigame(
     private var roundEnding = false
     private var winning: GameProfile? = null
 
-    val checkpoints: CheckpointManager
+    val checkpoints: IndexedCheckpoints
         get() = this.config.checkpoints
 
     fun getWinner(): String {
@@ -162,10 +162,9 @@ class GlideMinigame(
             player.glide.resetAnimation()
             this.end.addPlayer(player)
         }
-        this.scheduler.schedule(1.Seconds) {
-            this.end.countdown(this, 4.Seconds).then {
-                this.round.onRoundFinished(this)
-            }
+        this.launch {
+            delay(1.Seconds)
+            end.transition(4.Seconds, players = players::all)
         }
     }
 
@@ -187,8 +186,9 @@ class GlideMinigame(
         for (player in this.players) {
             this.sendFinish(player)
         }
-        this.finish.countdown(this, 60.Seconds).then {
-            this.setPhase(GlidePhase.Finish)
+        this.launch {
+            finish.transition(60.Seconds, players = players::all)
+            setPhase(GlidePhase.Finish)
         }
     }
 
@@ -212,9 +212,9 @@ class GlideMinigame(
             this.sidebar.addRow(SidebarScoreElement)
         }
         this.sidebar.addRow(SidebarElements.empty())
-        this.ui.setSidebar(this.sidebar)
+        this.visuals.setSidebar(this.sidebar)
 
-        this.ui.countdown = this.countdown
+        this.visuals.countdown = this.countdown
 
         this.music.suppressGameMusic(true)
         this.music.provider = GlideMusicProvider
@@ -223,13 +223,13 @@ class GlideMinigame(
         this.settings.canGetHungry.set(false)
         this.settings.canPvp.set(false)
         this.levels.setGameRules {
-            set(GameRules.RULE_KEEPINVENTORY, true)
-            set(GameRules.RULE_NATURAL_REGENERATION, false)
-            set(GameRules.RULE_DOMOBSPAWNING, false)
-            set(GameRules.RULE_RANDOMTICKING, 0)
-            set(GameRules.RULE_DOFIRETICK, false)
-            set(GameRules.RULE_WEATHER_CYCLE, false)
-            set(GameRules.RULE_DAYLIGHT, false)
+            set(GameRules.KEEP_INVENTORY, true)
+            set(GameRules.NATURAL_HEALTH_REGENERATION, false)
+            set(GameRules.SPAWN_MOBS, false)
+            set(GameRules.RANDOM_TICK_SPEED, 0)
+            set(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0)
+            set(GameRules.ADVANCE_WEATHER, false)
+            set(GameRules.ADVANCE_TIME, false)
         }
 
         this.effects.setInvisiblePredicate({ observee, observer ->

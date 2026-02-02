@@ -21,7 +21,7 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -44,7 +44,7 @@ interface GlideGRFVisitor {
 }
 
 class GlideGRFConverter(
-    val id: ResourceLocation,
+    val id: Identifier,
     val name: Component = Component.empty(),
     val description: Component = Component.empty(),
     val authors: List<String> = listOf(),
@@ -67,7 +67,7 @@ class GlideGRFConverter(
             this.spawn,
             this.boosters,
             this.thermals,
-            this.checkpoints,
+            IndexedCheckpoints(this.checkpoints),
             this.rings
         )
     }
@@ -94,7 +94,7 @@ class GlideGRFConverter(
 
     companion object {
         @Suppress("DEPRECATION")
-        fun convertSingle(id: ResourceLocation, input: Path, output: Path) {
+        fun convertSingle(id: Identifier, input: Path, output: Path) {
             val converter = GlideGRFConverter(id)
             try {
                 GlideGRFReader.read(input, converter)

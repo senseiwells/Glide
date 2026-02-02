@@ -115,7 +115,7 @@ class Ring(
 
             builder.location(player.locationWithLevel)
             builder.explosion {
-                addPrimaryColours(getRingType().color)
+                addPrimaryColors(getRingType().color)
                 shape(FireworkExplosion.Shape.LARGE_BALL)
                 twinkle()
             }

@@ -11,12 +11,11 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.codec.ArcadeExtraCodecs
-import net.casual.arcade.utils.codec.CodecProvider
-import net.casual.arcade.utils.codec.CodecProvider.Companion.register
 import net.casual.arcade.utils.math.location.Location
+import net.casual.arcade.utils.serialization.codec.ArcadeExtraCodecs
+import net.casual.arcade.utils.serialization.codec.CodecProvider
+import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
 import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.AABB
@@ -72,7 +71,7 @@ class ProgressCheckpoint(
     }
 
     companion object: CodecProvider<ProgressCheckpoint> {
-        override val ID: ResourceLocation = GlideMod.id("progress")
+        override val ID = GlideMod.id("progress")
 
         override val CODEC: MapCodec<ProgressCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
@@ -101,7 +100,7 @@ class FinishLine(
     }
 
     companion object: CodecProvider<FinishLine> {
-        override val ID: ResourceLocation = GlideMod.id("finish")
+        override val ID = GlideMod.id("finish")
 
         override val CODEC: MapCodec<FinishLine> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
@@ -159,7 +158,7 @@ class RespawnCheckpoint(
     }
 
     companion object: CodecProvider<RespawnCheckpoint> {
-        override val ID: ResourceLocation = GlideMod.id("respawn")
+        override val ID = GlideMod.id("respawn")
 
         override val CODEC: MapCodec<RespawnCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(

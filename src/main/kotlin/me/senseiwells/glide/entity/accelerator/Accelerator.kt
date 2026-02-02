@@ -27,6 +27,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import xyz.nucleoid.packettweaker.PacketContext
 
 abstract class Accelerator(
@@ -53,11 +54,11 @@ abstract class Accelerator(
         return this.size ?: DEFAULT_SIZE
     }
 
-    fun setDisplaySize(size: Vector3f) {
-        this.entityData.set(SIZE, size)
+    fun setDisplaySize(size: Vector3fc) {
+        this.entityData.set(SIZE, Vector3f(size))
     }
 
-    fun getDisplaySize(): Vector3f {
+    fun getDisplaySize(): Vector3fc {
         return this.entityData.get(SIZE)
     }
 
@@ -129,7 +130,7 @@ abstract class Accelerator(
 
     protected abstract fun getSound(): Sound
 
-    protected abstract fun getModelScale(): Vector3f
+    protected abstract fun getModelScale(): Vector3fc
 
     protected abstract fun getModelBrightness(): Brightness
 
@@ -139,6 +140,6 @@ abstract class Accelerator(
         val DEFAULT_SIZE = Vec3(5.0, 5.0, 5.0)
 
         @JvmStatic
-        private val SIZE: EntityDataAccessor<Vector3f> = SynchedEntityData.defineId(Accelerator::class.java, EntityDataSerializers.VECTOR3)
+        private val SIZE: EntityDataAccessor<Vector3fc> = SynchedEntityData.defineId(Accelerator::class.java, EntityDataSerializers.VECTOR3)
     }
 }
