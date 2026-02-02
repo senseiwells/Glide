@@ -24,6 +24,8 @@ import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.events.*
+import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.restrictMovement
+import net.casual.arcade.minigame.extensions.PlayerMovementRestrictionExtension.Companion.unrestrictMovement
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.countdown
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
@@ -58,6 +60,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
+import net.minecraft.util.Unit
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.Pose
@@ -261,7 +264,7 @@ class GlideMinigame(
         if (this.players.isPlaying(player)) {
             if (this.phase > GlidePhase.Countdown) {
                 if (player.verticalCollision) {
-                    player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
+                    player.hurtServer(player.level(), player.damageSources().flyIntoWall(), 2.0F)
                 }
 
                 if (this.phase == GlidePhase.Active) {
@@ -279,7 +282,7 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerHorizontalFlyFallCollision(event: PlayerHorizontalFlyFallCollisionEvent) {
         val (player) = event
-        player.hurtServer(player.serverLevel(), player.damageSources().flyIntoWall(), 2.0F)
+        player.hurtServer(player.level(), player.damageSources().flyIntoWall(), 2.0F)
         player.playSound(player.fallSounds.small, 1.0F, 1.0F)
 
         event.cancel()
@@ -305,7 +308,7 @@ class GlideMinigame(
         player.setGameMode(GameType.SPECTATOR)
         player.pose = Pose.STANDING
         player.setVelocityAndMark(0.0, 0.0, 0.0)
-        this.effects.freeze(player)
+        player.restrictMovement()
 
         this.removeBannerUI(player)
         this.sidebar.removePlayer(player)
@@ -319,7 +322,7 @@ class GlideMinigame(
         player.sendSystemMessage(Component.empty(), true)
 
         this.scheduler.schedule(1.Seconds) {
-            this.effects.unfreeze(player)
+            player.unrestrictMovement()
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)
             if (this.roundEnding) {
@@ -375,7 +378,7 @@ class GlideMinigame(
         this.setPlayerPlayingState(player)
         if (this.phase < GlidePhase.Active) {
             player.verticalCollision = false
-            player.isNoGravity = true
+            player.restrictMovement()
 
             this.countdown.addPlayer(player)
         }
@@ -401,7 +404,7 @@ class GlideMinigame(
     private fun onPlayerPose(event: PlayerPoseEvent) {
         val (player, _, updated) = event
         if (updated != Pose.FALL_FLYING && !player.isSpectator) {
-            player.kill(event.player.serverLevel())
+            player.kill(event.player.level())
         }
     }
 
@@ -445,7 +448,7 @@ class GlideMinigame(
         // Ensure the player has loaded the chunks
         GlobalTickedScheduler.schedule(1.Ticks) {
             val elytra = ItemStack(Items.ELYTRA)
-            elytra.set(DataComponents.UNBREAKABLE, Unbreakable(true))
+            elytra.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
             player.setItemSlot(EquipmentSlot.CHEST, elytra)
 
             player.teleportTo(player.glide.respawnLocation.with(this.level))

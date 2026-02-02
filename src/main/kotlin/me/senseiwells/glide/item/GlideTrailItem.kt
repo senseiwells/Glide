@@ -27,7 +27,7 @@ class GlideTrailItem(properties: Properties): Item(properties), PolymerItem {
         context: PacketContext
     ): ItemStack {
         val copy = super.getPolymerItemStack(stack, flag, context)
-        copy.set(DataComponents.DYED_COLOR, DyedItemColor(stack.getOrDefault(TRAIL_COLOR, 0xFFFFFF), false))
+        copy.set(DataComponents.DYED_COLOR, DyedItemColor(stack.getOrDefault(TRAIL_COLOR, 0xFFFFFF)))
         return copy
     }
 

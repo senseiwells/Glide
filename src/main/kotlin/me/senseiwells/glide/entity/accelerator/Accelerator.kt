@@ -5,22 +5,24 @@ import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.utils.*
 import net.casual.arcade.utils.PlayerUtils.sendSound
+import net.casual.arcade.utils.SynchedDataUtils
+import net.casual.arcade.utils.createValue
 import net.casual.arcade.utils.impl.Sound
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
+import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
@@ -67,24 +69,16 @@ abstract class Accelerator(
         builder.define(SIZE, Vector3f())
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        val size = compound.getVec3OrNull("Size")
-        if (size != null) {
-            this.setSize(size)
-        }
-        val displaySize = compound.getVector3fOrNull("DisplaySize")
-        if (displaySize != null) {
-            this.setDisplaySize(displaySize)
-        }
-        if (compound.contains("TargetVelocity", Tag.TAG_ANY_NUMERIC)) {
-            this.targetVelocity = compound.getDouble("TargetVelocity")
-        }
+    override fun readAdditionalSaveData(input: ValueInput) {
+        input.read("Size", Vec3.CODEC).ifPresent(this::setSize)
+        input.read("DisplaySize", ExtraCodecs.VECTOR3F).ifPresent(this::setDisplaySize)
+        this.targetVelocity = input.getDoubleOr("TargetVelocity", this.targetVelocity)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        compound.putVec3("Size", this.getSize())
-        compound.putVector3f("DisplaySize", this.getDisplaySize())
-        compound.putDouble("TargetVelocity", this.targetVelocity)
+    override fun addAdditionalSaveData(output: ValueOutput) {
+        output.store("Size", Vec3.CODEC, this.getSize())
+        output.store("DisplaySize", ExtraCodecs.VECTOR3F, this.getDisplaySize())
+        output.putDouble("TargetVelocity", this.targetVelocity)
     }
 
     override fun makeBoundingBox(position: Vec3): AABB {

@@ -26,14 +26,15 @@ import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.ComponentUtils.shadowless
 import net.casual.arcade.utils.ComponentUtils.wrap
 import net.casual.arcade.utils.MathUtils.projectionScalar
-import net.casual.arcade.utils.getLocation
-import net.casual.arcade.utils.getVec3
+import net.casual.arcade.utils.PlayerUtils.levelServer
 import net.casual.arcade.utils.math.location.Location
-import net.casual.arcade.utils.putLocation
-import net.casual.arcade.utils.putVec3
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.Util
-import net.minecraft.nbt.*
+import net.minecraft.core.UUIDUtil
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.IntArrayTag
+import net.minecraft.nbt.NbtIo
+import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
@@ -386,7 +387,7 @@ class PlayerGlideExtension(
         }
 
         // This should be big enough for any intersecting entities
-        val intersecting = this.player.serverLevel().getEntities(this.player, boundingBox.inflate(40.0))
+        val intersecting = this.player.level().getEntities(this.player, boundingBox.inflate(40.0))
         for (entity in intersecting) {
             if (entity is GlideCollider) {
                 this.checkCollision(entity, boundingBoxes, minigame)
@@ -412,20 +413,20 @@ class PlayerGlideExtension(
 
     override fun deserialize(element: Tag) {
         element as CompoundTag
-        this.finished = element.getBoolean("finished")
-        this.lastRespawnCheckpointIndex = element.getInt("last_respawn_checkpoint_index")
-        this.lastCheckpointIndex = element.getInt("last_checkpoint_index")
+        this.finished = element.getBooleanOr("finished", false)
+        this.lastRespawnCheckpointIndex = element.getIntOr("last_respawn_checkpoint_index", 0)
+        this.lastCheckpointIndex = element.getIntOr("last_checkpoint_index", 0)
         this.lastCrossedCheckpoint = CheckpointData(
-            element.getInt("last_crossed_checkpoint_index"),
-            element.getVec3("last_crossed_checkpoint_position")
+            element.getIntOr("last_crossed_checkpoint_index", 0),
+            element.read("last_crossed_checkpoint_position", Vec3.CODEC).orElse(Vec3.ZERO)
         )
-        this.ringTypes.addAll(element.getIntArray("ring_types").map { RingType.entries[it] })
-        this.lastSavedRingType = RingType.entries[element.getInt("last_saved_ring_type")]
-        this.rings.addAll(element.getList("rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
-        this.lastSavedRings.addAll(element.getList("last_saved_rings", Tag.TAG_INT_ARRAY.toInt()).map { NbtUtils.loadUUID(it) })
-        this.score = element.getInt("score")
-        this.lastSavedScore = element.getInt("last_saved_score")
-        this.respawnLocation = element.getLocation("respawn_location")
+        this.ringTypes.addAll(element.getIntArray("ring_types").orElseGet(::intArrayOf).map { RingType.entries[it] })
+        this.lastSavedRingType = element.getInt("last_saved_ring_type").map { RingType.entries[it] }.orElse(RingType.Grey)
+        this.rings.addAll(element.read("rings", UUIDUtil.CODEC_SET).orElse(setOf()))
+        this.lastSavedRings.addAll(element.read("last_saved_rings", UUIDUtil.CODEC_SET).orElse(setOf()))
+        this.score = element.getIntOr("score", 0)
+        this.lastSavedScore = element.getIntOr("last_saved_score", 0)
+        this.respawnLocation = element.read("respawn_location", Location.CODEC).orElse(this.respawnLocation)
     }
 
     override fun serialize(): CompoundTag? {
@@ -438,14 +439,14 @@ class PlayerGlideExtension(
         tag.putInt("last_respawn_checkpoint_index", this.lastRespawnCheckpointIndex)
         tag.putInt("last_checkpoint_index", this.lastCheckpointIndex)
         tag.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
-        tag.putVec3("last_crossed_checkpoint_position", this.lastCrossedCheckpoint.position)
+        tag.store("last_crossed_checkpoint_position", Vec3.CODEC, this.lastCrossedCheckpoint.position)
         tag.put("ring_types", IntArrayTag(this.ringTypes.map { it.ordinal }.toIntArray()))
         tag.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
-        tag.put("rings", this.rings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
-        tag.put("last_saved_rings", this.lastSavedRings.mapTo(ListTag()) { NbtUtils.createUUID(it) })
+        tag.store("rings", UUIDUtil.CODEC_SET, this.rings)
+        tag.store("last_saved_rings", UUIDUtil.CODEC_SET, this.lastSavedRings)
         tag.putInt("score", this.score)
         tag.putInt("last_saved_score", this.lastSavedScore)
-        tag.putLocation("respawn_location", this.respawnLocation)
+        tag.store("respawn_location", Location.CODEC, this.respawnLocation)
         return tag
     }
 
@@ -459,8 +460,7 @@ class PlayerGlideExtension(
         }
         try {
             val tag = NbtIo.read(path) ?: return
-            val encoded = tag.getList("personal_bests", Tag.TAG_COMPOUND.toInt())
-            val result = GlidePersonalBests.CODEC.listOf().parse(NbtOps.INSTANCE, encoded).result()
+            val result = tag.read("personal_bests", GlidePersonalBests.CODEC.listOf())
             if (result.isPresent) {
                 for (best in result.get()) {
                     this.personalBests[best.map] = best
@@ -477,10 +477,7 @@ class PlayerGlideExtension(
 
         val tag = CompoundTag()
         val bests = this.personalBests.values.toList()
-        val result = GlidePersonalBests.CODEC.listOf().encodeStart(NbtOps.INSTANCE, bests).result()
-        if (result.isPresent) {
-            tag.put("personal_bests", result.get())
-        }
+        tag.store("personal_bests", GlidePersonalBests.CODEC.listOf(), bests)
         Util.ioPool().execute {
             try {
                 NbtIo.write(tag, path)
@@ -491,7 +488,7 @@ class PlayerGlideExtension(
     }
 
     private fun getAdditionalDataPath(): Path {
-        val root = this.player.server.getWorldPath(LevelResource.ROOT)
+        val root = this.player.levelServer.getWorldPath(LevelResource.ROOT)
         return root.resolve("glide").resolve(this.player.stringUUID + ".nbt")
     }
 

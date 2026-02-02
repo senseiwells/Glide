@@ -5,16 +5,15 @@ import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
-import net.casual.arcade.utils.addVelocityAndMark
-import net.casual.arcade.utils.contains
+import net.casual.arcade.utils.addVelocitySmooth
 import net.casual.arcade.utils.impl.Sound
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
@@ -29,16 +28,14 @@ open class DynamicThermal(
 
     constructor(level: Level, size: Vec3): this(GlideEntities.DYNAMIC_THERMAL, level, size)
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        super.readAdditionalSaveData(compound)
-        if (compound.contains("LiftForceModifier", Tag.TAG_ANY_NUMERIC)) {
-            this.liftForceModifier = compound.getDouble("LiftForceModifier")
-        }
+    override fun readAdditionalSaveData(input: ValueInput) {
+        super.readAdditionalSaveData(input)
+        this.liftForceModifier = input.getDoubleOr("LiftForceModifier", this.liftForceModifier)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        super.addAdditionalSaveData(compound)
-        compound.putDouble("LiftForceModifier", this.liftForceModifier)
+    override fun addAdditionalSaveData(output: ValueOutput) {
+        super.addAdditionalSaveData(output)
+        output.putDouble("LiftForceModifier", this.liftForceModifier)
     }
 
     override fun makeBoundingBox(position: Vec3): AABB {
@@ -51,7 +48,7 @@ open class DynamicThermal(
 
         if (this.targetVelocity < 0) {
             if (player.deltaMovement.y > this.targetVelocity) {
-                player.addVelocityAndMark(
+                player.addVelocitySmooth(
                     0.0,
                     (this.targetVelocity - player.deltaMovement.y) / this.targetVelocity * -0.1,
                     0.0
@@ -59,18 +56,14 @@ open class DynamicThermal(
             }
         } else if (this.targetVelocity > 0) {
             if (player.deltaMovement.y < this.targetVelocity) {
-                player.addVelocityAndMark(
+                player.addVelocitySmooth(
                     0.0,
                     (this.targetVelocity - player.deltaMovement.y) / this.targetVelocity * 0.1,
                     0.0
                 )
             }
         } else {
-            player.addVelocityAndMark(
-                0.0,
-                0.025,
-                0.0
-            )
+            player.addVelocitySmooth(0.0, 0.025, 0.0)
         }
         return this.boundingBox.intersects(player.boundingBox)
     }
