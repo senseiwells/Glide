@@ -1,18 +1,23 @@
 package me.senseiwells.glide.entity.ring
 
+import com.mojang.serialization.Codec
 import me.senseiwells.glide.font.GlideFont.Score
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
+import net.casual.arcade.utils.convertCasing
+import net.casual.arcade.utils.string.PascalCase
+import net.casual.arcade.utils.string.SnakeCase
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.util.StringRepresentable
 import net.minecraft.world.item.ItemStack
 
 enum class RingType(
     val points: Int,
     val color: Int,
     val icon: Component
-) {
+): StringRepresentable {
     Blue(7, 0x63CECA, Score.BLUE) {
         override fun getModel(): ItemStack {
             return GlideItems.BLUE_RING
@@ -74,5 +79,13 @@ enum class RingType(
 
     fun getSize(): Int {
         return 12 - this.points
+    }
+
+    override fun getSerializedName(): String {
+        return this.name.convertCasing(PascalCase, SnakeCase)
+    }
+
+    companion object {
+        val CODEC: Codec<RingType> = StringRepresentable.fromEnum(RingType::values)
     }
 }
