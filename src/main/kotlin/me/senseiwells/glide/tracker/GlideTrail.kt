@@ -12,7 +12,9 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.entity.attachment.VirtualEntityAttachment
 import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
 import net.casual.arcade.virtual.entity.location.VirtualPosition
+import net.casual.arcade.virtual.entity.tracker.ObserverTracker
 import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
@@ -42,12 +44,14 @@ class GlideTrail(
             stack.set(GlideTrailItem.TRAIL_COLOR, blended)
 
             val item = attachment.attachWithParentObservers(::SimpleVirtualItemDisplay)
+            item.setItemStack(stack)
             // We use quaternions because we get more precision with them
             item.setLeftRotation(previous.rotationTowards(current))
             item.position = VirtualPosition.Absolute(previous)
             item.setScale(Vector3f(0.3F, 0.01F, length.toFloat()))
             item.setTranslation(current.subtract(previous).scale(0.5).toVector3f())
             item.setBrightness(Brightness.FULL_BRIGHT)
+            item.setObservableRange(Double.MAX_VALUE)
 
             previous = current
         }

@@ -62,9 +62,6 @@ class PlayerGlideExtension(
 
     private val accelerators = Reference2ObjectOpenHashMap<Accelerator, MutableInt>()
 
-    private val trails = IntArrayList()
-    private var ghost: GlideGhost? = null
-
     private var trailAttachment: SimpleVirtualEntityAttachment? = null
 
     private var oldPosition: Vec3? = null
@@ -167,6 +164,7 @@ class PlayerGlideExtension(
 
         val anchor = ManualAttachmentAnchor(Location.DEFAULT, this.player.level())
         val attachment = SimpleVirtualEntityAttachment(anchor)
+        attachment.interactable = false
 
         for (trail in best.trails) {
             trail.attachDisplays(attachment)
@@ -247,7 +245,9 @@ class PlayerGlideExtension(
             }
             return
         }
-        this.scoreIcon = this.ringTypes[0].icon
+        if (this.ringTypes.isNotEmpty()) {
+            this.scoreIcon = this.ringTypes[0].icon
+        }
     }
 
     fun respawn() {
@@ -421,8 +421,8 @@ class PlayerGlideExtension(
             input.getIntOr("last_crossed_checkpoint_index", 0),
             input.read("last_crossed_checkpoint_position", Vec3.CODEC).orElse(Vec3.ZERO)
         )
-        this.ringTypes.addAll(input.getIntArray("ring_types").orElseGet(::intArrayOf).map { RingType.entries[it] })
-        this.lastSavedRingType = input.getInt("last_saved_ring_type").map { RingType.entries[it] }.orElse(RingType.Grey)
+        this.ringTypes.addAll(input.read("ring_types", RingType.CODEC.listOf()).orElse(listOf()))
+        this.lastSavedRingType = input.read("last_saved_ring_type", RingType.CODEC).orElse(RingType.Grey)
         this.rings.addAll(input.read("rings", UUIDUtil.CODEC_SET).orElse(setOf()))
         this.lastSavedRings.addAll(input.read("last_saved_rings", UUIDUtil.CODEC_SET).orElse(setOf()))
         this.score = input.getIntOr("score", 0)
@@ -440,8 +440,8 @@ class PlayerGlideExtension(
         output.putInt("last_checkpoint_index", this.lastCheckpointIndex)
         output.putInt("last_crossed_checkpoint_index", this.lastCrossedCheckpoint.index)
         output.store("last_crossed_checkpoint_position", Vec3.CODEC, this.lastCrossedCheckpoint.position)
-        output.putIntArray("ring_types", this.ringTypes.map { it.ordinal }.toIntArray())
-        output.putInt("last_saved_ring_type", this.lastSavedRingType.ordinal)
+        output.store("ring_types", RingType.CODEC.listOf(), this.ringTypes)
+        output.store("last_saved_ring_type", RingType.CODEC, this.lastSavedRingType)
         output.store("rings", UUIDUtil.CODEC_SET, this.rings)
         output.store("last_saved_rings", UUIDUtil.CODEC_SET, this.lastSavedRings)
         output.putInt("score", this.score)

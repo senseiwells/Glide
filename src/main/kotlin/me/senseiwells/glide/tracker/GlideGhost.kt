@@ -12,6 +12,8 @@ import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
 import net.casual.arcade.virtual.entity.location.VirtualPosition
 import net.casual.arcade.virtual.entity.location.VirtualRotation
 import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
+import net.casual.arcade.virtual.entity.utils.location
+import net.minecraft.network.protocol.Packet
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -39,14 +41,17 @@ class GlideGhost(
 
         this.ghost.setItemStack(GlideItems.GHOST)
         this.ghost.setLeftRotation(Axis.XP.rotationDegrees(90F))
+        this.ghost.setObservableRange(Double.MAX_VALUE)
 
         this.rightWing.setItemStack(GlideItems.RIGHT_WING)
         this.rightWing.setTranslation(Vector3f(0.55F, 0.110F, -0.4F))
         this.rightWing.setLeftRotation(Quaternionf().rotationXYZ(ELYTRA_X_ROT, ELYTRA_Y_ROT, ELYTRA_Z_ROT))
+        this.rightWing.setObservableRange(Double.MAX_VALUE)
 
         this.leftWing.setItemStack(GlideItems.LEFT_WING)
         this.leftWing.setTranslation(Vector3f(-0.55F, 0.110F, -0.4F))
         this.leftWing.setLeftRotation(Quaternionf().rotationXYZ(ELYTRA_X_ROT, -ELYTRA_Y_ROT, -ELYTRA_Z_ROT))
+        this.leftWing.setObservableRange(Double.MAX_VALUE)
     }
 
     fun skip() {
@@ -115,7 +120,7 @@ class GlideGhost(
     }
 
     override fun canObserve(observer: ServerPlayer): Boolean {
-        return this.visible
+        return this.visible && this.location().position.closerThan(observer.position(), 64.0)
     }
 
     private companion object {
