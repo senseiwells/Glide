@@ -1,14 +1,15 @@
 package me.senseiwells.glide.entity.checkpoint
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import eu.pb4.polymer.virtualentity.api.ElementHolder
-import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
 import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.createValue
+import net.casual.arcade.virtual.entity.attachment.SimpleVirtualEntityAttachment
+import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
+import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
+import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
+import net.casual.arcade.virtual.entity.utils.createVirtualEntityAttachment
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -29,24 +30,22 @@ class BeaconBeam(
     level: Level,
     length: Float = 10.0F
 ): Entity(type, level), PolymerEntity {
-    private val shell = ItemDisplayElement(GlideItems.FAKE_BEAM_SHELL)
-    private val holder = ElementHolder()
+    private val shell: SimpleVirtualItemDisplay
 
     constructor(level: Level, length: Float): this(GlideEntities.BEACON_BEAM, level, length)
 
     init {
-        this.shell.scale = this.getModelScale()
-        this.shell.brightness = this.getModelBrightness()
-        this.holder.addElement(this.shell)
-        EntityAttachment.ofTicking(this.holder, this)
+        val attachment = this.createVirtualEntityAttachment(::SimpleVirtualEntityAttachment)
+        this.shell = attachment.attachWithParentObservers(::SimpleVirtualItemDisplay)
+        this.shell.setBrightness(this.getModelBrightness())
 
         this.setLength(length)
     }
 
     fun setLength(length: Float) {
         this.entityData.set(LENGTH, length)
-        this.shell.scale = this.getModelScale()
-        this.shell.translation = this.getModelTranslation()
+        this.shell.setScale(this.getModelScale())
+        this.shell.setTranslation(this.getModelTranslation())
     }
 
     fun getLength(): Float {
@@ -55,16 +54,6 @@ class BeaconBeam(
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
         return EntityType.ITEM_DISPLAY
-    }
-
-    override fun setYRot(yRot: Float) {
-        super.setYRot(yRot)
-        this.shell.yaw = yRot
-    }
-
-    override fun setXRot(xRot: Float) {
-        super.setXRot(xRot)
-        this.shell.pitch = xRot
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
@@ -93,14 +82,14 @@ class BeaconBeam(
         initial: Boolean
     ) {
         SynchedDataUtils.replaceSynchedData(data, LENGTH) { _, consumer ->
-            consumer.accept(DisplayTrackedData.SCALE.createValue(this.getModelScale()))
-            consumer.accept(DisplayTrackedData.TRANSLATION.createValue(this.getModelTranslation()))
+            consumer.accept(EntityDataAccessors.Display.SCALE.createValue(this.getModelScale()))
+            consumer.accept(EntityDataAccessors.Display.TRANSLATION.createValue(this.getModelTranslation()))
         }
 
         if (initial) {
-            data.add(DisplayTrackedData.Item.ITEM.createValue(GlideItems.FAKE_BEAM))
-            data.add(DisplayTrackedData.BRIGHTNESS.createValue(this.getModelBrightness().pack()))
-            data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
+            data.add(EntityDataAccessors.Display.Item.ITEM_STACK.createValue(GlideItems.FAKE_BEAM))
+            data.add(EntityDataAccessors.Display.BRIGHTNESS_OVERRIDE.createValue(this.getModelBrightness().pack()))
+            data.add(EntityDataAccessors.Display.VIEW_RANGE.createValue(3.0F))
         }
     }
 

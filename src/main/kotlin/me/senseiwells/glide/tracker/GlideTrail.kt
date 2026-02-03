@@ -9,6 +9,10 @@ import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
 import net.casual.arcade.utils.MathUtils.rotationTowards
 import net.casual.arcade.utils.time.MinecraftTimeDuration
+import net.casual.arcade.virtual.entity.attachment.VirtualEntityAttachment
+import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
+import net.casual.arcade.virtual.entity.location.VirtualPosition
+import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
 import net.minecraft.util.Brightness
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
@@ -19,12 +23,11 @@ class GlideTrail(
     val points: List<Vec3>,
     val interval: MinecraftTimeDuration
 ) {
-    fun createDisplays(): List<DisplayElement> {
+    fun attachDisplays(attachment: VirtualEntityAttachment) {
         if (this.points.isEmpty()) {
-            return listOf()
+            return
         }
 
-        val elements = ArrayList<DisplayElement>(this.points.size - 1)
         val iterator = this.points.iterator()
         var previous = iterator.next()
         var previousColor = 0xFF0000
@@ -38,19 +41,16 @@ class GlideTrail(
             previousColor = blended
             stack.set(GlideTrailItem.TRAIL_COLOR, blended)
 
-            val item = ItemDisplayElement(stack)
+            val item = attachment.attachWithParentObservers(::SimpleVirtualItemDisplay)
             // We use quaternions because we get more precision with them
-            item.leftRotation = previous.rotationTowards(current)
-            item.overridePos = previous
-            item.scale = Vector3f(0.3F, 0.01F, length.toFloat())
-            item.translation = current.subtract(previous).scale(0.5).toVector3f()
-            item.brightness = Brightness.FULL_BRIGHT
-            elements.add(item)
+            item.setLeftRotation(previous.rotationTowards(current))
+            item.position = VirtualPosition.Absolute(previous)
+            item.setScale(Vector3f(0.3F, 0.01F, length.toFloat()))
+            item.setTranslation(current.subtract(previous).scale(0.5).toVector3f())
+            item.setBrightness(Brightness.FULL_BRIGHT)
 
             previous = current
         }
-
-        return elements
     }
 
     companion object {

@@ -13,7 +13,7 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.*
-import me.senseiwells.glide.minigame.command.GlideCommand
+import me.senseiwells.glide.minigame.command.ContextualGlideCommand
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
@@ -109,10 +109,12 @@ class GlideMinigame(
     private val frozenPlayers = Object2ObjectOpenHashMap<UUID, Vec3>()
 
     private var placement = 1
-    private var ticks = 0
-
     private var roundEnding = false
+
     private var winning: GameProfile? = null
+
+    var ticks = 0
+        private set
 
     val checkpoints: IndexedCheckpoints
         get() = this.config.checkpoints
@@ -255,7 +257,7 @@ class GlideMinigame(
             set(GameRules.ADVANCE_TIME, false)
         }
 
-        this.commands.register(GlideCommand(this))
+        this.commands.register(ContextualGlideCommand(this))
 
         this.effects.setInvisiblePredicate({ observee, observer ->
             observer != observee && observee.distanceToSqr(observer) < 6 * 6
@@ -290,7 +292,7 @@ class GlideMinigame(
         }
 
         val glide = player.glide
-        glide.tick(this, this.ticks)
+        glide.tick(this)
 
         if (this.players.isPlaying(player)) {
             if (this.phase > GlidePhase.Countdown) {
@@ -423,7 +425,7 @@ class GlideMinigame(
 
     @Listener
     private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
-        event.player.glide.showTrailFor(this.config.id, this.mode, this.ticks)
+        event.player.glide.showTrailFor(this.config.id, this)
     }
 
     @Listener

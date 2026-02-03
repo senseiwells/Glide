@@ -7,10 +7,13 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigameFactory
 import me.senseiwells.glide.minigame.GlideStats
+import me.senseiwells.glide.minigame.command.GlideCommand
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
+import net.casual.arcade.commands.register
 import net.casual.arcade.events.GlobalEventHandler
 import net.casual.arcade.events.ListenerRegistry.Companion.register
+import net.casual.arcade.events.server.ServerRegisterCommandEvent
 import net.casual.arcade.events.server.player.PlayerJoinEvent
 import net.casual.arcade.host.GlobalPackHost
 import net.casual.arcade.minigame.utils.MinigameRegistries
@@ -68,6 +71,14 @@ object GlideMod: ModInitializer {
 
         GlideMinigameFactory.register(MinigameRegistries.MINIGAME_FACTORY)
 
+        GlobalEventHandler.Server.register<ServerRegisterCommandEvent> {
+            it.register(GlideCommand)
+        }
+
+        this.hostResourcePacks()
+    }
+
+    private fun hostResourcePacks() {
         val packDir = FabricLoader.getInstance().gameDir.resolve("glide_packs")
         val glidePack by GlobalPackHost.addPack(packDir, resourcePack).toPackInfo()
         val spacesPack by GlobalPackHost.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()

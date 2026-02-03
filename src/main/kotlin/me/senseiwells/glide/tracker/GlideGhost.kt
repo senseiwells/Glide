@@ -1,27 +1,33 @@
 package me.senseiwells.glide.tracker
 
 import com.mojang.math.Axis
-import eu.pb4.polymer.virtualentity.api.ElementHolder
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.ColorUtils
 import net.casual.arcade.utils.MathUtils.rotationAnglesTowards
-import net.minecraft.server.level.ServerLevel
+import net.casual.arcade.virtual.entity.SimpleParentVirtualEntity
+import net.casual.arcade.virtual.entity.attachment.VirtualEntityAttachment
+import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
+import net.casual.arcade.virtual.entity.location.VirtualPosition
+import net.casual.arcade.virtual.entity.location.VirtualRotation
+import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
 class GlideGhost(
-    private val trails: List<GlideTrail>
-): HolderAttachment {
-    private val holder = ElementHolder()
-    private val ghost = ItemDisplayElement(GlideItems.GHOST)
-    private val rightWing = ItemDisplayElement(GlideItems.RIGHT_WING)
-    private val leftWing = ItemDisplayElement(GlideItems.LEFT_WING)
+    attachment: VirtualEntityAttachment,
+    private val minigame: GlideMinigame,
+    private val trails: List<GlideTrail>,
+): SimpleParentVirtualEntity(attachment) {
+    private val ghost = this.attachWithParentObservers(::SimpleVirtualItemDisplay)
+    private val rightWing = this.attachWithParentObservers(::SimpleVirtualItemDisplay)
+    private val leftWing = this.attachWithParentObservers(::SimpleVirtualItemDisplay)
+
+    private var visible: Boolean = true
 
     private var currentIndex = 0
     private var currentPoint: Vec3
@@ -29,52 +35,50 @@ class GlideGhost(
 
     init {
         this.currentPoint = this.trails.firstOrNull()?.points?.firstOrNull() ?: Vec3.ZERO
+        this.position = VirtualPosition.Absolute(this.currentPoint)
 
-        this.ghost.leftRotation = Axis.XP.rotationDegrees(90F)
+        this.ghost.setItemStack(GlideItems.GHOST)
+        this.ghost.setLeftRotation(Axis.XP.rotationDegrees(90F))
 
-        this.rightWing.translation = Vector3f(0.55F, 0.110F, -0.4F)
-        this.leftWing.translation =  Vector3f(-0.55F, 0.110F, -0.4F)
+        this.rightWing.setItemStack(GlideItems.RIGHT_WING)
+        this.rightWing.setTranslation(Vector3f(0.55F, 0.110F, -0.4F))
+        this.rightWing.setLeftRotation(Quaternionf().rotationXYZ(ELYTRA_X_ROT, ELYTRA_Y_ROT, ELYTRA_Z_ROT))
 
-        this.rightWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, ELYTRA_Y_ROT, ELYTRA_Z_ROT)
-        this.leftWing.leftRotation = Quaternionf().rotationXYZ(ELYTRA_X_ROT, -ELYTRA_Y_ROT, -ELYTRA_Z_ROT)
-
-        this.holder.addElement(this.ghost)
-        this.holder.addElement(this.rightWing)
-        this.holder.addElement(this.leftWing)
-        this.holder.attachment = this
+        this.leftWing.setItemStack(GlideItems.LEFT_WING)
+        this.leftWing.setTranslation(Vector3f(-0.55F, 0.110F, -0.4F))
+        this.leftWing.setLeftRotation(Quaternionf().rotationXYZ(ELYTRA_X_ROT, -ELYTRA_Y_ROT, -ELYTRA_Z_ROT))
     }
 
-    fun destroy(player: ServerPlayer) {
-        this.holder.stopWatching(player)
-    }
-
-    fun skip(tick: Int) {
+    fun skip() {
+        val ticks = this.minigame.ticks
         for (i in this.trails.indices) {
-            if (this.trails[i].start.ticks > tick) {
+            if (this.trails[i].start.ticks > ticks) {
                 this.currentIndex = i - 1
             }
         }
     }
 
-    fun tick(player: ServerPlayer, tick: Int) {
+    override fun updateChildren() {
         if (this.currentIndex !in this.trails.indices) {
+            this.visible = false
             return
         }
 
+        val ticks = this.minigame.ticks
         val trail = this.trails[this.currentIndex]
         val startTicks = trail.start.ticks
-        if (startTicks > tick) {
+        if (startTicks > ticks) {
+            this.visible = false
             return
         } else {
-            this.holder.startWatching(player)
+            this.visible = true
         }
 
-        if (tick % trail.interval.ticks == 0) {
+        if (ticks % trail.interval.ticks == 0) {
             val interval = trail.interval.ticks
-            val index = (tick - startTicks) / interval
+            val index = (ticks - startTicks) / interval
             if (index >= trail.points.size) {
                 this.currentIndex++
-                this.holder.stopWatching(player)
                 return
             } else if (index < 0) {
                 return
@@ -86,57 +90,32 @@ class GlideGhost(
             val color = ColorUtils.blend(0xFF0000, 0xFFFF00, speed.toFloat() / 25.0F)
             val blended = ColorUtils.blend(color, this.previousColor, 0.5F)
             val rotation = point.rotationAnglesTowards(this.currentPoint)
+            this.position = VirtualPosition.Absolute(point)
+            this.rotation = VirtualRotation.Absolute(rotation)
 
             val ghostModel = GlideItems.GHOST
             ghostModel.set(GlideTrailItem.TRAIL_COLOR, blended)
-            this.ghost.yaw = rotation.y + 180
-            this.ghost.pitch = -rotation.x
-            this.ghost.teleportDuration = interval
-            this.ghost.item = ghostModel
+            this.ghost.rotation = VirtualRotation.Absolute(Vec2(-rotation.x, rotation.y + 180))
+            this.ghost.setTeleportationInterpolation(interval)
+            this.ghost.setItemStack(ghostModel)
 
             val rightModel = GlideItems.RIGHT_WING
             rightModel.set(GlideTrailItem.TRAIL_COLOR, blended)
-            this.rightWing.yaw = rotation.y
-            this.rightWing.pitch = rotation.x
-            this.rightWing.teleportDuration = interval
-            this.rightWing.item = rightModel
+            this.rightWing.setTeleportationInterpolation(interval)
+            this.rightWing.setItemStack(rightModel)
 
             val leftModel = GlideItems.LEFT_WING
             leftModel.set(GlideTrailItem.TRAIL_COLOR, blended)
-            this.leftWing.yaw = rotation.y
-            this.leftWing.pitch = rotation.x
-            this.leftWing.teleportDuration = interval
-            this.leftWing.item = leftModel
+            this.leftWing.setTeleportationInterpolation(interval)
+            this.leftWing.setItemStack(leftModel)
 
             this.currentPoint = point
             this.previousColor = color
         }
-
-        this.tick()
     }
 
-    override fun holder(): ElementHolder {
-        return this.holder
-    }
-
-    override fun destroy() {
-        this.holder.attachment = null
-    }
-
-    override fun getPos(): Vec3 {
-        return this.currentPoint
-    }
-
-    override fun getWorld(): ServerLevel? {
-        return null
-    }
-
-    override fun updateCurrentlyTracking(currentlyTracking: MutableCollection<ServerGamePacketListenerImpl>) {
-
-    }
-
-    override fun updateTracking(tracking: ServerGamePacketListenerImpl) {
-
+    override fun canObserve(observer: ServerPlayer): Boolean {
+        return this.visible
     }
 
     private companion object {

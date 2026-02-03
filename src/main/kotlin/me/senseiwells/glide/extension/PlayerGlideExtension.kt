@@ -24,18 +24,19 @@ import net.casual.arcade.extensions.utils.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.MathUtils.projectionScalar
-import net.casual.arcade.utils.PlayerUtils.levelServer
 import net.casual.arcade.utils.PlayerUtils.server
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.math.location.Location
 import net.casual.arcade.utils.time.MinecraftTimeDuration
+import net.casual.arcade.virtual.entity.attachment.SimpleVirtualEntityAttachment
+import net.casual.arcade.virtual.entity.attachment.anchor.ManualAttachmentAnchor
+import net.casual.arcade.virtual.entity.utils.attach
 import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
@@ -63,6 +64,8 @@ class PlayerGlideExtension(
 
     private val trails = IntArrayList()
     private var ghost: GlideGhost? = null
+
+    private var trailAttachment: SimpleVirtualEntityAttachment? = null
 
     private var oldPosition: Vec3? = null
 
@@ -152,35 +155,34 @@ class PlayerGlideExtension(
         }
     }
 
-    fun showTrailFor(id: Identifier, mode: GlideMode, tick: Int) {
+    fun showTrailFor(id: Identifier, glide: GlideMinigame) {
         val bests = this.personalBests[id] ?: return
-        val best = when (mode) {
+        val best = when (glide.mode) {
             GlideMode.ScoreAttack -> bests.score
             GlideMode.TimeAttack -> bests.time
         }
-        if (!best.display()) {
+        if (!best.display() || this.trailAttachment != null) {
             return
         }
-        for (display in best.trails.flatMap(GlideTrail::createDisplays)) {
-            display.startWatching(this.player, this.player.connection::send)
-            this.trails.add(display.entityId)
+
+        val anchor = ManualAttachmentAnchor(Location.DEFAULT, this.player.level())
+        val attachment = SimpleVirtualEntityAttachment(anchor)
+
+        for (trail in best.trails) {
+            trail.attachDisplays(attachment)
         }
 
-        val ghost = GlideGhost(best.trails)
-        ghost.skip(tick)
-        this.ghost = ghost
+        val ghost = attachment.attach { a -> GlideGhost(a, glide, best.trails) }
+        ghost.skip()
+        this.trailAttachment = attachment
+
+        attachment.startObservingAttached(this.player)
     }
 
     fun hideTrail() {
-        if (this.trails.isNotEmpty()) {
-            this.player.connection.send(ClientboundRemoveEntitiesPacket(this.trails))
-            this.trails.clear()
-        }
-        val ghost = this.ghost
-        if (ghost != null) {
-            ghost.destroy(this.player)
-            this.ghost = null
-        }
+        val attachment = this.trailAttachment ?: return
+        attachment.stopObservingAttached(this.player)
+        this.trailAttachment = null
     }
 
     fun updateBests(
@@ -205,15 +207,13 @@ class PlayerGlideExtension(
         return false
     }
 
-    fun tick(minigame: GlideMinigame, tick: Int) {
+    fun tick(minigame: GlideMinigame) {
         this.animationTick++
         if (!minigame.players.isPlaying(this.player)) {
             return
         }
 
-        if (minigame.phase == GlidePhase.Active) {
-            this.ghost?.tick(this.player, tick)
-        }
+        this.trailAttachment?.tick()
 
         if (this.lastRespawnCheckpointTicks > 0) {
             this.lastRespawnCheckpointTicks--
