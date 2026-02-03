@@ -103,7 +103,10 @@ void main() {
     } else {
         color = texture(Sampler0, texCoord0) * spectatorVertexColor * ColorModulator;
         if (sphericalVertexDistance < 16.0) { // Start of fadeout / Not a UI element. TODO: Add additional check for if it is a ring
-            if (color.a < 0.1) {discard;} // Most players have a transparent second layer.
+            // Most players have a transparent second layer.
+            if (color.a < 0.1) {
+                discard;
+            }
             color.a = (sphericalVertexDistance / 16.0); // Change divisor to match start of fade out.
         }
     }

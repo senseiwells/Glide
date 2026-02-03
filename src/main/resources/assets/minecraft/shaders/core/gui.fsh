@@ -16,7 +16,7 @@ void main() {
     vec4 color = vertexColor;
     // color.a == 0.4 Top part of sidebar
     // color.a == 0.3 Rest of sidebar
-        //??????????? -S
+    // ??????????? -S
     if ((color.a > 0.29 && color.a < 0.3) || color.a == 0.4) {
         discard;
     }
