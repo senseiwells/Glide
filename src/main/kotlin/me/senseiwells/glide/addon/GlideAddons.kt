@@ -1,6 +1,7 @@
 package me.senseiwells.glide.addon
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.Identifier
 import kotlin.io.path.createDirectories
@@ -25,5 +26,9 @@ object GlideAddons {
 
     fun get(id: Identifier): GlideAddon? {
         return this.addons[id]
+    }
+
+    fun ids(): ObjectSet<Identifier> {
+        return this.addons.keys
     }
 }
