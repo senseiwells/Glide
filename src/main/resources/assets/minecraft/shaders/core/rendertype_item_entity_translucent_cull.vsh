@@ -12,11 +12,8 @@ in vec2 UV1;
 in ivec2 UV2;
 in vec3 Normal;
 
-
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler2;
-
-uniform int FogShape;
 
 out float sphericalVertexDistance;
 out float cylindricalVertexDistance;
@@ -87,7 +84,6 @@ void main() {
         isBeaconShell = 1.0;
         vec2 texel = 1.0 / textureSize(Sampler0, 0);
     }
-
 
     cornerTex1 = vec3(0.0);
     cornerTex2 = vec3(0.0);
