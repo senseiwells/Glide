@@ -3,6 +3,7 @@ package me.senseiwells.glide.minigame
 import com.mojang.authlib.GameProfile
 import it.unimi.dsi.fastutil.objects.Object2IntFunction
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.addon.GlideAddon
 import me.senseiwells.glide.addon.GlideAddonConfig
@@ -12,6 +13,7 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.*
+import me.senseiwells.glide.minigame.command.GlideCommand
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
@@ -26,6 +28,7 @@ import net.casual.arcade.minigame.annotation.ListenerFlags
 import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.launch
+import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.resources.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
@@ -68,6 +71,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.gamerules.GameRules
+import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Team
 import java.util.*
 import kotlin.math.abs
@@ -102,6 +106,7 @@ class GlideMinigame(
 
     private val trackers = HashMap<UUID, GlideTrailTracker>()
     private val playerIndices = Object2IntOpenHashMap<UUID>()
+    private val frozenPlayers = Object2ObjectOpenHashMap<UUID, Vec3>()
 
     private var placement = 1
     private var ticks = 0
@@ -143,7 +148,7 @@ class GlideMinigame(
         val remaining = this.players.playingPlayerCount
         if (remaining > 0) {
             if (this.placement == 2) {
-                this.endingRound()
+                this.startEndingRound()
             } else {
                 this.sendFinish(player)
             }
@@ -162,9 +167,11 @@ class GlideMinigame(
             player.glide.resetAnimation()
             this.end.addPlayer(player)
         }
-        this.launch {
+        this.launchPhased {
             delay(1.Seconds)
             end.transition(4.Seconds, players = players::all)
+            delay(1.Seconds)
+            round.onRoundFinished(this@GlideMinigame)
         }
     }
 
@@ -177,23 +184,27 @@ class GlideMinigame(
         this.setPhase(GlidePhase.Waiting)
 
         for (player in this.players) {
+            this.players.setSpectating(player)
+            player.teleportTo(this.startPos.with(this.level))
             this.players.setPlaying(player)
         }
     }
 
     fun freezePlayer(player: ServerPlayer) {
         player.isNoGravity = true
-        this.scheduler.schedule(1.Ticks) {
-            this.effects.tickFreeze(player)
-        }
+        this.frozenPlayers[player.uuid] = player.position()
     }
 
     fun unfreezePlayer(player: ServerPlayer) {
-        this.effects.tickUnfreeze(player)
         player.isNoGravity = false
+        this.frozenPlayers.remove(player.uuid)
     }
 
-    private fun endingRound() {
+    fun startEndingRound() {
+        if (this.roundEnding) {
+            return
+        }
+
         this.roundEnding = true
         for (player in this.players) {
             this.sendFinish(player)
@@ -244,6 +255,8 @@ class GlideMinigame(
             set(GameRules.ADVANCE_TIME, false)
         }
 
+        this.commands.register(GlideCommand(this))
+
         this.effects.setInvisiblePredicate({ observee, observer ->
             observer != observee && observee.distanceToSqr(observer) < 6 * 6
         }, true)
@@ -269,6 +282,12 @@ class GlideMinigame(
     @Listener
     private fun onPlayerTick(event: PlayerTickEvent) {
         val (player) = event
+
+        val frozenPosition = this.frozenPlayers[player.uuid]
+        if (frozenPosition != null) {
+            player.setVelocityAndMark(0.0, 0.0, 0.0)
+            player.teleportTo(frozenPosition)
+        }
 
         val glide = player.glide
         glide.tick(this, this.ticks)
@@ -333,7 +352,7 @@ class GlideMinigame(
         )
         player.sendSystemMessage(Component.empty(), true)
 
-        this.scheduler.schedule(1.Seconds) {
+        this.scheduler.schedulePhased(1.Seconds) {
             this.unfreezePlayer(player)
             this.sidebar.addPlayer(player)
             this.respawnPlayer(player)

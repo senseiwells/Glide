@@ -1,13 +1,12 @@
 package me.senseiwells.glide.minigame
 
 import net.casual.arcade.minigame.phase.Phase
-import net.casual.arcade.minigame.utils.MinigameUtils.launch
+import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.resources.utils.ResourcePackUtils
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     Waiting("waiting") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.settings.canLookAroundWhenFrozen = true
             ResourcePackUtils.afterPacksLoad(minigame.players) {
                 minigame.setPhase(Countdown)
             }
@@ -15,7 +14,7 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Countdown("countdown") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.launch {
+            minigame.launchPhased {
                 minigame.visuals.countdown.transition(minigame.round.getCountdownTime(), players = minigame.players::all)
                 minigame.setPhase(Active)
             }
@@ -23,7 +22,6 @@ enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     },
     Active("active") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            minigame.settings.canLookAroundWhenFrozen = false
             for (player in minigame.players) {
                 minigame.unfreezePlayer(player)
             }
