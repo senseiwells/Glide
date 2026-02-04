@@ -4,31 +4,40 @@ import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.utils.impl.Sound
-import net.casual.arcade.utils.setVelocityAndMark
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.Vec3
-import org.apache.commons.lang3.mutable.MutableInt
 import org.joml.Vector3fc
 
-open class Booster(
+open class BoosterAccelerator(
     type: EntityType<*>,
     level: Level,
     size: Vec3 = DEFAULT_SIZE
 ): Accelerator(type, level, size) {
+    /**
+     * The target horizontal velocity for this booster.
+     *
+     * This field corresponds to the following member:
+     * ```
+     * ThermalAreaRuleDefinition::mSpeedBoost
+     * ```
+     */
+    var targetHorizontalVelocity: Double = 1.5
+
     constructor(level: Level, size: Vec3): this(GlideEntities.BOOSTER, level, size)
 
-    override fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean {
-        val velocity = player.deltaMovement
-        val horizontalVelocity = velocity.horizontalDistance()
-        if (horizontalVelocity < this.targetVelocity) {
-            player.setVelocityAndMark(velocity.x * 1.1, velocity.y, velocity.z * 1.1)
-            return true
-        }
-        return this.intersects(player.boundingBox)
+    override fun readAdditionalSaveData(input: ValueInput) {
+        super.readAdditionalSaveData(input)
+        this.targetHorizontalVelocity = input.getDoubleOr("TargetVelocity", this.targetHorizontalVelocity)
+    }
+
+    override fun addAdditionalSaveData(output: ValueOutput) {
+        super.addAdditionalSaveData(output)
+        output.putDouble("TargetVelocity", this.targetHorizontalVelocity)
     }
 
     override fun getSound(): Sound {

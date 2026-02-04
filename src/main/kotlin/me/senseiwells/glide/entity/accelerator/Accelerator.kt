@@ -1,10 +1,7 @@
 package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import me.senseiwells.glide.entity.GlideCollider
-import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.utils.PlayerUtils.sendSound
+import me.senseiwells.glide.utils.intersects
 import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.createValue
 import net.casual.arcade.utils.impl.Sound
@@ -25,20 +22,17 @@ import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import org.apache.commons.lang3.mutable.MutableInt
 import org.joml.Vector3f
 import org.joml.Vector3fc
 import xyz.nucleoid.packettweaker.PacketContext
 
-abstract class Accelerator(
+sealed class Accelerator(
     type: EntityType<*>,
     level: Level,
     size: Vec3 = DEFAULT_SIZE
 ): Entity(type, level), PolymerEntity {
     // Leaking `this` causes this to be nullable
     private var size: Vec3? = size
-
-    var targetVelocity: Double = 1.5
 
     init {
         this.setDisplaySize(size.scale(0.95).toVector3f())
@@ -62,8 +56,8 @@ abstract class Accelerator(
         return this.entityData.get(SIZE)
     }
 
-    fun intersects(box: AABB): Boolean {
-        return this.boundingBox.intersects(box)
+    open fun shouldAcceleratePlayer(player: ServerPlayer, swept: Collection<AABB>): Boolean {
+        return this.boundingBox.intersects(swept)
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
@@ -77,13 +71,11 @@ abstract class Accelerator(
     override fun readAdditionalSaveData(input: ValueInput) {
         input.read("Size", Vec3.CODEC).ifPresent(this::setSize)
         input.read("DisplaySize", ExtraCodecs.VECTOR3F).ifPresent(this::setDisplaySize)
-        this.targetVelocity = input.getDoubleOr("TargetVelocity", this.targetVelocity)
     }
 
     override fun addAdditionalSaveData(output: ValueOutput) {
         output.store("Size", Vec3.CODEC, this.getSize())
         output.store("DisplaySize", ExtraCodecs.VECTOR3F, this.getDisplaySize())
-        output.putDouble("TargetVelocity", this.targetVelocity)
     }
 
     override fun makeBoundingBox(position: Vec3): AABB {
@@ -98,17 +90,6 @@ abstract class Accelerator(
     override fun hurtServer(serverLevel: ServerLevel, damageSource: DamageSource, f: Float): Boolean {
         return false
     }
-
-    // override fun intersects(box: AABB): Boolean {
-    //     return
-    // }
-    //
-    // override fun collide(player: ServerPlayer, glide: GlideMinigame) {
-    //     if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
-    //         player.glide.initialEntryVelocity = player.deltaMovement
-    //         player.sendSound(this.getSound())
-    //     }
-    // }
 
     override fun modifyRawTrackedData(
         data: MutableList<SynchedEntityData.DataValue<*>>,
@@ -126,13 +107,7 @@ abstract class Accelerator(
         }
     }
 
-    open fun canStartAccelerating(player: ServerPlayer): Boolean {
-        return true
-    }
-
-    abstract fun accelerate(player: ServerPlayer, ticks: MutableInt): Boolean
-
-    protected abstract fun getSound(): Sound
+    abstract fun getSound(): Sound
 
     protected abstract fun getModelScale(): Vector3fc
 
