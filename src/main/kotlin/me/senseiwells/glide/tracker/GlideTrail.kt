@@ -2,8 +2,6 @@ package me.senseiwells.glide.tracker
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import eu.pb4.polymer.virtualentity.api.elements.DisplayElement
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.utils.ColorUtils
@@ -12,9 +10,7 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.entity.attachment.VirtualEntityAttachment
 import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
 import net.casual.arcade.virtual.entity.location.VirtualPosition
-import net.casual.arcade.virtual.entity.tracker.ObserverTracker
 import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Brightness
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
