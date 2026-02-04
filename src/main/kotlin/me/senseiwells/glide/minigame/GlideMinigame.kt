@@ -13,6 +13,8 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.*
+import me.senseiwells.glide.gui.debug.SidebarDebugGlideVelocityElement
+import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
 import me.senseiwells.glide.minigame.command.ContextualGlideCommand
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
@@ -56,6 +58,7 @@ import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.sidebar.FixedSidebar
 import net.casual.arcade.visuals.utils.elements.ComponentElements
 import net.casual.arcade.visuals.utils.elements.SidebarElements
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
@@ -236,6 +239,12 @@ class GlideMinigame(
             this.sidebar.addRow(SidebarElements.empty())
             this.sidebar.addRow(SidebarScoreElement)
         }
+        if (FabricLoader.getInstance().isDevelopmentEnvironment) {
+            this.sidebar.addRow(SidebarElements.empty())
+            this.sidebar.addRow(SidebarDebugVelocityElement)
+            this.sidebar.addRow(SidebarDebugGlideVelocityElement)
+        }
+
         this.sidebar.addRow(SidebarElements.empty())
         this.visuals.setSidebar(this.sidebar)
 

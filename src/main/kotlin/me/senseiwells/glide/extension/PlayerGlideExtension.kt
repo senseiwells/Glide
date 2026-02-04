@@ -16,13 +16,16 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.tracker.*
+import me.senseiwells.glide.utils.*
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.SerializableExtension
 import net.casual.arcade.extensions.utils.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.MathUtils.projectionScalar
+import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.server
+import net.casual.arcade.utils.addVelocitySmooth
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.math.location.Location
@@ -31,6 +34,7 @@ import net.casual.arcade.virtual.entity.attachment.SimpleVirtualEntityAttachment
 import net.casual.arcade.virtual.entity.attachment.anchor.ManualAttachmentAnchor
 import net.casual.arcade.virtual.entity.utils.attach
 import net.minecraft.core.UUIDUtil
+import net.minecraft.core.Vec3i
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.network.chat.Component
@@ -39,6 +43,8 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.util.Util
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.level.storage.LevelResource
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
@@ -77,6 +83,43 @@ class PlayerGlideExtension(
     private val lastSavedRings = ObjectOpenHashSet<UUID>()
     private var lastSavedScore = 0
 
+    // These are all the properties we need for the
+    // accelerator physics, and match up directly with
+    // the decomp `LivingEntity` members
+    // The decomp has 2 members that are seemingly unused.
+    // Or at least the methods that use them haven't been
+    // decomped yet, those are `bool_3E0` and `mIsInThermalArea`.
+
+    // LivingEntity::mThermalArea
+    private var accelerator: Accelerator? = null
+    // LivingEntity::mHasPendingThermalEntry
+    private var pendingAcceleratorEntry = true
+    // LivingEntity::mIsApplyingStaticLift
+    private var isApplyingStaticLift = false
+    // LivingEntity::mIsApplyingLift
+    private var isApplyingLift = false
+    // LivingEntity::mLiftDurationTimer
+    private var liftDurationTimer = 0
+    // LivingEntity::mTargetLiftVelocity
+    private var targetLiftVelocity = 0.0
+    // LivingEntity::mStaticLiftTargetHeight
+    private var staticLiftTargetY = 0.0
+    // LivingEntity::mIsUpdraft
+    private var isUpdraft = false
+    // LivingEntity::mIsSpeedBoosting
+    private var isSpeedBoosting = false
+    // LivingEntity::mTargetBoostSpeed
+    private var targetBoostSpeed = 0.0
+    // LivingEntity::mAdditionalGlideVelocity
+    private var additionalGlideVelocity = 0.0
+    // LivingEntity::mAppliedLiftVelocity
+    private var appliedLiftVelocity = 0.0
+    // LivingEntity::qword_3E8 (This is an educated guess - Sensei)
+    private var liftForceModifier = 1.0
+
+    var isAppliedLiftDirty = false
+        private set
+
     var animationTick = 0
         private set
 
@@ -91,23 +134,41 @@ class PlayerGlideExtension(
     var score = 0
     var progress = 0.0
 
-    var initialEntryVelocity = Vec3(0.0, 0.0, 0.0)
-    var thermalDeltaMovement = 0.0
-    var liftForceModifier = 1.0
-        private set
-
     var respawnLocation: Location = Location.DEFAULT
 
     init {
         this.deserializeAdditionalData()
     }
 
-    fun collideWithAccelerator(accelerator: Accelerator): Boolean {
-        if (!this.accelerators.containsKey(accelerator)) {
-            this.accelerators[accelerator] = MutableInt()
-            return true
+    fun modifyVelocityWithLift(original: Vec3): Vec3 {
+        val glideVerticalVelocity = this.getGlideVerticalVelocity()
+        if (glideVerticalVelocity != 0.0) {
+            return Vec3(original.x, glideVerticalVelocity, original.z)
         }
-        return false
+        return original
+    }
+
+    fun getGlideVerticalVelocity(): Double {
+        return this.appliedLiftVelocity + this.additionalGlideVelocity
+    }
+
+    fun getLiftForceModifier(): Double {
+        return this.liftForceModifier
+    }
+
+    fun getGlideNetworkScale(): Double {
+        return 0.9
+    }
+
+    fun checkForCollisions() {
+        val glide = this.player.getMinigame() as? GlideMinigame ?: return
+        if (this.player.level() != glide.level) {
+            return
+        }
+
+        val swept = this.calculateSweptHitbox()
+        this.checkColliders(glide, swept)
+        this.checkAccelerators(glide, swept)
     }
 
     fun collideWithRing(ring: Ring): Boolean {
@@ -142,12 +203,6 @@ class PlayerGlideExtension(
         this.lastSavedScore = this.score
         this.lastSavedRingType = this.ringTypes.last()
         this.lastRespawnCheckpointTicks = CHECKPOINT_TICKS + 2
-    }
-
-    fun setLiftForceModifier(modifier: Double) {
-        if (modifier > this.liftForceModifier) {
-            this.liftForceModifier = modifier
-        }
     }
 
     fun showTrailFor(id: Identifier, glide: GlideMinigame) {
@@ -215,17 +270,6 @@ class PlayerGlideExtension(
             this.lastRespawnCheckpointTicks--
         }
 
-        this.tickCollisions(minigame)
-
-        this.liftForceModifier = 1.0
-        val iterator = this.accelerators.iterator()
-        for (entry in iterator) {
-            val (accelerator, ticks) = entry
-            if (!accelerator.accelerate(this.player, ticks)) {
-                iterator.remove()
-            }
-        }
-
         this.tickProgress(minigame)
 
         if (this.ringTypes.size >= 2) {
@@ -249,9 +293,7 @@ class PlayerGlideExtension(
     }
 
     fun respawn() {
-        this.thermalDeltaMovement = 0.0
         this.oldPosition = null
-        this.liftForceModifier = 1.0
         this.lastCrossedCheckpoint = CheckpointData(this.lastRespawnCheckpointIndex, this.respawnLocation.position)
         this.player.isNoGravity = false
         this.score = this.lastSavedScore
@@ -264,6 +306,20 @@ class PlayerGlideExtension(
         this.ringTypes.add(recent)
         this.addRingType(this.lastSavedRingType)
         this.ringTypeTicks = 0
+
+        this.accelerator = null
+        this.pendingAcceleratorEntry = true
+        this.isApplyingStaticLift = false
+        this.isApplyingLift = false
+        this.liftDurationTimer = 0
+        this.targetLiftVelocity = 0.0
+        this.staticLiftTargetY = 0.0
+        this.isUpdraft = false
+        this.isSpeedBoosting = false
+        this.targetBoostSpeed = 0.0
+        this.additionalGlideVelocity = 0.0
+        this.appliedLiftVelocity = 0.0
+        this.liftForceModifier = 1.0
     }
 
     fun reset() {
@@ -342,14 +398,152 @@ class PlayerGlideExtension(
         this.progress = Mth.clamp(currentDistance / checkpoints.totalLength, 0.0, 1.0)
     }
 
-    private fun tickCollisions(minigame: GlideMinigame) {
+    private fun checkColliders(minigame: GlideMinigame, swept: Collection<AABB>) {
+        // We only need to check if the player has collided with the previous
+        // or next checkpoints, they shouldn't be able to skip checkpoints...
+        val checkpoints = Iterables.concat(
+            minigame.checkpoints.get(this.lastCheckpointIndex - 1),
+            minigame.checkpoints.get(this.lastCheckpointIndex + 1)
+        )
+        for (checkpoint in checkpoints) {
+            if (this.checkCollision(checkpoint, swept, minigame)) {
+                break
+            }
+        }
+
+        // This should be big enough for any intersecting entities
+        val intersecting = this.player.level().getEntities(this.player, this.player.boundingBox.inflate(16.0))
+        for (entity in intersecting) {
+            if (entity is GlideCollider) {
+                this.checkCollision(entity, swept, minigame)
+            }
+        }
+    }
+
+    private fun checkAccelerators(minigame: GlideMinigame, swept: Collection<AABB>) {
+        this.liftForceModifier = 1.0
+
+        val accelerators = minigame.level.getEntities(ACCELERATOR_TYPE_TEST) { true }
+        val accelerator = accelerators.firstOrNull { accelerator ->
+            accelerator.shouldAcceleratePlayer(this.player, swept)
+        }
+
+        var boostDirection: Vec3i? = null
+        if (accelerator != null) {
+            if (this.pendingAcceleratorEntry) {
+                this.pendingAcceleratorEntry = false
+                this.player.sendSound(accelerator.getSound())
+            }
+
+            this.liftForceModifier = accelerator.getLiftForceModifier()
+
+            val staticLift = accelerator.getStaticLift()
+            if (!this.isApplyingStaticLift) {
+                if (staticLift != 0.0) {
+                    this.isApplyingLift = true
+                    this.liftDurationTimer = 0
+                }
+                this.targetLiftVelocity = staticLift
+            }
+
+            val targetY = accelerator.getTargetY()
+            if (targetY > 0.0) {
+                this.isApplyingStaticLift = true
+                this.staticLiftTargetY = targetY
+            }
+
+            this.isUpdraft = staticLift >= 0.0
+
+            val speedBoost = accelerator.getSpeedBoost()
+            if (speedBoost > 0.0) {
+                this.isSpeedBoosting = true
+                this.targetBoostSpeed = speedBoost
+                boostDirection = accelerator.getBoostDirection()
+            }
+
+            @Suppress("ControlFlowWithEmptyBody")
+            if (this.accelerator != accelerator) {
+                // I presume this is for some client-side syncing that we don't need - Sensei
+                // player->GetGameMode()->RecordThermalEntered()
+            }
+
+            this.accelerator = accelerator
+        } else if (this.accelerator != null) {
+            this.pendingAcceleratorEntry = true
+            // This update count is used in one of the accelerators
+            // use conditions, but I think it's unused - Sensei
+            // mThermalArea->updateUseCount();
+            this.accelerator = null
+        }
+
+        if (this.isApplyingStaticLift) {
+            if (this.player.y >= this.staticLiftTargetY || this.player.verticalCollision) {
+                this.isApplyingStaticLift = false
+                this.isApplyingLift = false
+            } else {
+                this.isApplyingLift = true
+            }
+        }
+
+        val previousAppliedLift = this.appliedLiftVelocity
+        if (this.isApplyingLift) {
+            if (this.appliedLiftVelocity == 0.0 && this.player.deltaMovement.y != 0.0) {
+                this.appliedLiftVelocity = this.player.deltaMovement.y
+            }
+            if (this.isUpdraft) {
+                if (this.appliedLiftVelocity < this.targetLiftVelocity) {
+                    this.appliedLiftVelocity += (this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity * 0.1
+                }
+            } else {
+                if (this.appliedLiftVelocity > this.targetLiftVelocity) {
+                    this.appliedLiftVelocity += (this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity * -0.1
+                }
+            }
+
+            if (!this.isApplyingStaticLift) {
+                this.liftDurationTimer += 1
+                if (this.liftDurationTimer > 20) {
+                    this.isApplyingLift = false
+                    this.liftDurationTimer = 0
+                }
+            }
+        } else if (this.isUpdraft) {
+            this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+        } else {
+            this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+        }
+        this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
+
+        if (this.isSpeedBoosting) {
+            val deltaMovement = this.player.deltaMovement
+            val horizSpeed = deltaMovement.horizontalDistance()
+            if (horizSpeed < this.targetBoostSpeed) {
+                if (boostDirection != null) {
+                    val xBoost = abs(deltaMovement.x) * 0.1 * boostDirection.x
+                    val zBoost = abs(deltaMovement.z) * 0.1 * boostDirection.z
+                    this.player.addVelocitySmooth(xBoost, 0.0, zBoost)
+
+                    val newDeltaMovement = this.player.deltaMovement
+                    if (newDeltaMovement.x * boostDirection.x < 0.0 || newDeltaMovement.z * boostDirection.z < 0.0) {
+                        this.isSpeedBoosting = false
+                    }
+                } else {
+                    this.player.addVelocitySmooth(deltaMovement.x * 0.1, 0.0, deltaMovement.z * 0.1)
+                }
+            } else {
+                this.isSpeedBoosting = false
+            }
+        }
+    }
+
+    private fun calculateSweptHitbox(): ArrayList<AABB> {
         val boundingBox = this.player.boundingBox
 
         val current = this.player.position()
         val old = this.oldPosition ?: current
         val posDelta = old.distanceToSqr(current)
 
-        val swept = LinkedList<AABB>()
+        val swept = ArrayList<AABB>()
         swept.add(boundingBox)
 
         // We have to lerp the hit-box if the player is travelling
@@ -374,30 +568,11 @@ class PlayerGlideExtension(
             }
         }
 
-        // We only need to check if the player has collided with the previous
-        // or next checkpoints, they shouldn't be able to skip checkpoints...
-        val checkpoints = Iterables.concat(
-            minigame.checkpoints.get(this.lastCheckpointIndex - 1),
-            minigame.checkpoints.get(this.lastCheckpointIndex + 1)
-        )
-        for (checkpoint in checkpoints) {
-            if (this.checkCollision(checkpoint, swept, minigame)) {
-                break
-            }
-        }
-
-        // This should be big enough for any intersecting entities
-        val intersecting = this.player.level().getEntities(this.player, boundingBox.inflate(40.0))
-        for (entity in intersecting) {
-            if (entity is GlideCollider) {
-                this.checkCollision(entity, swept, minigame)
-            }
-        }
-
         this.oldPosition = current
+        return swept
     }
 
-    private fun checkCollision(collider: GlideCollider, boxes: List<AABB>, minigame: GlideMinigame): Boolean {
+    private fun checkCollision(collider: GlideCollider, boxes: Collection<AABB>, minigame: GlideMinigame): Boolean {
         for (box in boxes) {
             if (collider.intersects(box)) {
                 collider.collide(this.player, minigame)
@@ -490,6 +665,8 @@ class PlayerGlideExtension(
     }
 
     companion object {
+        private val ACCELERATOR_TYPE_TEST = EntityTypeTest.forClass<Entity, _>(Accelerator::class.java)
+
         private const val CHECKPOINT_TICKS = 12
 
         @JvmStatic

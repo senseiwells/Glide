@@ -2,10 +2,10 @@ package me.senseiwells.glide.entity
 
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils
 import me.senseiwells.glide.GlideMod
-import me.senseiwells.glide.entity.accelerator.Booster
-import me.senseiwells.glide.entity.accelerator.DirectionalBooster
-import me.senseiwells.glide.entity.accelerator.DynamicThermal
-import me.senseiwells.glide.entity.accelerator.StaticThermal
+import me.senseiwells.glide.entity.accelerator.BoosterAccelerator
+import me.senseiwells.glide.entity.accelerator.DirectionalBoosterAccelerator
+import me.senseiwells.glide.entity.accelerator.StaticThermalAccelerator
+import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.checkpoint.BeaconBeam
 import me.senseiwells.glide.entity.ring.Ring
 import net.minecraft.core.Registry
@@ -19,19 +19,19 @@ import net.minecraft.world.entity.MobCategory
 object GlideEntities {
     val DYNAMIC_THERMAL = register(
         "dynamic_thermal",
-        EntityType.Builder.of(::DynamicThermal, MobCategory.MISC).clientTrackingRange(32)
+        EntityType.Builder.of(::ThermalAccelerator, MobCategory.MISC).clientTrackingRange(32)
     )
     val STATIC_THERMAL = register(
         "static_thermal",
-        EntityType.Builder.of(::StaticThermal, MobCategory.MISC).clientTrackingRange(32)
+        EntityType.Builder.of(::StaticThermalAccelerator, MobCategory.MISC).clientTrackingRange(32)
     )
     val BOOSTER = register(
         "booster",
-        EntityType.Builder.of(::Booster, MobCategory.MISC).clientTrackingRange(32)
+        EntityType.Builder.of(::BoosterAccelerator, MobCategory.MISC).clientTrackingRange(32)
     )
     val DIRECTIONAL_BOOSTER = register(
         "directional_booster",
-        EntityType.Builder.of(::DirectionalBooster, MobCategory.MISC).clientTrackingRange(32)
+        EntityType.Builder.of(::DirectionalBoosterAccelerator, MobCategory.MISC).clientTrackingRange(32)
     )
     val BEACON_BEAM = register(
         "beacon_beam",

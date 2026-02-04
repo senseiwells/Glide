@@ -8,7 +8,6 @@ object GlideExtensions {
     fun register() {
         GlobalEventHandler.Server.register<PlayerExtensionEvent> {
             it.addExtension(::PlayerGlideExtension)
-            it.addExtension(::PlayerAcceleratorExtension)
         }
     }
 }

@@ -1,5 +1,6 @@
 package me.senseiwells.glide.mixin;
 
+import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -7,17 +8,24 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent;
 import me.senseiwells.glide.extension.PlayerGlideExtension;
 import net.casual.arcade.events.GlobalEventHandler;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public abstract class LivingEntityMixin extends Entity {
+	public LivingEntityMixin(EntityType<?> entityType, Level level) {
+		super(entityType, level);
+	}
+
 	@Expression("(float) (? * 10.0 - 3.0)")
 	@ModifyExpressionValue(
 		method = "handleFallFlyingCollisions",
@@ -34,6 +42,16 @@ public class LivingEntityMixin {
 		return original;
 	}
 
+	@Inject(
+		method = "travelFallFlying",
+		at = @At("HEAD")
+	)
+	private void checkGlideCollisions(Vec3 travelVector, CallbackInfo ci) {
+		if ((Object) this instanceof ServerPlayer player) {
+			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
+			glide.checkForCollisions();
+		}
+	}
 
 	@WrapOperation(
 		method = "travelFallFlying",
@@ -45,26 +63,26 @@ public class LivingEntityMixin {
 	private void onMove(LivingEntity instance, MoverType moverType, Vec3 vec3, Operation<Void> original) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
-			double thermalDeltaMovement = glide.getThermalDeltaMovement();
-			if (thermalDeltaMovement != 0.0) {
-				Vec3 initial = glide.getInitialEntryVelocity();
-				Vec3 delta = player.getDeltaMovement();
-				if (delta.length() > initial.length()) {
-					delta = new Vec3(
-						Mth.clamp(delta.x, -initial.length(), initial.length()),
-						Mth.clamp(delta.y, -initial.length(), initial.y),
-						Mth.clamp(delta.z, -initial.length(), initial.length())
-					);
-				}
-				Vec3 thermalDelta = new Vec3(delta.x, (thermalDeltaMovement * glide.getLiftForceModifier()), delta.z);
-				original.call(player, moverType, thermalDelta);
-				player.setDeltaMovement(delta.x, 0.0, delta.z);
-				player.connection.send(
-					new ClientboundSetEntityMotionPacket(player.getId(), thermalDelta)
-				);
-				return;
+			if (glide.isAppliedLiftDirty()) {
+				this.markHurt();
 			}
+			vec3 = glide.modifyVelocityWithLift(vec3);
 		}
 		original.call(instance, moverType, vec3);
+	}
+
+	@Definition(id = "square", method = "Lnet/minecraft/util/Mth;square(D)D")
+	@Definition(id = "cos", method = "Ljava/lang/Math;cos(D)D")
+	@Expression("square(cos(?))")
+	@ModifyExpressionValue(
+		method = "updateFallFlyingMovement",
+		at = @At("MIXINEXTRAS:EXPRESSION")
+	)
+	private double modifyVerticalBoost(double original) {
+		if ((Object) this instanceof ServerPlayer player) {
+			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
+			return original * glide.getLiftForceModifier();
+		}
+		return original;
 	}
 }

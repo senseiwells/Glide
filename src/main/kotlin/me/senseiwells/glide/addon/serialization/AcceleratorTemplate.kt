@@ -18,10 +18,10 @@ class BoosterTemplate(
 ) {
     fun create(level: ServerLevel): Accelerator {
         val size = this.boundingBox.getSizeVec()
-        val booster = if (this.isDirectional) DirectionalBooster(level, size) else Booster(level, size)
+        val booster = if (this.isDirectional) DirectionalBoosterAccelerator(level, size) else BoosterAccelerator(level, size)
         booster.setPos(this.boundingBox.center)
         booster.yRot = this.direction.toYRot()
-        booster.targetVelocity = this.targetVelocity
+        booster.targetHorizontalVelocity = this.targetVelocity
         return booster
     }
 
@@ -46,14 +46,14 @@ class ThermalTemplate(
     fun create(level: ServerLevel): Accelerator {
         val size = this.boundingBox.getSizeVec()
         val thermal = if (this.targetY.isPresent) {
-            val static = StaticThermal(level, size)
+            val static = StaticThermalAccelerator(level, size)
             static.targetHeight = this.targetY.get() - this.boundingBox.minY
             static
         } else {
-            DynamicThermal(level, size)
+            ThermalAccelerator(level, size)
         }
         thermal.setPos(this.boundingBox.bottomCenter)
-        thermal.targetVelocity = targetVelocity
+        thermal.targetVerticalVelocity = targetVelocity
         thermal.liftForceModifier = this.liftForceModifier
         return thermal
     }
