@@ -38,7 +38,7 @@ dependencies {
     modImplementation(libs.fabric.kotlin)
 
     modImplementation(libs.arcade)
-    modImplementation(libs.polymer.virtual.entity)
+    // modImplementation(libs.polymer.virtual.entity)
 
     modImplementation(libs.arcade.datagen)
 }

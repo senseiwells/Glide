@@ -1,7 +1,6 @@
 package me.senseiwells.glide.entity.ring
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
@@ -11,6 +10,7 @@ import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.createValue
 import net.casual.arcade.utils.math.location.LocationWithLevel.Companion.locationWithLevel
+import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
 import net.casual.arcade.visuals.entity.firework.VirtualFireworkBuilder
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -129,13 +129,13 @@ class Ring(
         initial: Boolean
     ) {
         SynchedDataUtils.replaceSynchedData(data, TYPE) { _, consumer ->
-            consumer.accept(DisplayTrackedData.Item.ITEM.createValue(this.getModelItem()))
+            consumer.accept(EntityDataAccessors.Display.Item.ITEM_STACK.createValue(this.getModelItem()))
         }
 
         if (initial) {
-            data.add(DisplayTrackedData.SCALE.createValue(Vector3f(8.0F)))
-            data.add(DisplayTrackedData.BRIGHTNESS.createValue(Brightness.FULL_BRIGHT.pack()))
-            data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
+            data.add(EntityDataAccessors.Display.SCALE.createValue(Vector3f(8.0F)))
+            data.add(EntityDataAccessors.Display.BRIGHTNESS_OVERRIDE.createValue(Brightness.FULL_BRIGHT.pack()))
+            data.add(EntityDataAccessors.Display.VIEW_RANGE.createValue(3.0F))
         }
     }
 

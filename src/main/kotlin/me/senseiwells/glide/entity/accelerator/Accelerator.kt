@@ -1,7 +1,6 @@
 package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
@@ -117,13 +116,13 @@ abstract class Accelerator(
         initial: Boolean
     ) {
         SynchedDataUtils.replaceSynchedData(data, SIZE) { _, consumer ->
-            consumer.accept(DisplayTrackedData.SCALE.createValue(this.getModelScale()))
-            consumer.accept(DisplayTrackedData.BRIGHTNESS.createValue(this.getModelBrightness().pack()))
+            consumer.accept(EntityDataAccessors.Display.SCALE.createValue(this.getModelScale()))
+            consumer.accept(EntityDataAccessors.Display.BRIGHTNESS_OVERRIDE.createValue(this.getModelBrightness().pack()))
         }
 
         if (initial) {
-            data.add(DisplayTrackedData.Item.ITEM.createValue(this.getModelItem()))
-            data.add(DisplayTrackedData.VIEW_RANGE.createValue(3.0F))
+            data.add(EntityDataAccessors.Display.Item.ITEM_STACK.createValue(this.getModelItem()))
+            data.add(EntityDataAccessors.Display.VIEW_RANGE.createValue(3.0F))
         }
     }
 
