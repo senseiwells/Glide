@@ -9,6 +9,7 @@ import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.createValue
 import net.casual.arcade.utils.impl.Sound
+import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -34,7 +35,7 @@ abstract class Accelerator(
     type: EntityType<*>,
     level: Level,
     size: Vec3 = DEFAULT_SIZE
-): Entity(type, level), PolymerEntity, GlideCollider {
+): Entity(type, level), PolymerEntity {
     // Leaking `this` causes this to be nullable
     private var size: Vec3? = size
 
@@ -60,6 +61,10 @@ abstract class Accelerator(
 
     fun getDisplaySize(): Vector3fc {
         return this.entityData.get(SIZE)
+    }
+
+    fun intersects(box: AABB): Boolean {
+        return this.boundingBox.intersects(box)
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
@@ -95,16 +100,16 @@ abstract class Accelerator(
         return false
     }
 
-    override fun intersects(box: AABB): Boolean {
-        return this.boundingBox.intersects(box)
-    }
-
-    override fun collide(player: ServerPlayer, glide: GlideMinigame) {
-        if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
-            player.glide.initialEntryVelocity = player.deltaMovement
-            player.sendSound(this.getSound())
-        }
-    }
+    // override fun intersects(box: AABB): Boolean {
+    //     return
+    // }
+    //
+    // override fun collide(player: ServerPlayer, glide: GlideMinigame) {
+    //     if (this.canStartAccelerating(player) && player.glide.collideWithAccelerator(this)) {
+    //         player.glide.initialEntryVelocity = player.deltaMovement
+    //         player.sendSound(this.getSound())
+    //     }
+    // }
 
     override fun modifyRawTrackedData(
         data: MutableList<SynchedEntityData.DataValue<*>>,

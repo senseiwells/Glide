@@ -1,7 +1,6 @@
 package me.senseiwells.glide.extension
 
 import com.google.common.collect.Iterables
-import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -16,7 +15,6 @@ import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
-import me.senseiwells.glide.minigame.GlidePhase
 import me.senseiwells.glide.tracker.*
 import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.SerializableExtension
@@ -351,8 +349,8 @@ class PlayerGlideExtension(
         val old = this.oldPosition ?: current
         val posDelta = old.distanceToSqr(current)
 
-        val boundingBoxes = LinkedList<AABB>()
-        boundingBoxes.add(boundingBox)
+        val swept = LinkedList<AABB>()
+        swept.add(boundingBox)
 
         // We have to lerp the hit-box if the player is travelling
         // fast enough that it could skip potential collisions.
@@ -365,7 +363,7 @@ class PlayerGlideExtension(
             val delta = 1 / splits.toDouble()
             for (i in 1..< splits) {
                 val between = old.lerp(current, i * delta)
-                boundingBoxes.add(AABB(
+                swept.add(AABB(
                     between.x - halfWidth,
                     between.y,
                     between.z - halfWidth,
@@ -383,7 +381,7 @@ class PlayerGlideExtension(
             minigame.checkpoints.get(this.lastCheckpointIndex + 1)
         )
         for (checkpoint in checkpoints) {
-            if (this.checkCollision(checkpoint, boundingBoxes, minigame)) {
+            if (this.checkCollision(checkpoint, swept, minigame)) {
                 break
             }
         }
@@ -392,7 +390,7 @@ class PlayerGlideExtension(
         val intersecting = this.player.level().getEntities(this.player, boundingBox.inflate(40.0))
         for (entity in intersecting) {
             if (entity is GlideCollider) {
-                this.checkCollision(entity, boundingBoxes, minigame)
+                this.checkCollision(entity, swept, minigame)
             }
         }
 
