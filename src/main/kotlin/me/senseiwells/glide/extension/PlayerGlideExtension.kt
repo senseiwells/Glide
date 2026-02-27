@@ -11,6 +11,7 @@ import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
 import me.senseiwells.glide.entity.accelerator.BoosterAccelerator
+import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
@@ -509,6 +510,12 @@ class PlayerGlideExtension(
             }
         }
 
+        // Natural thermals have no targetLiftVelocity.
+        // This is probably wrong, but at least players get lifted when they enter one now.
+        if (accelerator is ThermalAccelerator && this.targetLiftVelocity == 0.0) {
+            this.player.addVelocityAndMark(0.0,0.025, 0.0)
+        }
+
         val previousAppliedLift = this.appliedLiftVelocity
         if (this.isApplyingLift) {
             if (this.appliedLiftVelocity == 0.0 && this.player.deltaMovement.y != 0.0) {
@@ -542,7 +549,7 @@ class PlayerGlideExtension(
             val deltaMovement = this.player.deltaMovement
             val horizSpeed = deltaMovement.horizontalDistance()
             if (horizSpeed < this.targetBoostSpeed) {
-                if (boostDirection != null && (boundingBox?.intersects(this.player.boundingBox) ?: true)) {
+                if (boostDirection != null && boundingBox != null && boundingBox.intersects(this.player.boundingBox)) {
                     val xBoost = abs(deltaMovement.x) * 0.1 * boostDirection.x
                     val zBoost = abs(deltaMovement.z) * 0.1 * boostDirection.z
                     this.player.addVelocityAndMark(xBoost, 0.0, zBoost)
