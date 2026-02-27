@@ -447,6 +447,7 @@ class PlayerGlideExtension(
         }
 
         var boostDirection: Vec3i? = null
+        var boundingBox: AABB? = null
         if (accelerator != null) {
             if (this.pendingAcceleratorEntry) {
                 this.pendingAcceleratorEntry = false
@@ -480,6 +481,8 @@ class PlayerGlideExtension(
                 this.targetBoostSpeed = speedBoost
                 boostDirection = accelerator.getBoostDirection()
             }
+
+            boundingBox = accelerator.boundingBox
 
             @Suppress("ControlFlowWithEmptyBody")
             if (this.accelerator != accelerator) {
@@ -538,7 +541,7 @@ class PlayerGlideExtension(
             val deltaMovement = this.player.deltaMovement
             val horizSpeed = deltaMovement.horizontalDistance()
             if (horizSpeed < this.targetBoostSpeed) {
-                if (boostDirection != null && !player.boundingBox.intersects(accelerator?.boundingBox)) {
+                if (boostDirection != null && (boundingBox?.intersects(this.player.boundingBox) ?: true)) {
                     val xBoost = abs(deltaMovement.x) * 0.1 * boostDirection.x
                     val zBoost = abs(deltaMovement.z) * 0.1 * boostDirection.z
                     this.player.addVelocityAndMark(xBoost, 0.0, zBoost)
