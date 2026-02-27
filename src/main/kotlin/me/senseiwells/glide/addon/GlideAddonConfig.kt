@@ -23,11 +23,11 @@ class GlideAddonConfig(
     val thermals: List<ThermalTemplate>,
     val checkpoints: IndexedCheckpoints,
     val rings: List<RingTemplate>
-): AddonConfig(id, name, description, authors, version) {
+): AddonConfig(id, name, description, authors, version, "glide_map", "nopack") {
     companion object {
         val CODEC: Codec<GlideAddonConfig> = RecordCodecBuilder.create { instance ->
             instance.group(
-                Identifier.CODEC.fieldOf("id").forGetter(GlideAddonConfig::id),
+                Identifier.CODEC.fieldOf("addon_id").forGetter(GlideAddonConfig::addon_id),
                 ComponentSerialization.CODEC.fieldOf("name").forGetter(GlideAddonConfig::name),
                 ComponentSerialization.CODEC.fieldOf("description").forGetter(GlideAddonConfig::description),
                 Codec.STRING.listOf().fieldOf("authors").forGetter(GlideAddonConfig::authors),
