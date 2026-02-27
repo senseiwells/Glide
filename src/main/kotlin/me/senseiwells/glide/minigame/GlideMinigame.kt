@@ -143,7 +143,7 @@ class GlideMinigame(
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
         val tracker = this.trackers.remove(player.uuid) ?: return
-        val updated = player.glide.updateBests(this.config.id, this, this.ticks.Ticks, tracker.finish())
+        val updated = player.glide.updateBests(this.config.addon_id, this, this.ticks.Ticks, tracker.finish())
         if (updated) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
@@ -434,7 +434,7 @@ class GlideMinigame(
 
     @Listener
     private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
-        event.player.glide.showTrailFor(this.config.id, this)
+        event.player.glide.showTrailFor(this.config.addon_id, this)
     }
 
     @Listener
@@ -556,7 +556,7 @@ class GlideMinigame(
         ): GlideMinigame {
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
-                spoofedDimensionKey(addon.config.id)
+                spoofedDimensionKey(addon.config.addon_id)
                 dimensionType(addon.dimensionType)
                 chunkGenerator(VoidChunkGenerator(server))
             }
