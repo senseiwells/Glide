@@ -535,7 +535,6 @@ class PlayerGlideExtension(
             this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
         } else {
             this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + 0.025 else 0.0
-            }
         }
         this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
 
