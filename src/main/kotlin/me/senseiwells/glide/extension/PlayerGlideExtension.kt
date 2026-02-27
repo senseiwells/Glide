@@ -10,6 +10,7 @@ import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
+import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
@@ -25,7 +26,7 @@ import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.MathUtils.projectionScalar
 import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.PlayerUtils.server
-import net.casual.arcade.utils.addVelocitySmooth
+import net.casual.arcade.utils.addVelocityAndMark
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.math.location.Location
@@ -117,6 +118,10 @@ class PlayerGlideExtension(
     // LivingEntity::qword_3E8 (This is an educated guess - Sensei)
     private var liftForceModifier = 1.0
 
+    //Janky non-decomp sourced parity vars
+    var initialEntryVelocity = Vec3.ZERO
+    var respawnSpeedBoost = 0.0
+
     var isAppliedLiftDirty = false
         private set
 
@@ -143,7 +148,11 @@ class PlayerGlideExtension(
     fun modifyVelocityWithLift(original: Vec3): Vec3 {
         val glideVerticalVelocity = this.getGlideVerticalVelocity()
         if (glideVerticalVelocity != 0.0) {
-            return Vec3(original.x, glideVerticalVelocity, original.z)
+            var clamped = original
+            if (original.horizontal().length() > this.initialEntryVelocity.horizontal().length()) {
+                clamped = original.horizontal().normalize().scale(this.initialEntryVelocity.horizontal().length())
+            }
+            return Vec3(clamped.x, glideVerticalVelocity, clamped.z)
         }
         return original
     }
@@ -197,12 +206,13 @@ class PlayerGlideExtension(
         return false
     }
 
-    fun collideWithRespawnCheckpoint(checkpoint: RespawnCheckpoint, spawn: Location) {
+    fun collideWithRespawnCheckpoint(checkpoint: RespawnCheckpoint, spawn: Location, speedBoost: Double) {
         this.respawnLocation = spawn
         this.lastRespawnCheckpointIndex = checkpoint.index
         this.lastSavedScore = this.score
         this.lastSavedRingType = this.ringTypes.last()
         this.lastRespawnCheckpointTicks = CHECKPOINT_TICKS + 2
+        this.respawnSpeedBoost = speedBoost
     }
 
     fun showTrailFor(id: Identifier, glide: GlideMinigame) {
@@ -320,6 +330,13 @@ class PlayerGlideExtension(
         this.additionalGlideVelocity = 0.0
         this.appliedLiftVelocity = 0.0
         this.liftForceModifier = 1.0
+
+        this.initialEntryVelocity = Vec3.ZERO
+
+        if (this.respawnSpeedBoost != 0.0) {
+            this.isSpeedBoosting = true
+            this.targetBoostSpeed = this.respawnSpeedBoost
+        }
     }
 
     fun reset() {
@@ -334,6 +351,7 @@ class PlayerGlideExtension(
         this.ringTypes.add(RingType.Grey)
         this.lastSavedRings.clear()
         this.lastSavedRingType = RingType.Grey
+        this.respawnSpeedBoost = 0.0
         this.respawn()
         this.hideTrail()
     }
@@ -432,6 +450,8 @@ class PlayerGlideExtension(
         if (accelerator != null) {
             if (this.pendingAcceleratorEntry) {
                 this.pendingAcceleratorEntry = false
+                // Janky check for if thermal is static, this doesn't need to be set for natural thermals or boosters.
+                if (accelerator is ThermalAccelerator && accelerator.liftForceModifier != 1.0) { this.initialEntryVelocity = player.deltaMovement }
                 this.player.sendSound(accelerator.getSound())
             }
 
@@ -518,17 +538,17 @@ class PlayerGlideExtension(
             val deltaMovement = this.player.deltaMovement
             val horizSpeed = deltaMovement.horizontalDistance()
             if (horizSpeed < this.targetBoostSpeed) {
-                if (boostDirection != null) {
+                if (boostDirection != null && !player.boundingBox.intersects(accelerator?.boundingBox)) {
                     val xBoost = abs(deltaMovement.x) * 0.1 * boostDirection.x
                     val zBoost = abs(deltaMovement.z) * 0.1 * boostDirection.z
-                    this.player.addVelocitySmooth(xBoost, 0.0, zBoost)
+                    this.player.addVelocityAndMark(xBoost, 0.0, zBoost)
 
                     val newDeltaMovement = this.player.deltaMovement
                     if (newDeltaMovement.x * boostDirection.x < 0.0 || newDeltaMovement.z * boostDirection.z < 0.0) {
                         this.isSpeedBoosting = false
                     }
                 } else {
-                    this.player.addVelocitySmooth(deltaMovement.x * 0.1, 0.0, deltaMovement.z * 0.1)
+                    this.player.addVelocityAndMark(deltaMovement.x * 0.1, 0.0, deltaMovement.z * 0.1)
                 }
             } else {
                 this.isSpeedBoosting = false

@@ -16,14 +16,12 @@ import net.casual.arcade.utils.JsonUtils.objects
 import net.casual.arcade.utils.JsonUtils.string
 import net.casual.arcade.utils.JsonUtils.stringOrNull
 import net.casual.arcade.utils.math.location.Location
-import net.casual.arcade.utils.math.location.Location.Companion.withRotation
 import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.mutable.MutableInt
 import java.nio.file.Path
@@ -208,6 +206,12 @@ object GlideGRFReader {
             return
         }
 
+        // For parity's sake check for speedBoost, it's used on checkpoint 28 in cavern, the upper rightmost path.
+        // It gives you the boost when you respawn. AFAIK this is the ONLY checkpoint in the game that does this.
+        // But we probably should check for it for parity.
+        // -S 2026-02-26
+        val speedBoost = parameters.stringOrNull("speedBoost")?.toDouble() ?: 0.0
+
         var spawn: Location? = null
         val beacons = ArrayList<BeaconBeamTemplate>()
         for (child in children.objects()) {
@@ -222,7 +226,7 @@ object GlideGRFReader {
         if (spawn == null) {
             throw IllegalStateException("Respawn checkpoint didn't specify a respawn point!")
         }
-        visitor.visitCheckpoint(RespawnCheckpoint(id, box, spawn, beacons))
+        visitor.visitCheckpoint(RespawnCheckpoint(id, box, spawn, beacons, speedBoost))
     }
 
     private fun readBeaconBeam(json: JsonObject): BeaconBeamTemplate {
@@ -230,17 +234,14 @@ object GlideGRFReader {
         val y = json.string("spawnY").toInt()
         val z = json.string("spawnZ").toInt()
         val length = json.string("beam_length").toFloat()
-        val rotation = when (json.string("beam_direction")) {
-            "plus_x" -> Vec2(0.0F, -90.0F)
-            "minus_x" -> Vec2(0.0F, 90.0F)
-            "plus_z" -> Vec2(0.0F, 0.0F)
-            "minus_z" -> Vec2(0.0F, 180.0F)
-            "plus_y" -> Vec2(-90.0F, 0.0F)
-            "minus_y" -> Vec2(90.0F, 0.0F)
-            else -> throw IllegalArgumentException("Unknown beam direction")
-        }
+
+        // Why do rings get to have an axis, but beacons need a direction?? Beacon beams are the same in both directions, aren't they?
+        // Anyways, Changed this so that the beam direction is converted to an axis, should make it easier for custom map creators too
+        // -S 2026-02-26
+        val axis = Axis.byName(json.string("beam_direction").removePrefix("plus_").removePrefix("minus_"))
+            ?: throw IllegalArgumentException("Unknown  beam direction")
         val spawnPos = Vec3.atCenterOf(Vec3i(x, y, z))
-        return BeaconBeamTemplate(length, spawnPos.withRotation(rotation))
+        return BeaconBeamTemplate(length, spawnPos, axis)
     }
 
     private fun readRespawnPoint(json: JsonObject): Location {

@@ -15,6 +15,7 @@ import net.casual.arcade.utils.math.location.Location
 import net.casual.arcade.utils.serialization.codec.ArcadeExtraCodecs
 import net.casual.arcade.utils.serialization.codec.CodecProvider
 import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
+import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Registry
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -113,13 +114,17 @@ class FinishLine(
 
 class BeaconBeamTemplate(
     val length: Float,
-    val location: Location
+    val position: Vec3,
+    val axis: Axis,
 ) {
     fun create(level: ServerLevel): BeaconBeam {
         val beam = BeaconBeam(level, this.length)
-        beam.setPos(this.location.position)
-        beam.xRot = this.location.rotation.x
-        beam.yRot = this.location.rotation.y
+        beam.setPos(this.position)
+        when (this.axis) {
+            Axis.X -> beam.yRot = -90.0F
+            Axis.Y -> beam.xRot = -90.0F
+            Axis.Z -> beam.yRot = 0.0F
+        }
         return beam
     }
 
@@ -127,7 +132,8 @@ class BeaconBeamTemplate(
         val CODEC: Codec<BeaconBeamTemplate> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.FLOAT.fieldOf("length").forGetter(BeaconBeamTemplate::length),
-                Location.CODEC.fieldOf("location").forGetter(BeaconBeamTemplate::location)
+                Vec3.CODEC.fieldOf("position").forGetter(BeaconBeamTemplate::position),
+                Axis.CODEC.fieldOf("axis").forGetter(BeaconBeamTemplate::axis),
             ).apply(instance, ::BeaconBeamTemplate)
         }
     }
@@ -137,7 +143,8 @@ class RespawnCheckpoint(
     override val index: Int,
     override val boundingBox: AABB,
     private val spawn: Location,
-    private val beacons: List<BeaconBeamTemplate>
+    private val beacons: List<BeaconBeamTemplate>,
+    private val speedBoost: Double,
 ): Checkpoint {
     override val shouldMarkOnProgressBar: Boolean = true
 
@@ -153,7 +160,7 @@ class RespawnCheckpoint(
         if (player.glide.collideWithCheckpoint(this)) {
             player.sendSound(GlideSounds.CHECKPOINT, static = true)
             glide.displayCheckpointNotificationTo(player)
-            player.glide.collideWithRespawnCheckpoint(this, this.spawn)
+            player.glide.collideWithRespawnCheckpoint(this, this.spawn, this.speedBoost)
         }
     }
 
@@ -165,7 +172,8 @@ class RespawnCheckpoint(
                 Codec.INT.fieldOf("id").forGetter(RespawnCheckpoint::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(RespawnCheckpoint::boundingBox),
                 Location.CODEC.fieldOf("respawn_location").forGetter(RespawnCheckpoint::spawn),
-                BeaconBeamTemplate.CODEC.listOf().fieldOf("beacon_beams").forGetter(RespawnCheckpoint::beacons)
+                BeaconBeamTemplate.CODEC.listOf().fieldOf("beacon_beams").forGetter(RespawnCheckpoint::beacons),
+                Codec.DOUBLE.optionalFieldOf("target_velocity", 0.0).forGetter(RespawnCheckpoint::speedBoost)
             ).apply(instance, ::RespawnCheckpoint)
         }
     }
