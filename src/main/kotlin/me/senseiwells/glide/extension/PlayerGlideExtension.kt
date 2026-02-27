@@ -10,7 +10,7 @@ import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
-import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
+import me.senseiwells.glide.entity.accelerator.BoosterAccelerator
 import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
@@ -149,9 +149,10 @@ class PlayerGlideExtension(
         val glideVerticalVelocity = this.getGlideVerticalVelocity()
         if (glideVerticalVelocity != 0.0) {
             var clamped = original
-            if (original.horizontal().length() > this.initialEntryVelocity.horizontal().length()) {
+            if (original.horizontal().length() > this.initialEntryVelocity.horizontal().length() && (this.initialEntryVelocity.length() != 0.0)) {
                 clamped = original.horizontal().normalize().scale(this.initialEntryVelocity.horizontal().length())
             }
+            player.deltaMovement = Vec3(clamped.x, glideVerticalVelocity, clamped.z)
             return Vec3(clamped.x, glideVerticalVelocity, clamped.z)
         }
         return original
@@ -452,7 +453,7 @@ class PlayerGlideExtension(
             if (this.pendingAcceleratorEntry) {
                 this.pendingAcceleratorEntry = false
                 // Janky check for if thermal is static, this doesn't need to be set for natural thermals or boosters.
-                if (accelerator is ThermalAccelerator && accelerator.liftForceModifier != 1.0) { this.initialEntryVelocity = player.deltaMovement }
+                if (accelerator !is BoosterAccelerator) { this.initialEntryVelocity = player.deltaMovement }
                 this.player.sendSound(accelerator.getSound())
             }
 
@@ -515,11 +516,11 @@ class PlayerGlideExtension(
             }
             if (this.isUpdraft) {
                 if (this.appliedLiftVelocity < this.targetLiftVelocity) {
-                    this.appliedLiftVelocity += (this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity * 0.1
+                    this.appliedLiftVelocity += ((this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity) * 0.1
                 }
             } else {
                 if (this.appliedLiftVelocity > this.targetLiftVelocity) {
-                    this.appliedLiftVelocity += (this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity * -0.1
+                    this.appliedLiftVelocity += ((this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity) * -0.1
                 }
             }
 
@@ -533,7 +534,8 @@ class PlayerGlideExtension(
         } else if (this.isUpdraft) {
             this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
         } else {
-            this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+            this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + 0.025 else 0.0
+            }
         }
         this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
 
