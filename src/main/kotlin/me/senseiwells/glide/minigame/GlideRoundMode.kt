@@ -70,7 +70,7 @@ data object SoloGlideRoundMode: GlideRoundMode, GlideRoundMode.Provider {
     }
 
     override fun onRoundFinished(glide: GlideMinigame) {
-
+        glide.complete()
     }
 
     override fun create(): GlideRoundMode {
@@ -113,6 +113,8 @@ class MultiGlideRoundMode(private val rounds: Int): GlideRoundMode {
     override fun onRoundFinished(glide: GlideMinigame) {
         if (++this.round <= this.rounds) {
             glide.restart()
+        } else {
+            glide.complete()
         }
     }
 
