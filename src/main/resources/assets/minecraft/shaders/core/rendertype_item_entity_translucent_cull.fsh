@@ -102,7 +102,7 @@ void main() {
         }
     } else {
         color = texture(Sampler0, texCoord0) * spectatorVertexColor * ColorModulator;
-        if (sphericalVertexDistance < 16.0) { // Start of fadeout / Not a UI element. TODO: Add additional check for if it is a ring
+        if (spectatorVertexColor.a < 0.26 && sphericalVertexDistance < 16.0) { // Start Fade out, for players, friendly invisibles have an alpha of 0.26
             // Most players have a transparent second layer.
             if (color.a < 0.1) {
                 discard;
