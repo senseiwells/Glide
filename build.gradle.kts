@@ -28,26 +28,25 @@ repositories {
 
 dependencies {
     minecraft(libs.minecraft)
-    @Suppress("UnstableApiUsage")
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${libs.versions.parchment.get()}@zip")
-    })
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
-    modImplementation(libs.fabric.kotlin)
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.api)
+    implementation(libs.fabric.kotlin)
 
-    modImplementation(libs.arcade)
-    // modImplementation(libs.polymer.virtual.entity)
-
-    modImplementation(libs.arcade.datagen)
+    implementation(libs.arcade)
+    implementation(libs.arcade.datagen)
 }
 
 tasks {
     processResources {
         inputs.property("version", project.version)
         filesMatching("fabric.mod.json") {
-            expand(mutableMapOf("version" to project.version))
+            expand(mutableMapOf(
+                "version" to modVersion,
+                "minecraft_dependency" to libs.versions.minecraft.get(),
+                "fabric_loader_dependency" to libs.versions.fabric.loader.get(),
+                "fabric_api_dependency" to libs.versions.fabric.api.get(),
+                "fabric_kotlin_dependency" to libs.versions.fabric.kotlin.get()
+            ))
         }
     }
 

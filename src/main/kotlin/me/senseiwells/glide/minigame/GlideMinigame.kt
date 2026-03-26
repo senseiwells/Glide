@@ -18,6 +18,7 @@ import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
 import me.senseiwells.glide.minigame.command.ContextualGlideCommand
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
+import me.senseiwells.glide.utils.boostHealth
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
 import net.casual.arcade.dimensions.utils.getDimensionPath
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
@@ -34,26 +35,25 @@ import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.resources.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
-import net.casual.arcade.utils.PlayerUtils.addToTeam
-import net.casual.arcade.utils.PlayerUtils.boostHealth
-import net.casual.arcade.utils.PlayerUtils.clearPlayerInventory
-import net.casual.arcade.utils.PlayerUtils.clearTitle
-import net.casual.arcade.utils.PlayerUtils.player
-import net.casual.arcade.utils.PlayerUtils.removeFromTeam
-import net.casual.arcade.utils.PlayerUtils.resetHealth
-import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.PlayerUtils.sendTitle
-import net.casual.arcade.utils.PlayerUtils.setTitleAnimation
-import net.casual.arcade.utils.TeamUtils.getOrCreateTeam
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.coroutine.delay
+import net.casual.arcade.utils.entity.setVelocityAndMark
+import net.casual.arcade.utils.entity.teleportTo
 import net.casual.arcade.utils.isOf
-import net.casual.arcade.utils.set
-import net.casual.arcade.utils.setVelocityAndMark
-import net.casual.arcade.utils.teleportTo
+import net.casual.arcade.utils.level.set
+import net.casual.arcade.utils.player.addToTeam
+import net.casual.arcade.utils.player.clearPlayerInventory
+import net.casual.arcade.utils.player.clearTitle
+import net.casual.arcade.utils.player.removeFromTeam
+import net.casual.arcade.utils.player.resetHealth
+import net.casual.arcade.utils.player.sendSound
+import net.casual.arcade.utils.player.sendTitle
+import net.casual.arcade.utils.player.setTitleAnimation
+import net.casual.arcade.utils.scoreboard.getOrCreateTeam
+import net.casual.arcade.utils.server.player
 import net.casual.arcade.visuals.bossbar.SuppliedBossbar
 import net.casual.arcade.visuals.sidebar.FixedSidebar
 import net.casual.arcade.visuals.utils.elements.ComponentElements
@@ -92,7 +92,7 @@ class GlideMinigame(
     override val id: Identifier = ID
 
     // TODO: Rework this
-    private val team = this.server.scoreboard.getOrCreateTeam("Glide") {
+    private val team = this.server.scoreboard.getOrCreateTeam("Glide").apply {
         setSeeFriendlyInvisibles(true)
         collisionRule = Team.CollisionRule.NEVER
     }
@@ -143,7 +143,7 @@ class GlideMinigame(
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
         val tracker = this.trackers.remove(player.uuid) ?: return
-        val updated = player.glide.updateBests(this.config.addon_id, this, this.ticks.Ticks, tracker.finish())
+        val updated = player.glide.updateBests(this.config.addonId, this, this.ticks.Ticks, tracker.finish())
         if (updated) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
@@ -434,7 +434,7 @@ class GlideMinigame(
 
     @Listener
     private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
-        event.player.glide.showTrailFor(this.config.addon_id, this)
+        event.player.glide.showTrailFor(this.config.addonId, this)
     }
 
     @Listener
@@ -556,7 +556,7 @@ class GlideMinigame(
         ): GlideMinigame {
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
-                spoofedDimensionKey(addon.config.addon_id)
+                spoofedDimensionKey(addon.config.addonId)
                 dimensionType(addon.dimensionType)
                 chunkGenerator(VoidChunkGenerator(server))
             }

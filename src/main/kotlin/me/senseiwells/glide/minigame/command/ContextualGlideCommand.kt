@@ -8,8 +8,7 @@ import net.casual.arcade.commands.CommandTree
 import net.casual.arcade.commands.argument
 import net.casual.arcade.commands.literal
 import net.casual.arcade.commands.success
-import net.casual.arcade.minigame.utils.MinigameUtils.requiresAdminOrPermission
-import net.casual.arcade.utils.PlayerUtils.username
+import net.casual.arcade.utils.player.username
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument

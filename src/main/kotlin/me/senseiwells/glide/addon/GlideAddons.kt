@@ -20,7 +20,7 @@ object GlideAddons {
         }
         for (path in this.path.listDirectoryEntries("*.lemaddon")) {
             val addon = GlideAddon.from(path)
-            this.addons[addon.config.addon_id] = addon
+            this.addons[addon.config.addonId] = addon
         }
     }
 

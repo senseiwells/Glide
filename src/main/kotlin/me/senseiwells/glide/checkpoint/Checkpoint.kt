@@ -10,12 +10,11 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
-import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.math.location.Location
+import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.utils.serialization.codec.ArcadeExtraCodecs
 import net.casual.arcade.utils.serialization.codec.CodecProvider
 import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
-import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Registry
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -64,7 +63,7 @@ class ProgressCheckpoint(
     override val shouldMarkOnProgressBar: Boolean = false
 
     override fun codec(): MapCodec<out Checkpoint> {
-        return CODEC
+        return codec
     }
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
@@ -72,9 +71,9 @@ class ProgressCheckpoint(
     }
 
     companion object: CodecProvider<ProgressCheckpoint> {
-        override val ID = GlideMod.id("progress")
+        override val id = GlideMod.id("progress")
 
-        override val CODEC: MapCodec<ProgressCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
+        override val codec: MapCodec<ProgressCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 Codec.INT.fieldOf("id").forGetter(ProgressCheckpoint::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(ProgressCheckpoint::boundingBox)
@@ -90,7 +89,7 @@ class FinishLine(
     override val shouldMarkOnProgressBar: Boolean = false
 
     override fun codec(): MapCodec<out Checkpoint> {
-        return CODEC
+        return codec
     }
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
@@ -101,9 +100,9 @@ class FinishLine(
     }
 
     companion object: CodecProvider<FinishLine> {
-        override val ID = GlideMod.id("finish")
+        override val id = GlideMod.id("finish")
 
-        override val CODEC: MapCodec<FinishLine> = RecordCodecBuilder.mapCodec { instance ->
+        override val codec: MapCodec<FinishLine> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 Codec.INT.fieldOf("id").forGetter(FinishLine::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(FinishLine::boundingBox)
@@ -114,17 +113,13 @@ class FinishLine(
 
 class BeaconBeamTemplate(
     val length: Float,
-    val position: Vec3,
-    val axis: Axis,
+    val location: Location
 ) {
     fun create(level: ServerLevel): BeaconBeam {
         val beam = BeaconBeam(level, this.length)
-        beam.setPos(this.position)
-        when (this.axis) {
-            Axis.X -> beam.yRot = -90.0F
-            Axis.Y -> beam.xRot = -90.0F
-            Axis.Z -> beam.yRot = 0.0F
-        }
+        beam.setPos(this.location.position)
+        beam.xRot = this.location.rotation.x
+        beam.yRot = this.location.rotation.y
         return beam
     }
 
@@ -132,8 +127,7 @@ class BeaconBeamTemplate(
         val CODEC: Codec<BeaconBeamTemplate> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.FLOAT.fieldOf("length").forGetter(BeaconBeamTemplate::length),
-                Vec3.CODEC.fieldOf("position").forGetter(BeaconBeamTemplate::position),
-                Axis.CODEC.fieldOf("axis").forGetter(BeaconBeamTemplate::axis),
+                Location.CODEC.fieldOf("location").forGetter(BeaconBeamTemplate::location)
             ).apply(instance, ::BeaconBeamTemplate)
         }
     }
@@ -153,7 +147,7 @@ class RespawnCheckpoint(
     }
 
     override fun codec(): MapCodec<out Checkpoint> {
-        return CODEC
+        return codec
     }
 
     override fun collide(player: ServerPlayer, glide: GlideMinigame) {
@@ -165,9 +159,9 @@ class RespawnCheckpoint(
     }
 
     companion object: CodecProvider<RespawnCheckpoint> {
-        override val ID = GlideMod.id("respawn")
+        override val id = GlideMod.id("respawn")
 
-        override val CODEC: MapCodec<RespawnCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
+        override val codec: MapCodec<RespawnCheckpoint> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 Codec.INT.fieldOf("id").forGetter(RespawnCheckpoint::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(RespawnCheckpoint::boundingBox),

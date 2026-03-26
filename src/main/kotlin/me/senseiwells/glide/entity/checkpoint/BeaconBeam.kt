@@ -3,13 +3,14 @@ package me.senseiwells.glide.entity.checkpoint
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.item.GlideItems
-import net.casual.arcade.utils.SynchedDataUtils
-import net.casual.arcade.utils.createValue
+import net.casual.arcade.utils.entity.SynchedDataUtils
+import net.casual.arcade.utils.entity.createValue
 import net.casual.arcade.virtual.entity.attachment.SimpleVirtualEntityAttachment
 import net.casual.arcade.virtual.entity.display.SimpleVirtualItemDisplay
 import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
 import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
 import net.casual.arcade.virtual.entity.utils.createVirtualEntityAttachment
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -23,7 +24,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import org.joml.Vector3f
-import xyz.nucleoid.packettweaker.PacketContext
 
 class BeaconBeam(
     type: EntityType<*>,

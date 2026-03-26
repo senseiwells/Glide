@@ -5,13 +5,14 @@ import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.GlideEntities
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.SynchedDataUtils
 import net.casual.arcade.utils.TimeUtils.Ticks
-import net.casual.arcade.utils.createValue
+import net.casual.arcade.utils.entity.SynchedDataUtils
+import net.casual.arcade.utils.entity.createValue
 import net.casual.arcade.utils.math.location.LocationWithLevel.Companion.locationWithLevel
+import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
 import net.casual.arcade.visuals.entity.firework.VirtualFireworkBuilder
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -31,7 +32,6 @@ import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
-import xyz.nucleoid.packettweaker.PacketContext
 import kotlin.math.abs
 
 class Ring(

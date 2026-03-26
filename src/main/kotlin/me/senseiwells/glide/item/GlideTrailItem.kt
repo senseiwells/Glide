@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec
 import eu.pb4.polymer.core.api.item.PolymerItem
 import eu.pb4.polymer.core.api.other.PolymerComponent
 import me.senseiwells.glide.GlideMod.id
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
@@ -14,7 +16,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.DyedItemColor
-import xyz.nucleoid.packettweaker.PacketContext
 
 class GlideTrailItem(properties: Properties): Item(properties), PolymerItem {
     override fun getPolymerItem(stack: ItemStack, context: PacketContext): Item {
@@ -24,9 +25,10 @@ class GlideTrailItem(properties: Properties): Item(properties), PolymerItem {
     override fun getPolymerItemStack(
         stack: ItemStack,
         flag: TooltipFlag,
-        context: PacketContext
+        context: PacketContext,
+        lookup: HolderLookup.Provider
     ): ItemStack {
-        val copy = super.getPolymerItemStack(stack, flag, context)
+        val copy = super.getPolymerItemStack(stack, flag, context, lookup)
         copy.set(DataComponents.DYED_COLOR, DyedItemColor(stack.getOrDefault(TRAIL_COLOR, 0xFFFFFF)))
         return copy
     }

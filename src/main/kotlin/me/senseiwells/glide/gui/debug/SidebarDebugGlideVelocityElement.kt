@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer
 object SidebarDebugGlideVelocityElement: PlayerSpecificElement<SidebarComponent> {
     override fun get(player: ServerPlayer): SidebarComponent {
         val velocity = player.glide.modifyVelocityWithLift(player.deltaMovement)
-        return SidebarComponent.Companion.withNoScore(
+        return SidebarComponent.withNoScore(
             Component.literal("%.2f, %.2f, %.2f".format(velocity.x, velocity.y, velocity.z))
         )
     }
