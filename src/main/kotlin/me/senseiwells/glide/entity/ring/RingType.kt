@@ -4,9 +4,9 @@ import com.mojang.serialization.Codec
 import me.senseiwells.glide.font.GlideFont.Score
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.sound.GlideSounds
-import net.casual.arcade.utils.convertCasing
 import net.casual.arcade.utils.string.PascalCase
 import net.casual.arcade.utils.string.SnakeCase
+import net.casual.arcade.utils.string.convertCasing
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents

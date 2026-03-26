@@ -1,22 +1,17 @@
 package me.senseiwells.glide.font
 
-import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntIntPair
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
 import net.casual.arcade.resources.font.FontResources
 import net.casual.arcade.resources.font.IndexedFontResources
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.utils.JsonUtils
-import net.casual.arcade.utils.JsonUtils.int
-import net.casual.arcade.utils.JsonUtils.objects
+import net.casual.arcade.utils.collection.component1
+import net.casual.arcade.utils.collection.component2
 import net.casual.arcade.utils.component.LiteralWidthResolver
-import net.casual.arcade.utils.component1
-import net.casual.arcade.utils.component2
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.TranslatableContents
-import kotlin.io.path.reader
 
 object GlideFont: FontResources(GlideMod.id("glide_font")) {
     private const val SHIFT = -35

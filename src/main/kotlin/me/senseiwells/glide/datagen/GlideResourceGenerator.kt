@@ -1,7 +1,5 @@
 package me.senseiwells.glide.datagen
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import eu.pb4.polymer.resourcepack.api.ResourcePackCreator
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.font.GlideComponents
@@ -9,9 +7,7 @@ import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.datagen.language.LanguageGenerator
 import net.casual.arcade.datagen.resource.ArcadeResourceGenerator
 import net.casual.arcade.resources.ArcadeResourcePacks
-import net.casual.arcade.utils.JsonUtils
 import net.minecraft.client.Minecraft
-import kotlin.io.path.writer
 
 class GlideResourceGenerator: ArcadeResourceGenerator {
     override fun id(): String {

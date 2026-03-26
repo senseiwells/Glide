@@ -25,12 +25,12 @@ import net.casual.arcade.extensions.utils.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.resources.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.MathUtils.projectionScalar
-import net.casual.arcade.utils.PlayerUtils.sendSound
-import net.casual.arcade.utils.PlayerUtils.server
-import net.casual.arcade.utils.addVelocityAndMark
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
+import net.casual.arcade.utils.entity.addVelocityAndMark
 import net.casual.arcade.utils.math.location.Location
+import net.casual.arcade.utils.player.sendSound
+import net.casual.arcade.utils.player.server
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.entity.attachment.SimpleVirtualEntityAttachment
 import net.casual.arcade.virtual.entity.attachment.anchor.ManualAttachmentAnchor
@@ -617,6 +617,7 @@ class PlayerGlideExtension(
         return GlideMod.id("glide_extension")
     }
 
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun deserialize(input: ValueInput) {
         this.finished = input.getBooleanOr("finished", false)
         this.lastRespawnCheckpointIndex = input.getIntOr("last_respawn_checkpoint_index", 0)

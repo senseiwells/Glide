@@ -2,10 +2,11 @@ package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
 import me.senseiwells.glide.utils.intersects
-import net.casual.arcade.utils.SynchedDataUtils
-import net.casual.arcade.utils.createValue
+import net.casual.arcade.utils.entity.SynchedDataUtils
+import net.casual.arcade.utils.entity.createValue
 import net.casual.arcade.utils.impl.Sound
 import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -24,7 +25,6 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import org.joml.Vector3fc
-import xyz.nucleoid.packettweaker.PacketContext
 
 sealed class Accelerator(
     type: EntityType<*>,

@@ -17,7 +17,7 @@ class GlideMinigameFactory(
     private val mode: GlideMode
 ): MinigameFactory {
     override fun codec(): MapCodec<out MinigameFactory> {
-        return CODEC
+        return codec
     }
 
     override fun create(context: MinigameCreationContext): Minigame {
@@ -28,9 +28,9 @@ class GlideMinigameFactory(
     companion object: CodecProvider<GlideMinigameFactory> {
         private val DEFAULT_MAP = GlideMod.id("temple")
 
-        override val ID = GlideMinigame.ID
+        override val id = GlideMinigame.ID
 
-        override val CODEC: MapCodec<out GlideMinigameFactory> = RecordCodecBuilder.mapCodec { instance ->
+        override val codec: MapCodec<out GlideMinigameFactory> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 Identifier.CODEC.optionalFieldOf("map", DEFAULT_MAP).forGetter(GlideMinigameFactory::map),
                 GlideRoundMode.Provider.CODEC.optionalFieldOf("round", SoloGlideRoundMode).forGetter(GlideMinigameFactory::round),

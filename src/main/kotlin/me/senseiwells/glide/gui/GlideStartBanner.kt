@@ -6,11 +6,11 @@ import me.senseiwells.glide.minigame.GlideRoundMode
 import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.resources.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
-import net.casual.arcade.utils.PlayerUtils.sendSound
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.component.color
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
+import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
