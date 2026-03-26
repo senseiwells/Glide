@@ -215,6 +215,7 @@ class PlayerGlideExtension(
         this.lastSavedRingType = this.ringTypes.last()
         this.lastRespawnCheckpointTicks = CHECKPOINT_TICKS + 2
         this.respawnSpeedBoost = speedBoost
+        this.lastSavedRings.addAll(this.rings)
     }
 
     fun showTrailFor(id: Identifier, glide: GlideMinigame) {
