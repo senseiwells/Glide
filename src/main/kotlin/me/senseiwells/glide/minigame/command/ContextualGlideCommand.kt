@@ -13,7 +13,7 @@ import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 
-class ContextualGlideCommand(private val glide: GlideMinigame): CommandTree {
+class ContextualGlideCommand(private val glide: GlideMinigame): CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
         return GlideCommand.create(buildContext).apply {
             literal("start-ending-round") {

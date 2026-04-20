@@ -25,7 +25,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
 import java.util.UUID
 
-object GlideCommand: CommandTree {
+object GlideCommand: CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
         return CommandTree.buildLiteral("glide") {
             requiresAdminOrPermission()
