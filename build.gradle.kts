@@ -34,6 +34,7 @@ dependencies {
 
     implementation(libs.arcade)
     implementation(libs.arcade.datagen)
+    implementation(libs.polymer.core)
 }
 
 tasks {

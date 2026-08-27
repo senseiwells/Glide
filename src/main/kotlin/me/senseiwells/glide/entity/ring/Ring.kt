@@ -8,10 +8,10 @@ import me.senseiwells.glide.minigame.GlideMinigame
 import net.casual.arcade.utils.TimeUtils.Ticks
 import net.casual.arcade.utils.entity.SynchedDataUtils
 import net.casual.arcade.utils.entity.createValue
-import net.casual.arcade.utils.math.location.LocationWithLevel.Companion.locationWithLevel
+import net.casual.arcade.utils.math.location.locationWithLevel
 import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.virtual.entity.utils.EntityDataAccessors
-import net.casual.arcade.visuals.entity.firework.VirtualFireworkBuilder
+import net.casual.arcade.virtual.visuals.entity.firework.VirtualFireworkBuilder
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext
 import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -24,6 +24,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.FireworkExplosion
 import net.minecraft.world.level.Level
@@ -58,7 +59,7 @@ class Ring(
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
-        return EntityType.ITEM_DISPLAY
+        return EntityTypes.ITEM_DISPLAY
     }
 
     override fun setYRot(yRot: Float) {

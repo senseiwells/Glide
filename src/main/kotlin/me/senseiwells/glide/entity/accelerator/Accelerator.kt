@@ -17,6 +17,7 @@ import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
@@ -61,7 +62,7 @@ sealed class Accelerator(
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
-        return EntityType.ITEM_DISPLAY
+        return EntityTypes.ITEM_DISPLAY
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {

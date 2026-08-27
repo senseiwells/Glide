@@ -2,9 +2,9 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
-import me.senseiwells.glide.minigame.GlideRoundMode
+import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
-import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.component.color
@@ -26,7 +26,7 @@ import net.minecraft.server.level.ServerPlayer
 //     their times/score, or DNF
 //   - If the round is the last round the previous banner is replaced
 //     with whoever won the round 'foobar won!'
-class GlideStartBanner(private val round: GlideRoundMode): GlideBanner() {
+class GlideStartBanner(private val glide: GlideMinigame): GlideBanner(glide.server) {
     init {
         this.setTitle(GlideComponents.STARTING.withShiftedDownFont(12))
     }
@@ -37,7 +37,7 @@ class GlideStartBanner(private val round: GlideRoundMode): GlideBanner() {
 
     override fun getBannerText(player: ServerPlayer): Component {
         // return Component.literal("foo bar xyz").color(0x444444).shadowless().withShiftedDownFont(29)
-        return this.round.getStartBanner().color(0x444444).shadowless().withShiftedDownFont(29)
+        return this.glide.round.getStartBanner().color(0x444444).shadowless().withShiftedDownFont(29)
     }
 
     override fun getDelay(): Int {
@@ -62,7 +62,7 @@ class GlideStartBanner(private val round: GlideRoundMode): GlideBanner() {
             player.sendSound(GlideSounds.COUNTDOWN_START)
         }
         this.setTitle(GlideComponents.STARTED.withShiftedDownFont(12))
-        GlobalTickedScheduler.schedule(2.Seconds) {
+        GlobalTickedScheduler.Server.schedule(2.Seconds) {
             super.afterTransition(players)
         }
     }

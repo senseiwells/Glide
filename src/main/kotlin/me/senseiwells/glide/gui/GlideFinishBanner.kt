@@ -4,7 +4,7 @@ import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.utils.component.color
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap

@@ -1,12 +1,12 @@
 package me.senseiwells.glide.datagen
 
-import eu.pb4.polymer.resourcepack.api.ResourcePackCreator
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.datagen.language.LanguageGenerator
 import net.casual.arcade.datagen.resource.ArcadeResourceGenerator
-import net.casual.arcade.resources.ArcadeResourcePacks
+import net.casual.arcade.pack.generation.BuiltInResourcePacks
+import net.casual.arcade.pack.generation.PackDefinition
 import net.minecraft.client.Minecraft
 
 class GlideResourceGenerator: ArcadeResourceGenerator {
@@ -14,10 +14,10 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
         return GlideMod.MOD_ID
     }
 
-    override fun resources(): Collection<ResourcePackCreator> {
+    override fun resources(): Collection<PackDefinition> {
         return listOf(
-            GlideMod.resourcePack.getCreator(),
-            ArcadeResourcePacks.SPACING_FONT_PACK.getCreator()
+            GlideMod.resourcePack,
+            BuiltInResourcePacks.SPACING_FONT_PACK
         )
     }
 

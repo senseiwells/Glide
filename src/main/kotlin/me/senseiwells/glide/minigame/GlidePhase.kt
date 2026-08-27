@@ -2,12 +2,13 @@ package me.senseiwells.glide.minigame
 
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
-import net.casual.arcade.resources.utils.ResourcePackUtils
+import net.casual.arcade.pack.utils.ResourcePackUtils
 
 enum class GlidePhase(override val id: String): Phase<GlideMinigame> {
     Waiting("waiting") {
         override fun start(minigame: GlideMinigame, previous: Phase<GlideMinigame>) {
-            ResourcePackUtils.afterPacksLoad(minigame.players) {
+            minigame.launchPhased {
+                ResourcePackUtils.awaitPacks(minigame.players)
                 minigame.setPhase(Countdown)
             }
         }

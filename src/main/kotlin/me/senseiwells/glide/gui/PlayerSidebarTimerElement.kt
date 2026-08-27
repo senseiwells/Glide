@@ -2,8 +2,8 @@ package me.senseiwells.glide.gui
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import net.casual.arcade.visuals.elements.PlayerSpecificElement
-import net.casual.arcade.visuals.sidebar.SidebarComponent
+import net.casual.arcade.virtual.visuals.elements.PlayerSpecificElement
+import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
 import net.minecraft.server.level.ServerPlayer
 import java.util.*
 

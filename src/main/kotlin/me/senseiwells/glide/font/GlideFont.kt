@@ -3,9 +3,9 @@ package me.senseiwells.glide.font
 import it.unimi.dsi.fastutil.ints.IntIntPair
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.resources.font.FontResources
-import net.casual.arcade.resources.font.IndexedFontResources
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.font.FontResources
+import net.casual.arcade.pack.font.IndexedFontResources
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.collection.component1
 import net.casual.arcade.utils.collection.component2
 import net.casual.arcade.utils.component.LiteralWidthResolver
