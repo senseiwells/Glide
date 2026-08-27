@@ -2,7 +2,7 @@ package me.senseiwells.glide.datagen
 
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer
 import net.casual.arcade.datagen.language.LanguageEntryGenerator
-import net.casual.arcade.resources.lang.LanguageEntry
+import net.casual.arcade.pack.lang.LanguageEntry
 import net.minecraft.client.gui.Font
 import net.minecraft.network.chat.Component
 import java.awt.Color

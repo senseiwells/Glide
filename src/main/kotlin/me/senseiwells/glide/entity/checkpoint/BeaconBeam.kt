@@ -20,6 +20,7 @@ import net.minecraft.util.Brightness
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
@@ -53,7 +54,7 @@ class BeaconBeam(
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {
-        return EntityType.ITEM_DISPLAY
+        return EntityTypes.ITEM_DISPLAY
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {

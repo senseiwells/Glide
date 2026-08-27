@@ -5,8 +5,8 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component

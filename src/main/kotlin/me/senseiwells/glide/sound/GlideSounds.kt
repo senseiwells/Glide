@@ -1,7 +1,7 @@
 package me.senseiwells.glide.sound
 
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.resources.sound.SoundResources
+import net.casual.arcade.pack.sound.SoundResources
 import net.casual.arcade.utils.TimeUtils.Minutes
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.impl.Sound

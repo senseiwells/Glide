@@ -46,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
 		method = "travelFallFlying",
 		at = @At("HEAD")
 	)
-	private void checkGlideCollisions(Vec3 travelVector, CallbackInfo ci) {
+	private void checkGlideCollisions(Vec3 input, CallbackInfo ci) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
 			glide.checkForCollisions();

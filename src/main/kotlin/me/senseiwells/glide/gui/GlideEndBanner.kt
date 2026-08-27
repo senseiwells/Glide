@@ -3,7 +3,7 @@ package me.senseiwells.glide.gui
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.minigame.GlideMinigame
-import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.utils.component.color
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer
 
 open class GlideEndBanner(
     private val glide: GlideMinigame
-): GlideBanner() {
+): GlideBanner(glide.server) {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         return this.glide.mode.getBannerShield(frame).wrap().shadowless()
     }

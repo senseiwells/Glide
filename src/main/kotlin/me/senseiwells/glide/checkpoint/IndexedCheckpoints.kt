@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.component.shadowless
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth

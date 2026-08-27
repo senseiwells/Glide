@@ -1,9 +1,9 @@
 package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.visuals.elements.PlayerSpecificElement
-import net.casual.arcade.visuals.sidebar.SidebarComponent
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
+import net.casual.arcade.virtual.visuals.elements.PlayerSpecificElement
+import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 

@@ -23,7 +23,8 @@ import net.casual.arcade.extensions.PlayerExtension
 import net.casual.arcade.extensions.SerializableExtension
 import net.casual.arcade.extensions.utils.getExtension
 import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.observer.utils.asObserver
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.MathUtils.projectionScalar
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
@@ -240,12 +241,12 @@ class PlayerGlideExtension(
         ghost.skip()
         this.trailAttachment = attachment
 
-        attachment.startObservingAttached(this.player)
+        attachment.startObservingAttached(this.player.asObserver())
     }
 
     fun hideTrail() {
         val attachment = this.trailAttachment ?: return
-        attachment.stopObservingAttached(this.player)
+        attachment.stopObservingAttached(this.player.asObserver())
         this.trailAttachment = null
     }
 

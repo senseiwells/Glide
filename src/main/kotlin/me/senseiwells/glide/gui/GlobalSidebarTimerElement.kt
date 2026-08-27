@@ -1,12 +1,12 @@
 package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.font.GlideFont
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.Identifier
 import net.casual.arcade.utils.TimeUtils.format
 import net.casual.arcade.utils.time.MinecraftTimeDuration
-import net.casual.arcade.visuals.elements.UniversalElement
-import net.casual.arcade.visuals.sidebar.SidebarComponent
+import net.casual.arcade.virtual.visuals.elements.UniversalElement
+import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.Style

@@ -7,4 +7,4 @@ import net.minecraft.server.level.ServerPlayer
 data class PlayerHorizontalFlyFallCollisionEvent(
     override val player: ServerPlayer,
     val damage: Float
-): CancellableEvent.Default(), PlayerEvent
+): CancellableEvent.Simple(), PlayerEvent

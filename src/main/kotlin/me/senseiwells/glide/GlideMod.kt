@@ -12,20 +12,16 @@ import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.utils.GlideRegistries
 import net.casual.arcade.commands.register
 import net.casual.arcade.events.GlobalEventHandler
-import net.casual.arcade.events.ListenerRegistry.Companion.register
 import net.casual.arcade.events.server.ServerRegisterCommandEvent
 import net.casual.arcade.events.server.player.PlayerJoinEvent
-import net.casual.arcade.host.GlobalPackHost
+import net.casual.arcade.events.utils.register
 import net.casual.arcade.minigame.utils.MinigameRegistries
-import net.casual.arcade.resources.ArcadeResourcePacks
-import net.casual.arcade.resources.creator.NamedResourcePackCreator
-import net.casual.arcade.resources.utils.ResourcePackUtils.addFont
-import net.casual.arcade.resources.utils.ResourcePackUtils.addLangsFromData
-import net.casual.arcade.resources.utils.ResourcePackUtils.addMissingItemModels
-import net.casual.arcade.resources.utils.ResourcePackUtils.addPack
-import net.casual.arcade.resources.utils.ResourcePackUtils.addSounds
-import net.casual.arcade.resources.utils.ResourcePackUtils.sendResourcePack
-import net.casual.arcade.resources.utils.ResourcePackUtils.toPackInfo
+import net.casual.arcade.pack.generation.BuiltInResourcePacks
+import net.casual.arcade.pack.generation.PackDefinition
+import net.casual.arcade.pack.generation.utils.add
+import net.casual.arcade.pack.host.GlobalPackHost
+import net.casual.arcade.pack.utils.ResourcePackUtils.sendResourcePack
+import net.casual.arcade.pack.utils.ResourcePackUtils.toPackInfo
 import net.casual.arcade.utils.Identifier
 import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
 import net.fabricmc.api.ModInitializer
@@ -42,8 +38,9 @@ object GlideMod: ModInitializer {
 
     val container = FabricLoader.getInstance().getModContainer(MOD_ID).get()
 
-    val resourcePack = NamedResourcePackCreator.named("glide_pack") {
-        addAssetSource(MOD_ID)
+    val resourcePack = PackDefinition("glide_pack") {
+        description = Component.literal("GlidePack")
+        include(MOD_ID)
         addFont(GlideFont)
         addFont(GlideFont.Timer)
         addFont(GlideFont.Speedometer)
@@ -51,9 +48,8 @@ object GlideMod: ModInitializer {
         addFont(GlideFont.Score)
         addFont(GlideFont.Banner)
         addSounds(GlideSounds)
-        addLangsFromData(MOD_ID)
-        addMissingItemModels(MOD_ID)
-        packDescription = Component.literal("GlidePack")
+        addLangs(MOD_ID)
+        generateMissingItemModels(MOD_ID)
     }
 
     fun id(path: String): Identifier {
@@ -79,10 +75,9 @@ object GlideMod: ModInitializer {
     }
 
     private fun hostResourcePacks() {
-        val packDir = FabricLoader.getInstance().gameDir.resolve("glide_packs")
-        val glidePack by GlobalPackHost.addPack(packDir, resourcePack).toPackInfo()
-        val spacesPack by GlobalPackHost.addPack(packDir, ArcadeResourcePacks.SPACING_FONT_PACK).toPackInfo()
-        val shiftedPack by GlobalPackHost.addPack(packDir, ArcadeResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
+        val glidePack by GlobalPackHost.add(this.resourcePack).toPackInfo()
+        val spacesPack by GlobalPackHost.add(BuiltInResourcePacks.SPACING_FONT_PACK).toPackInfo()
+        val shiftedPack by GlobalPackHost.add(BuiltInResourcePacks.ACTION_BAR_FONT_PACK).toPackInfo()
 
         GlobalEventHandler.Server.register<PlayerJoinEvent> { (player) ->
             player.sendResourcePack(glidePack)

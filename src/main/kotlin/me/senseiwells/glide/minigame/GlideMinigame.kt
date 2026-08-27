@@ -32,8 +32,9 @@ import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameUtils.launch
 import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
-import net.casual.arcade.resources.font.spacing.SpacingFontResources
-import net.casual.arcade.resources.utils.withShiftedDownFont
+import net.casual.arcade.observer.utils.asObserver
+import net.casual.arcade.pack.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
@@ -42,7 +43,6 @@ import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.coroutine.delay
 import net.casual.arcade.utils.entity.setVelocityAndMark
 import net.casual.arcade.utils.entity.teleportTo
-import net.casual.arcade.utils.isOf
 import net.casual.arcade.utils.level.set
 import net.casual.arcade.utils.player.addToTeam
 import net.casual.arcade.utils.player.clearPlayerInventory
@@ -52,12 +52,15 @@ import net.casual.arcade.utils.player.resetHealth
 import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.utils.player.sendTitle
 import net.casual.arcade.utils.player.setTitleAnimation
+import net.casual.arcade.utils.registries.isOf
 import net.casual.arcade.utils.scoreboard.getOrCreateTeam
 import net.casual.arcade.utils.server.player
-import net.casual.arcade.visuals.bossbar.SuppliedBossbar
-import net.casual.arcade.visuals.sidebar.FixedSidebar
-import net.casual.arcade.visuals.utils.elements.ComponentElements
-import net.casual.arcade.visuals.utils.elements.SidebarElements
+import net.casual.arcade.virtual.visuals.bossbar.VirtualBossbar
+import net.casual.arcade.virtual.visuals.sidebar.DynamicVirtualSidebar
+import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
+import net.casual.arcade.virtual.visuals.sidebar.VirtualSidebar
+import net.casual.arcade.virtual.visuals.utils.startObservingAndSendPackets
+import net.casual.arcade.virtual.visuals.utils.stopObservingAndSendPackets
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
@@ -97,14 +100,14 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
-    private val checkpointBossbar = SuppliedBossbar(ComponentElements.of(GlideComponents.CHECKPOINT.withShiftedDownFont(12)))
+    private val checkpointBossbar = VirtualBossbar()
     private val startPos = this.config.spawn
 
-    private val countdown = GlideStartBanner(this.round)
+    private val countdown = GlideStartBanner(this)
     private val finish = GlideFinishBanner(this)
     private val end = GlideEndBanner(this)
 
-    private val sidebar = FixedSidebar(ComponentElements.empty())
+    private val sidebar = DynamicVirtualSidebar(this.server)
     private var progressBar: Component = Component.empty()
 
     private val trackers = HashMap<UUID, GlideTrailTracker>()
@@ -122,6 +125,10 @@ class GlideMinigame(
     val checkpoints: IndexedCheckpoints
         get() = this.config.checkpoints
 
+    init {
+        this.checkpointBossbar.title.set(GlideComponents.CHECKPOINT.withShiftedDownFont(12))
+    }
+
     fun getWinner(): String {
         return this.winning?.name ?: "Unknown"
     }
@@ -131,10 +138,10 @@ class GlideMinigame(
     }
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
-        this.checkpointBossbar.addPlayer(player)
+        this.checkpointBossbar.startObservingAndSendPackets(player.asObserver())
         // 2 Seconds, then 1 second fade
-        GlobalTickedScheduler.schedule(3.Seconds) {
-            this.checkpointBossbar.removePlayer(player)
+        GlobalTickedScheduler.Server.schedule(3.Seconds) {
+            this.checkpointBossbar.stopObservingAndSendPackets(player.asObserver())
         }
     }
 
@@ -232,20 +239,22 @@ class GlideMinigame(
     @Listener
     private fun onInitialize(event: MinigameInitializeEvent) {
         this.levels.add(this.level)
-        this.sidebar.addRow(PlayerSidebarTimerElement(GlobalSidebarTimerElement { this.ticks.Ticks }))
-        this.sidebar.addRow(SidebarElements.empty())
-        this.sidebar.addRow(SidebarVelocityElement)
-        if (this.mode == GlideMode.ScoreAttack) {
-            this.sidebar.addRow(SidebarElements.empty())
-            this.sidebar.addRow(SidebarScoreElement)
-        }
+        var row = 0
+        this.sidebar.row(row++).set(SidebarComponent.EMPTY)
         if (FabricLoader.getInstance().isDevelopmentEnvironment) {
-            this.sidebar.addRow(SidebarElements.empty())
-            this.sidebar.addRow(SidebarDebugVelocityElement)
-            this.sidebar.addRow(SidebarDebugGlideVelocityElement)
+            this.sidebar.setRow(row++, SidebarDebugGlideVelocityElement)
+            this.sidebar.setRow(row++, SidebarDebugVelocityElement)
+            this.sidebar.row(row++).set(SidebarComponent.EMPTY)
+        }
+        if (this.mode == GlideMode.ScoreAttack) {
+            this.sidebar.setRow(row++, SidebarScoreElement)
+            this.sidebar.row(row++).set(SidebarComponent.EMPTY)
         }
 
-        this.sidebar.addRow(SidebarElements.empty())
+        this.sidebar.setRow(row++, SidebarVelocityElement)
+        this.sidebar.row(row++).set(SidebarComponent.EMPTY)
+        this.sidebar.setRow(row, PlayerSidebarTimerElement(GlobalSidebarTimerElement { this.ticks.Ticks }))
+
         this.visuals.setSidebar(this.sidebar)
 
         this.visuals.countdown = this.countdown
@@ -353,7 +362,7 @@ class GlideMinigame(
         this.freezePlayer(player)
 
         this.removeBannerUI(player)
-        this.sidebar.removePlayer(player)
+        this.sidebar.stopObservingAndSendPackets(player.asObserver())
 
         player.sendSound(GlideSounds.CRASH)
         player.setTitleAnimation(10.Ticks, 1.Seconds)
@@ -365,7 +374,7 @@ class GlideMinigame(
 
         this.scheduler.schedulePhased(1.Seconds) {
             this.unfreezePlayer(player)
-            this.sidebar.addPlayer(player)
+            this.sidebar.startObservingAndSendPackets(player.asObserver())
             this.respawnPlayer(player)
             if (this.roundEnding) {
                 this.finish.addPlayer(player, shield = false)
@@ -379,6 +388,7 @@ class GlideMinigame(
             this.ticks++
         }
 
+        this.tickBanners()
         this.tickProgress()
 
         for ((uuid, index) in this.playerIndices) {
@@ -470,7 +480,7 @@ class GlideMinigame(
     }
 
     private fun removeBannerUI(player: ServerPlayer) {
-        this.checkpointBossbar.removePlayer(player)
+        this.checkpointBossbar.stopObservingAndSendPackets(player.asObserver())
         this.countdown.removePlayer(player)
         this.finish.removePlayer(player)
         this.end.removePlayer(player)
@@ -488,7 +498,7 @@ class GlideMinigame(
         player.setVelocityAndMark(0.0, 0.0, 0.0)
 
         // Ensure the player has loaded the chunks
-        GlobalTickedScheduler.schedule(1.Ticks) {
+        GlobalTickedScheduler.Server.schedule(1.Ticks) {
             val elytra = ItemStack(Items.ELYTRA)
             elytra.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
             player.setItemSlot(EquipmentSlot.CHEST, elytra)
@@ -526,6 +536,12 @@ class GlideMinigame(
         progressBar.append(SpacingFontResources.spaced(145))
         this.round.addToProgressBar(progressBar)
         player.sendSystemMessage(progressBar, true)
+    }
+
+    private fun tickBanners() {
+        this.countdown.tick()
+        this.finish.tick()
+        this.end.tick()
     }
 
     private fun tickProgress() {

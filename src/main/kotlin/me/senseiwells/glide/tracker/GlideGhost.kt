@@ -5,6 +5,7 @@ import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.item.GlideTrailItem
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.utils.ColorUtils
+import net.casual.arcade.observer.Observer
 import net.casual.arcade.utils.MathUtils.rotationAnglesTowards
 import net.casual.arcade.virtual.entity.SimpleParentVirtualEntity
 import net.casual.arcade.virtual.entity.attachment.VirtualEntityAttachment
@@ -13,8 +14,6 @@ import net.casual.arcade.virtual.entity.location.VirtualPosition
 import net.casual.arcade.virtual.entity.location.VirtualRotation
 import net.casual.arcade.virtual.entity.utils.attachWithParentObservers
 import net.casual.arcade.virtual.entity.utils.location
-import net.minecraft.network.protocol.Packet
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
@@ -119,8 +118,8 @@ class GlideGhost(
         }
     }
 
-    override fun canObserve(observer: ServerPlayer): Boolean {
-        return this.visible && this.location().position.closerThan(observer.position(), 64.0)
+    override fun canObserve(observer: Observer): Boolean {
+        return this.visible && this.location().position.closerThan(observer.location.position, 64.0)
     }
 
     private companion object {

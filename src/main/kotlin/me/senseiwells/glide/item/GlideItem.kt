@@ -8,6 +8,6 @@ import net.minecraft.world.item.Items
 
 class GlideItem(properties: Properties): Item(properties), PolymerItem {
     override fun getPolymerItem(stack: ItemStack, context: PacketContext): Item {
-        return Items.WHITE_STAINED_GLASS
+        return Items.STAINED_GLASS.white
     }
 }

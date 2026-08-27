@@ -2,21 +2,25 @@ package me.senseiwells.glide.gui
 
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont
+import net.casual.arcade.observer.utils.asObserver
 import net.casual.arcade.utils.component.shadowless
 import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.time.MinecraftTimeDuration
-import net.casual.arcade.visuals.bossbar.SuppliedBossbar
-import net.casual.arcade.visuals.transition.Transition
-import net.casual.arcade.visuals.utils.elements.ComponentElements
+import net.casual.arcade.virtual.visuals.bossbar.DynamicVirtualBossbar
+import net.casual.arcade.virtual.visuals.bossbar.VirtualBossbar
+import net.casual.arcade.virtual.visuals.transition.Transition
+import net.casual.arcade.virtual.visuals.utils.startObservingAndSendPackets
+import net.casual.arcade.virtual.visuals.utils.stopObservingAndSendPackets
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 
-abstract class GlideBanner: Transition {
-    private val titleBossbar = SuppliedBossbar()
-    private val shieldBossbar = SuppliedBossbar()
-    private val textboxBossbar = SuppliedBossbar()
-    private val textBossbar = SuppliedBossbar()
+abstract class GlideBanner(server: MinecraftServer): Transition {
+    private val titleBossbar = VirtualBossbar()
+    private val shieldBossbar = DynamicVirtualBossbar(server)
+    private val textboxBossbar = DynamicVirtualBossbar(server)
+    private val textBossbar = DynamicVirtualBossbar(server)
 
     init {
         this.shieldBossbar.setTitle(::shieldTitle)
@@ -24,30 +28,39 @@ abstract class GlideBanner: Transition {
         this.textBossbar.setTitle(::textTitle)
     }
 
+    fun tick() {
+        this.titleBossbar.tick()
+        this.shieldBossbar.tick()
+        this.textboxBossbar.tick()
+        this.textBossbar.tick()
+    }
+
     fun addPlayer(player: ServerPlayer, title: Boolean = true, shield: Boolean = true) {
+        val observer = player.asObserver()
         if (title) {
-            this.titleBossbar.addPlayer(player)
+            this.titleBossbar.startObservingAndSendPackets(observer)
         }
         if (shield) {
-            this.shieldBossbar.addPlayer(player)
-            this.textboxBossbar.addPlayer(player)
-            this.textBossbar.addPlayer(player)
+            this.shieldBossbar.startObservingAndSendPackets(observer)
+            this.textboxBossbar.startObservingAndSendPackets(observer)
+            this.textBossbar.startObservingAndSendPackets(observer)
         }
     }
 
     fun removePlayer(player: ServerPlayer, title: Boolean = true, shield: Boolean = true) {
+        val observer = player.asObserver()
         if (title) {
-            this.titleBossbar.removePlayer(player)
+            this.titleBossbar.stopObservingAndSendPackets(observer)
         }
         if (shield) {
-            this.shieldBossbar.removePlayer(player)
-            this.textboxBossbar.removePlayer(player)
-            this.textBossbar.removePlayer(player)
+            this.shieldBossbar.stopObservingAndSendPackets(observer)
+            this.textboxBossbar.stopObservingAndSendPackets(observer)
+            this.textBossbar.stopObservingAndSendPackets(observer)
         }
     }
 
     fun setTitle(component: Component) {
-        this.titleBossbar.setTitle(ComponentElements.of(component))
+        this.titleBossbar.title.set(component)
     }
 
     override fun beforeTransition(players: Collection<ServerPlayer>, interval: MinecraftTimeDuration, updates: Int) {
