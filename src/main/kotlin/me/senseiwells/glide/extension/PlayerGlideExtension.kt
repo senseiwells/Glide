@@ -93,36 +93,34 @@ class PlayerGlideExtension(
     // Or at least the methods that use them haven't been
     // decomped yet, those are `bool_3E0` and `mIsInThermalArea`.
 
-    // LivingEntity::mThermalArea
+    // LivingEntity::m_thermalArea
     private var accelerator: Accelerator? = null
-    // LivingEntity::mHasPendingThermalEntry
+    // LivingEntity::m_isInThermalArea
+    private var isInAccelerator = false
+    // LivingEntity::m_hasPendingThermalEntry
     private var pendingAcceleratorEntry = true
-    // LivingEntity::mIsApplyingStaticLift
+    // LivingEntity::m_isApplyingStaticLift
     private var isApplyingStaticLift = false
-    // LivingEntity::mIsApplyingLift
+    // LivingEntity::m_isApplyingLift
     private var isApplyingLift = false
-    // LivingEntity::mLiftDurationTimer
+    // LivingEntity::m_liftDurationTimer
     private var liftDurationTimer = 0
-    // LivingEntity::mTargetLiftVelocity
+    // LivingEntity::m_targetLiftVelocity
     private var targetLiftVelocity = 0.0
-    // LivingEntity::mStaticLiftTargetHeight
+    // LivingEntity::m_staticLiftTargetHeight
     private var staticLiftTargetY = 0.0
-    // LivingEntity::mIsUpdraft
+    // LivingEntity::m_isUpdraft
     private var isUpdraft = false
-    // LivingEntity::mIsSpeedBoosting
+    // LivingEntity::m_isSpeedBoosting
     private var isSpeedBoosting = false
-    // LivingEntity::mTargetBoostSpeed
+    // LivingEntity::m_targetBoostSpeed
     private var targetBoostSpeed = 0.0
-    // LivingEntity::mAdditionalGlideVelocity
+    // LivingEntity::m_additionalGlideVelocity
     private var additionalGlideVelocity = 0.0
-    // LivingEntity::mAppliedLiftVelocity
+    // LivingEntity::m_appliedLiftVelocity
     private var appliedLiftVelocity = 0.0
     // LivingEntity::qword_3E8 (This is an educated guess - Sensei)
     private var liftForceModifier = 1.0
-
-    //Janky non-decomp sourced parity vars
-    var initialEntryVelocity = Vec3.ZERO
-    var respawnSpeedBoost = 0.0
 
     var isAppliedLiftDirty = false
         private set
@@ -150,12 +148,7 @@ class PlayerGlideExtension(
     fun modifyVelocityWithLift(original: Vec3): Vec3 {
         val glideVerticalVelocity = this.getGlideVerticalVelocity()
         if (glideVerticalVelocity != 0.0) {
-            var clamped = original
-            if (original.horizontal().length() > this.initialEntryVelocity.horizontal().length() && (this.initialEntryVelocity.length() != 0.0)) {
-                clamped = original.horizontal().normalize().scale(this.initialEntryVelocity.horizontal().length())
-            }
-            player.deltaMovement = Vec3(clamped.x, glideVerticalVelocity, clamped.z)
-            return Vec3(clamped.x, glideVerticalVelocity, clamped.z)
+            return Vec3(original.x, glideVerticalVelocity, original.z)
         }
         return original
     }
@@ -209,13 +202,12 @@ class PlayerGlideExtension(
         return false
     }
 
-    fun collideWithRespawnCheckpoint(checkpoint: RespawnCheckpoint, spawn: Location, speedBoost: Double) {
+    fun collideWithRespawnCheckpoint(checkpoint: RespawnCheckpoint, spawn: Location) {
         this.respawnLocation = spawn
         this.lastRespawnCheckpointIndex = checkpoint.index
         this.lastSavedScore = this.score
         this.lastSavedRingType = this.ringTypes.last()
         this.lastRespawnCheckpointTicks = CHECKPOINT_TICKS + 2
-        this.respawnSpeedBoost = speedBoost
         this.lastSavedRings.addAll(this.rings)
     }
 
@@ -334,13 +326,6 @@ class PlayerGlideExtension(
         this.additionalGlideVelocity = 0.0
         this.appliedLiftVelocity = 0.0
         this.liftForceModifier = 1.0
-
-        this.initialEntryVelocity = Vec3.ZERO
-
-        if (this.respawnSpeedBoost != 0.0) {
-            this.isSpeedBoosting = true
-            this.targetBoostSpeed = this.respawnSpeedBoost
-        }
     }
 
     fun reset() {
@@ -355,7 +340,6 @@ class PlayerGlideExtension(
         this.ringTypes.add(RingType.Grey)
         this.lastSavedRings.clear()
         this.lastSavedRingType = RingType.Grey
-        this.respawnSpeedBoost = 0.0
         this.respawn()
         this.hideTrail()
     }
@@ -445,24 +429,30 @@ class PlayerGlideExtension(
     private fun checkAccelerators(minigame: GlideMinigame, swept: Collection<AABB>) {
         this.liftForceModifier = 1.0
 
+        var active: Accelerator? = null
+        var entering = false
         val accelerators = minigame.level.getEntities(ACCELERATOR_TYPE_TEST) { true }
-        val accelerator = accelerators.firstOrNull { accelerator ->
-            accelerator.shouldAcceleratePlayer(this.player, swept)
+        for (accelerator in accelerators) {
+            if (accelerator.shouldAcceleratePlayer(this.player, swept)) {
+                entering = true
+                if (!this.isInAccelerator) {
+                    active = accelerator
+                    break
+                }
+            }
         }
 
         var boostDirection: Vec3i? = null
         var boundingBox: AABB? = null
-        if (accelerator != null) {
+        if (active != null) {
             if (this.pendingAcceleratorEntry) {
                 this.pendingAcceleratorEntry = false
-                // Janky check for if thermal is static, this doesn't need to be set for natural thermals or boosters.
-                if (accelerator !is BoosterAccelerator) { this.initialEntryVelocity = player.deltaMovement }
-                this.player.sendSound(accelerator.getSound())
+                this.player.sendSound(active.getSound())
             }
 
-            this.liftForceModifier = accelerator.getLiftForceModifier()
+            this.liftForceModifier = active.getLiftForceModifier()
 
-            val staticLift = accelerator.getStaticLift()
+            val staticLift = active.getStaticLift()
             if (!this.isApplyingStaticLift) {
                 if (staticLift != 0.0) {
                     this.isApplyingLift = true
@@ -471,7 +461,7 @@ class PlayerGlideExtension(
                 this.targetLiftVelocity = staticLift
             }
 
-            val targetY = accelerator.getTargetY()
+            val targetY = active.getTargetY()
             if (targetY > 0.0) {
                 this.isApplyingStaticLift = true
                 this.staticLiftTargetY = targetY
@@ -479,23 +469,30 @@ class PlayerGlideExtension(
 
             this.isUpdraft = staticLift >= 0.0
 
-            val speedBoost = accelerator.getSpeedBoost()
+            val speedBoost = active.getSpeedBoost()
             if (speedBoost > 0.0) {
                 this.isSpeedBoosting = true
                 this.targetBoostSpeed = speedBoost
-                boostDirection = accelerator.getBoostDirection()
+                boostDirection = active.getBoostDirection()
             }
 
-            boundingBox = accelerator.boundingBox
+            boundingBox = active.boundingBox
 
             @Suppress("ControlFlowWithEmptyBody")
-            if (this.accelerator != accelerator) {
+            if (this.accelerator != active) {
                 // I presume this is for some client-side syncing that we don't need - Sensei
                 // player->GetGameMode()->RecordThermalEntered()
             }
 
-            this.accelerator = accelerator
-        } else if (this.accelerator != null) {
+            this.accelerator = active
+        }
+
+        if (this.isInAccelerator) {
+            this.isInAccelerator = entering
+            return
+        }
+
+        if (!entering && this.accelerator != null) {
             this.pendingAcceleratorEntry = true
             // This update count is used in one of the accelerators
             // use conditions, but I think it's unused - Sensei
@@ -512,12 +509,6 @@ class PlayerGlideExtension(
             }
         }
 
-        // Natural thermals have no targetLiftVelocity.
-        // This is probably wrong, but at least players get lifted when they enter one now.
-        if (accelerator is ThermalAccelerator && this.targetLiftVelocity == 0.0) {
-            this.player.addVelocityAndMark(0.0,0.025, 0.0)
-        }
-
         val previousAppliedLift = this.appliedLiftVelocity
         if (this.isApplyingLift) {
             if (this.appliedLiftVelocity == 0.0 && this.player.deltaMovement.y != 0.0) {
@@ -526,10 +517,14 @@ class PlayerGlideExtension(
             if (this.isUpdraft) {
                 if (this.appliedLiftVelocity < this.targetLiftVelocity) {
                     this.appliedLiftVelocity += ((this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity) * 0.1
+                } else {
+                    this.appliedLiftVelocity = this.targetLiftVelocity
                 }
             } else {
                 if (this.appliedLiftVelocity > this.targetLiftVelocity) {
                     this.appliedLiftVelocity += ((this.targetLiftVelocity - this.appliedLiftVelocity) / this.targetLiftVelocity) * -0.1
+                } else {
+                    this.appliedLiftVelocity = this.targetLiftVelocity
                 }
             }
 
@@ -540,12 +535,20 @@ class PlayerGlideExtension(
                     this.liftDurationTimer = 0
                 }
             }
-        } else if (this.isUpdraft) {
-            this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+            this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
         } else {
-            this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + 0.025 else 0.0
+            if (this.isUpdraft) {
+                this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+            } else {
+                this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + 0.025 else 0.0
+            }
+
+            this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
+
+            if (this.appliedLiftVelocity != 0.0 && !this.isSpeedBoosting) {
+                return
+            }
         }
-        this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
 
         if (this.isSpeedBoosting) {
             val deltaMovement = this.player.deltaMovement

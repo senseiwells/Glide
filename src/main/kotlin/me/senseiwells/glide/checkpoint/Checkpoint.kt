@@ -137,8 +137,7 @@ class RespawnCheckpoint(
     override val index: Int,
     override val boundingBox: AABB,
     private val spawn: Location,
-    private val beacons: List<BeaconBeamTemplate>,
-    private val speedBoost: Double,
+    private val beacons: List<BeaconBeamTemplate>
 ): Checkpoint {
     override val shouldMarkOnProgressBar: Boolean = true
 
@@ -154,7 +153,7 @@ class RespawnCheckpoint(
         if (player.glide.collideWithCheckpoint(this)) {
             player.sendSound(GlideSounds.CHECKPOINT, static = true)
             glide.displayCheckpointNotificationTo(player)
-            player.glide.collideWithRespawnCheckpoint(this, this.spawn, this.speedBoost)
+            player.glide.collideWithRespawnCheckpoint(this, this.spawn)
         }
     }
 
@@ -166,8 +165,7 @@ class RespawnCheckpoint(
                 Codec.INT.fieldOf("id").forGetter(RespawnCheckpoint::index),
                 ArcadeExtraCodecs.AABB.fieldOf("bounding_box").forGetter(RespawnCheckpoint::boundingBox),
                 Location.CODEC.fieldOf("respawn_location").forGetter(RespawnCheckpoint::spawn),
-                BeaconBeamTemplate.CODEC.listOf().fieldOf("beacon_beams").forGetter(RespawnCheckpoint::beacons),
-                Codec.DOUBLE.optionalFieldOf("target_velocity", 0.0).forGetter(RespawnCheckpoint::speedBoost)
+                BeaconBeamTemplate.CODEC.listOf().fieldOf("beacon_beams").forGetter(RespawnCheckpoint::beacons)
             ).apply(instance, ::RespawnCheckpoint)
         }
     }
