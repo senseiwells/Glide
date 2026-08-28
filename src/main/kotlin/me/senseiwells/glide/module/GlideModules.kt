@@ -28,10 +28,13 @@ object GlideModules {
         GlobalEventHandler.Server.register<ServerStartEvent>(::onServerStart)
         RegistryEventHandler.register(Registries.DIMENSION_TYPE, ::onRegisterDimensionTypes)
 
-        GlideAddonData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
+        GlideAcceleratorsData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
+        GlideCheckpointsData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
         GlideDimensionTypeData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
+        GlideMetadataData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
         GlideMusicData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
         GlideResourcePackData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
+        GlideRingsData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
     }
 
     fun get(id: Identifier): MinigameDataModules? {
@@ -46,9 +49,9 @@ object GlideModules {
         for (path in this.paths()) {
             val archive = ReadableArchive.from(path)
             val module = MinigameDataModules.from(archive, event.server)
-            val data = module.get<GlideAddonData>()
+            val data = module.get<GlideMetadataData>()
             if (data == null) {
-                GlideMod.logger.error("Failed to load glide map '${archive.name}', no glide_addon.json was found!")
+                GlideMod.logger.error("Failed to load glide map '${archive.name}', no glide_metadata.json was found!")
                 module.close()
                 continue
             }
@@ -60,7 +63,7 @@ object GlideModules {
         for (path in this.paths()) {
             val archive = ReadableArchive.from(path)
             val dimension = GlideDimensionTypeData.getDimensionTypeIfPresent(archive, event.context) ?: continue
-            event.register(GlideAddonData.getId(archive), dimension)
+            event.register(GlideMetadataData.getId(archive), dimension)
         }
     }
 

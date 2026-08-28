@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import kotlinx.io.bytestring.encodeToByteString
 import me.senseiwells.glide.GlideMod
-import me.senseiwells.glide.module.GlideAddonData
 import me.senseiwells.glide.checkpoint.IndexedCheckpoints
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
@@ -16,9 +15,13 @@ import me.senseiwells.glide.gui.*
 import me.senseiwells.glide.gui.debug.SidebarDebugGlideVelocityElement
 import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
 import me.senseiwells.glide.minigame.command.ContextualGlideCommand
+import me.senseiwells.glide.module.GlideAcceleratorsData
+import me.senseiwells.glide.module.GlideCheckpointsData
 import me.senseiwells.glide.module.GlideDimensionTypeData
+import me.senseiwells.glide.module.GlideMetadataData
 import me.senseiwells.glide.module.GlideMusicData
 import me.senseiwells.glide.module.GlideResourcePackData
+import me.senseiwells.glide.module.GlideRingsData
 import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
@@ -116,10 +119,12 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
-    private val addon: GlideAddonData = this.modules.get()!!
+    private val metadata: GlideMetadataData = this.modules.get()!!
+
+    val checkpoints: IndexedCheckpoints = this.modules.get<GlideCheckpointsData>()!!.checkpoints
 
     private val checkpointBossbar = VirtualBossbar()
-    private val startPos = this.addon.spawn
+    private val startPos = this.metadata.spawn
 
     private val countdown = GlideStartBanner(this)
     private val finish = GlideFinishBanner(this)
@@ -139,9 +144,6 @@ class GlideMinigame(
 
     var ticks = 0
         private set
-
-    val checkpoints: IndexedCheckpoints
-        get() = this.addon.checkpoints
 
     init {
         this.checkpointBossbar.title.set(GlideComponents.CHECKPOINT.withShiftedDownFont(12))
@@ -168,7 +170,7 @@ class GlideMinigame(
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
         val tracker = this.trackers.remove(player.uuid) ?: return
-        val updated = player.glide.updateBests(this.addon.id, this, this.ticks.Ticks, tracker.finish())
+        val updated = player.glide.updateBests(this.metadata.id, this, this.ticks.Ticks, tracker.finish())
         if (updated) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
@@ -299,19 +301,23 @@ class GlideMinigame(
             observer != observee && observee.distanceToSqr(observer) < 6 * 6
         }, true)
 
-        for (booster in this.addon.boosters) {
-            this.level.addFreshEntity(booster.create(this.level))
-        }
-        for (thermal in this.addon.thermals) {
-            this.level.addFreshEntity(thermal.create(this.level))
+        val accelerators = this.modules.get<GlideAcceleratorsData>()
+        if (accelerators != null) {
+            for (booster in accelerators.boosters) {
+                this.level.addFreshEntity(booster.create(this.level))
+            }
+            for (thermal in accelerators.thermals) {
+                this.level.addFreshEntity(thermal.create(this.level))
+            }
         }
         for (checkpoint in this.checkpoints.all()) {
             for (beam in checkpoint.createBeaconBeams(this.level)) {
                 this.level.addFreshEntity(beam)
             }
         }
-        if (this.mode == GlideMode.ScoreAttack) {
-            for (ring in this.addon.rings) {
+        val rings = this.modules.get<GlideRingsData>()
+        if (this.mode == GlideMode.ScoreAttack && rings != null) {
+            for (ring in rings.rings) {
                 this.level.addFreshEntity(ring.create(this.level))
             }
         }
@@ -473,7 +479,7 @@ class GlideMinigame(
 
     @Listener
     private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
-        event.player.glide.showTrailFor(this.addon.id, this)
+        event.player.glide.showTrailFor(this.metadata.id, this)
     }
 
     @Listener
@@ -607,19 +613,19 @@ class GlideMinigame(
             round: GlideRoundMode,
             mode: GlideMode
         ): GlideMinigame {
-            val addon = modules.get<GlideAddonData>()!!
+            val metadata = modules.get<GlideMetadataData>()!!
             var dimensionType = when {
-                modules.has(GlideDimensionTypeData::class.java) -> addon.id.toKey(Registries.DIMENSION_TYPE)
+                modules.has(GlideDimensionTypeData::class.java) -> metadata.id.toKey(Registries.DIMENSION_TYPE)
                 else -> BuiltinDimensionTypes.OVERWORLD
             }
             if (server.registryAccess().get(dimensionType).isEmpty) {
-                GlideMod.logger.error("Custom dimension type '${addon.id}' was never registered, defaulting to overworld")
+                GlideMod.logger.error("Custom dimension type '${metadata.id}' was never registered, defaulting to overworld")
                 dimensionType = BuiltinDimensionTypes.OVERWORLD
             }
 
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
-                spoofedDimensionKey(addon.id)
+                spoofedDimensionKey(metadata.id)
                 dimensionType(dimensionType)
                 chunkGenerator(VoidChunkGenerator(server))
             }
