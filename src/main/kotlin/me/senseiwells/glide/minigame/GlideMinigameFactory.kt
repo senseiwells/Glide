@@ -3,7 +3,7 @@ package me.senseiwells.glide.minigame
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.GlideMod
-import me.senseiwells.glide.addon.GlideAddons
+import me.senseiwells.glide.module.GlideModules
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.exception.MinigameCreationException
 import net.casual.arcade.minigame.serialization.MinigameCreationContext
@@ -21,7 +21,7 @@ class GlideMinigameFactory(
     }
 
     override fun create(context: MinigameCreationContext): Minigame {
-        val addon = GlideAddons.get(this.map) ?: throw MinigameCreationException("No such map ${this.map} available")
+        val addon = GlideModules.get(this.map) ?: throw MinigameCreationException("No such map ${this.map} available")
         return GlideMinigame.create(context.server, context.uuid, addon, this.round.create(), this.mode)
     }
 

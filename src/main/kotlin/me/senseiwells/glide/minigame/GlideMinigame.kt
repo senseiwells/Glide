@@ -4,9 +4,9 @@ import com.mojang.authlib.GameProfile
 import it.unimi.dsi.fastutil.objects.Object2IntFunction
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import kotlinx.io.bytestring.encodeToByteString
 import me.senseiwells.glide.GlideMod
-import me.senseiwells.glide.addon.GlideAddon
-import me.senseiwells.glide.addon.GlideAddonConfig
+import me.senseiwells.glide.module.GlideAddonData
 import me.senseiwells.glide.checkpoint.IndexedCheckpoints
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
@@ -16,11 +16,13 @@ import me.senseiwells.glide.gui.*
 import me.senseiwells.glide.gui.debug.SidebarDebugGlideVelocityElement
 import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
 import me.senseiwells.glide.minigame.command.ContextualGlideCommand
+import me.senseiwells.glide.module.GlideDimensionTypeData
+import me.senseiwells.glide.module.GlideResourcePackData
+import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.boostHealth
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
-import net.casual.arcade.dimensions.utils.getDimensionPath
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
 import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.events.server.player.*
@@ -28,12 +30,21 @@ import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.During
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.annotation.ListenerFlags
+import net.casual.arcade.minigame.data.MinigameDataModules
+import net.casual.arcade.minigame.data.MinigameDataModules.Companion.get
+import net.casual.arcade.minigame.data.module.MinigameWorldData
 import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.Phase
+import net.casual.arcade.minigame.utils.MinigameResources
 import net.casual.arcade.minigame.utils.MinigameUtils.launch
 import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.observer.utils.asObserver
+import net.casual.arcade.pack.PackInfo
 import net.casual.arcade.pack.font.spacing.SpacingFontResources
+import net.casual.arcade.pack.generation.utils.add
+import net.casual.arcade.pack.host.GlobalPackHost
+import net.casual.arcade.pack.utils.PackInfoRef
+import net.casual.arcade.pack.utils.ResourcePackUtils.toPackInfo
 import net.casual.arcade.pack.utils.withShiftedDownFont
 import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.TimeUtils.Seconds
@@ -53,16 +64,17 @@ import net.casual.arcade.utils.player.sendSound
 import net.casual.arcade.utils.player.sendTitle
 import net.casual.arcade.utils.player.setTitleAnimation
 import net.casual.arcade.utils.registries.isOf
+import net.casual.arcade.utils.registries.toKey
 import net.casual.arcade.utils.scoreboard.getOrCreateTeam
 import net.casual.arcade.utils.server.player
 import net.casual.arcade.virtual.visuals.bossbar.VirtualBossbar
 import net.casual.arcade.virtual.visuals.sidebar.DynamicVirtualSidebar
 import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
-import net.casual.arcade.virtual.visuals.sidebar.VirtualSidebar
 import net.casual.arcade.virtual.visuals.utils.startObservingAndSendPackets
 import net.casual.arcade.virtual.visuals.utils.stopObservingAndSendPackets
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
@@ -76,6 +88,7 @@ import net.minecraft.world.entity.Pose
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.GameType
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes
 import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Team
@@ -87,7 +100,7 @@ import kotlin.math.roundToInt
 class GlideMinigame(
     server: MinecraftServer,
     uuid: UUID,
-    private val config: GlideAddonConfig,
+    val modules: MinigameDataModules,
     val round: GlideRoundMode,
     val mode: GlideMode,
     val level: ServerLevel
@@ -100,8 +113,10 @@ class GlideMinigame(
         collisionRule = Team.CollisionRule.NEVER
     }
 
+    private val addon: GlideAddonData = this.modules.get()!!
+
     private val checkpointBossbar = VirtualBossbar()
-    private val startPos = this.config.spawn
+    private val startPos = this.addon.spawn
 
     private val countdown = GlideStartBanner(this)
     private val finish = GlideFinishBanner(this)
@@ -123,7 +138,7 @@ class GlideMinigame(
         private set
 
     val checkpoints: IndexedCheckpoints
-        get() = this.config.checkpoints
+        get() = this.addon.checkpoints
 
     init {
         this.checkpointBossbar.title.set(GlideComponents.CHECKPOINT.withShiftedDownFont(12))
@@ -150,7 +165,7 @@ class GlideMinigame(
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
         val tracker = this.trackers.remove(player.uuid) ?: return
-        val updated = player.glide.updateBests(this.config.addonId, this, this.ticks.Ticks, tracker.finish())
+        val updated = player.glide.updateBests(this.addon.id, this, this.ticks.Ticks, tracker.finish())
         if (updated) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
@@ -281,10 +296,10 @@ class GlideMinigame(
             observer != observee && observee.distanceToSqr(observer) < 6 * 6
         }, true)
 
-        for (booster in this.config.boosters) {
+        for (booster in this.addon.boosters) {
             this.level.addFreshEntity(booster.create(this.level))
         }
-        for (thermal in this.config.thermals) {
+        for (thermal in this.addon.thermals) {
             this.level.addFreshEntity(thermal.create(this.level))
         }
         for (checkpoint in this.checkpoints.all()) {
@@ -293,10 +308,21 @@ class GlideMinigame(
             }
         }
         if (this.mode == GlideMode.ScoreAttack) {
-            for (ring in this.config.rings) {
+            for (ring in this.addon.rings) {
                 this.level.addFreshEntity(ring.create(this.level))
             }
         }
+
+        val packs = ArrayList(GlidePacks.get())
+        val module = this.modules.get<GlideResourcePackData>()
+        if (module != null) {
+            packs.add(GlobalPackHost.add(module.definition).toPackInfo())
+        }
+        this.resources.add(object: MinigameResources {
+            override fun getPacks(): Collection<PackInfo> {
+                return packs.map(PackInfoRef::join)
+            }
+        })
     }
 
     @Listener
@@ -444,7 +470,7 @@ class GlideMinigame(
 
     @Listener
     private fun onLoadPlaying(event: MinigameLoadPlayingEvent) {
-        event.player.glide.showTrailFor(this.config.addonId, this)
+        event.player.glide.showTrailFor(this.addon.id, this)
     }
 
     @Listener
@@ -566,19 +592,29 @@ class GlideMinigame(
         fun create(
             server: MinecraftServer,
             uuid: UUID,
-            addon: GlideAddon,
+            modules: MinigameDataModules,
             round: GlideRoundMode,
             mode: GlideMode
         ): GlideMinigame {
+            val addon = modules.get<GlideAddonData>()!!
+            var dimensionType = when {
+                modules.has(GlideDimensionTypeData::class.java) -> addon.id.toKey(Registries.DIMENSION_TYPE)
+                else -> BuiltinDimensionTypes.OVERWORLD
+            }
+            if (server.registryAccess().get(dimensionType).isEmpty) {
+                GlideMod.logger.error("Custom dimension type '${addon.id}' was never registered, defaulting to overworld")
+                dimensionType = BuiltinDimensionTypes.OVERWORLD
+            }
+
             val level = CustomLevelBuilder.build(server) {
                 randomDimensionKey()
-                spoofedDimensionKey(addon.config.addonId)
-                dimensionType(addon.dimensionType)
+                spoofedDimensionKey(addon.id)
+                dimensionType(dimensionType)
                 chunkGenerator(VoidChunkGenerator(server))
             }
 
-            addon.extractWorld(server.getDimensionPath(level.dimension()))
-            return GlideMinigame(server, uuid, addon.config, round, mode, level)
+            modules.get<MinigameWorldData>()!!.extract(server, level.dimension())
+            return GlideMinigame(server, uuid, modules, round, mode, level)
         }
     }
 }

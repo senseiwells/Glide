@@ -3,6 +3,7 @@ package me.senseiwells.glide.datagen
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.font.GlideFont
+import me.senseiwells.glide.pack.GlidePacks
 import net.casual.arcade.datagen.language.LanguageGenerator
 import net.casual.arcade.datagen.resource.ArcadeResourceGenerator
 import net.casual.arcade.pack.generation.BuiltInResourcePacks
@@ -16,7 +17,7 @@ class GlideResourceGenerator: ArcadeResourceGenerator {
 
     override fun resources(): Collection<PackDefinition> {
         return listOf(
-            GlideMod.resourcePack,
+            GlidePacks.MAIN,
             BuiltInResourcePacks.SPACING_FONT_PACK
         )
     }
