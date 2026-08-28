@@ -30,7 +30,7 @@ class GlideAddonData(
     val rings: List<RingTemplate>
 ): MinigameDataModule {
     companion object: MinigameDataModule.Provider {
-        private const val ADDON_FILE = "addon.json"
+        private const val ADDON_FILE = "glide_addon.json"
         private val ID_CODEC = Identifier.CODEC.fieldOfAny("id", "addon_id")
 
         override val id: Identifier = GlideMod.id("addon")

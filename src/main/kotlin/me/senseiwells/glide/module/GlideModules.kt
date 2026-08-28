@@ -30,6 +30,7 @@ object GlideModules {
 
         GlideAddonData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
         GlideDimensionTypeData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
+        GlideMusicData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
         GlideResourcePackData.register(MinigameRegistries.MINIGAME_DATA_MODULE_PROVIDER)
     }
 
@@ -47,7 +48,7 @@ object GlideModules {
             val module = MinigameDataModules.from(archive, event.server)
             val data = module.get<GlideAddonData>()
             if (data == null) {
-                GlideMod.logger.error("Failed to load glide map '${archive.name}', no addon.json was found!")
+                GlideMod.logger.error("Failed to load glide map '${archive.name}', no glide_addon.json was found!")
                 module.close()
                 continue
             }

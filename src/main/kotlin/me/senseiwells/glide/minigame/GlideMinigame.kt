@@ -17,6 +17,7 @@ import me.senseiwells.glide.gui.debug.SidebarDebugGlideVelocityElement
 import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
 import me.senseiwells.glide.minigame.command.ContextualGlideCommand
 import me.senseiwells.glide.module.GlideDimensionTypeData
+import me.senseiwells.glide.module.GlideMusicData
 import me.senseiwells.glide.module.GlideResourcePackData
 import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.sound.GlideSounds
@@ -54,6 +55,7 @@ import net.casual.arcade.utils.component.wrap
 import net.casual.arcade.utils.coroutine.delay
 import net.casual.arcade.utils.entity.setVelocityAndMark
 import net.casual.arcade.utils.entity.teleportTo
+import net.casual.arcade.utils.impl.TimedSound
 import net.casual.arcade.utils.level.set
 import net.casual.arcade.utils.player.addToTeam
 import net.casual.arcade.utils.player.clearPlayerInventory
@@ -82,6 +84,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.util.Unit
+import net.minecraft.world.attribute.EnvironmentAttributes
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.Pose
@@ -275,7 +278,7 @@ class GlideMinigame(
         this.visuals.countdown = this.countdown
 
         this.music.suppressGameMusic(true)
-        this.music.provider = GlideMusicProvider
+        this.music.provider = GlideMusicProvider(this.getMusic())
 
         this.settings.tickFreezeOnPause.set(true)
         this.settings.canGetHungry.set(false)
@@ -584,6 +587,14 @@ class GlideMinigame(
 
         progressBar.append(SpacingFontResources.spaced(309 - lastOffset))
         this.progressBar = progressBar
+    }
+
+    private fun getMusic(): List<TimedSound> {
+        val module = this.modules.get<GlideMusicData>()
+        if (module != null) {
+            return module.music
+        }
+        return listOf(GlideSounds.MAP_1_MUSIC, GlideSounds.MAP_2_MUSIC, GlideSounds.MAP_3_MUSIC)
     }
 
     companion object {
