@@ -1,0 +1,14 @@
+[
+  {
+    "sound": "glide:music.dragon.1",
+    "duration": 2460
+  },
+  {
+    "sound": "glide:music.dragon.2",
+    "duration": 2540
+  },
+  {
+    "sound": "glide:music.dragon.3",
+    "duration": 2820
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "music.dragon.1": {
+    "sounds": [
+      {
+        "name": "glide:music.dragon.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.dragon.2": {
+    "sounds": [
+      {
+        "name": "glide:music.dragon.2",
+        "stream": true
+      }
+    ]
+  },
+  "music.dragon.3": {
+    "sounds": [
+      {
+        "name": "glide:music.dragon.3",
+        "stream": true
+      }
+    ]
+  }
+}
