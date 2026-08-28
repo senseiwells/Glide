@@ -8,3 +8,5 @@ run/
 /rules/
 /run-datagen/
 /.kotlin/
+
+/src/main/resources/data/glide/maps/**/resource_pack/assets/minecraft
