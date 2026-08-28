@@ -1,0 +1,11 @@
+{
+  "id": "glide:temple",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [66.0, 236.0, -215.0],
+    "rotation": [0.0, 0.0]
+  }
+}

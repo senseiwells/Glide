@@ -1,4 +1,7 @@
 [
   "arcade:world",
-  "glide:addon"
+  "glide:accelerators",
+  "glide:checkpoints",
+  "glide:metadata",
+  "glide:rings"
 ]

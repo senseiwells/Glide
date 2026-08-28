@@ -1,0 +1,11 @@
+{
+  "id": "glide:body",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [280.5, 207.0, 163.0],
+    "rotation": [0.0, 180.0]
+  }
+}

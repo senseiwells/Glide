@@ -1,0 +1,11 @@
+{
+  "id": "glide:dragon",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [-378.0, 235.0, 334.0],
+    "rotation": [0.0, -90.0]
+  }
+}

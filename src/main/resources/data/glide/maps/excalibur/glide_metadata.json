@@ -1,0 +1,11 @@
+{
+  "id": "glide:excalibur",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [178.0, 233.0, 3.0],
+    "rotation": [0.0, 0.0]
+  }
+}

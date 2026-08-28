@@ -1,0 +1,11 @@
+{
+  "id": "glide:icarus",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [-23.0, 204.0, -259.0],
+    "rotation": [0.0, 180.0]
+  }
+}

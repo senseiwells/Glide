@@ -1,0 +1,372 @@
+{
+  "boosters": [
+    {
+      "bounding_box": {
+        "from": [-149.0, 165.0, 276.0],
+        "to": [-141.0, 171.0, 281.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "east"
+    },
+    {
+      "bounding_box": {
+        "from": [-121.0, 165.0, 274.0],
+        "to": [-117.0, 170.0, 280.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-3.0, 131.0, 283.0],
+        "to": [2.0, 137.0, 291.0]
+      },
+      "target_velocity": 1.4,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-88.0, 165.0, 324.0],
+        "to": [-81.0, 171.0, 329.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-115.0, 165.0, 335.0],
+        "to": [-104.0, 169.0, 341.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "east"
+    },
+    {
+      "bounding_box": {
+        "from": [1.8, 1.8, 1.8],
+        "to": [1.8, 1.8, 1.8]
+      },
+      "target_velocity": 1.8,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-329.0, 125.0, 338.0],
+        "to": [-321.0, 133.0, 343.0]
+      },
+      "target_velocity": 1.9,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-319.0, 95.0, 341.0],
+        "to": [-314.0, 100.0, 349.0]
+      },
+      "target_velocity": 1.4,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-67.0, 121.0, 324.0],
+        "to": [-58.0, 125.0, 330.0]
+      },
+      "target_velocity": 1.7,
+      "direction": "west"
+    },
+    {
+      "bounding_box": {
+        "from": [-268.0, 70.0, 155.0],
+        "to": [-263.0, 75.0, 163.0]
+      },
+      "target_velocity": 1.7,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-235.0, 68.0, 35.0],
+        "to": [-230.0, 73.0, 43.0]
+      },
+      "target_velocity": 2.0,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-207.0, 70.0, 160.0],
+        "to": [-202.0, 75.0, 171.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-209.0, 68.0, 109.0],
+        "to": [-204.0, 72.0, 116.0]
+      },
+      "target_velocity": 2.0,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-268.0, 80.0, 35.0],
+        "to": [-263.0, 85.0, 43.0]
+      },
+      "target_velocity": 1.9,
+      "direction": "north"
+    },
+    {
+      "bounding_box": {
+        "from": [-244.0, 72.0, -43.0],
+        "to": [-239.0, 75.0, -35.0]
+      },
+      "target_velocity": 1.6,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-157.0, 44.0, -6.0],
+        "to": [-152.0, 49.0, 2.0]
+      },
+      "target_velocity": 2.5,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-168.0, 46.0, -57.0],
+        "to": [-163.0, 51.0, -49.0]
+      },
+      "target_velocity": 2.0,
+      "direction": "south",
+      "directional": true
+    }
+  ],
+  "thermals": [
+    {
+      "bounding_box": {
+        "from": [-368.0, 237.0, 288.0],
+        "to": [-192.0, 245.0, 384.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-195.0, 223.0, 272.0],
+        "to": [-32.0, 238.0, 378.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-32.0, 209.0, 272.0],
+        "to": [32.0, 230.0, 336.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-145.0, 205.0, 256.0],
+        "to": [-14.0, 238.0, 274.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-256.0, 122.0, 242.0],
+        "to": [-210.0, 131.0, 274.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-256.0, 111.0, 211.0],
+        "to": [-208.0, 130.0, 242.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-277.0, 97.0, 36.0],
+        "to": [-188.0, 100.0, 209.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-288.0, 103.0, -16.0],
+        "to": [-191.0, 119.0, 36.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-272.0, 118.0, -128.0],
+        "to": [-189.0, 132.0, -16.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-192.0, 90.0, -143.0],
+        "to": [-122.0, 97.0, 25.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-187.0, 85.0, 25.0],
+        "to": [-112.0, 90.0, 270.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-368.0, 232.0, 288.0],
+        "to": [-192.0, 237.0, 295.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-368.0, 225.0, 377.0],
+        "to": [-192.0, 237.0, 384.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-97.0, 166.0, 311.0],
+        "to": [-92.0, 174.0, 316.0]
+      },
+      "lift_multiplier": 2.1
+    },
+    {
+      "bounding_box": {
+        "from": [-115.0, 166.0, 294.0],
+        "to": [-110.0, 176.0, 299.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 185.0
+    },
+    {
+      "bounding_box": {
+        "from": [-265.0, 91.0, 378.0],
+        "to": [-260.0, 99.0, 383.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 113.0
+    },
+    {
+      "bounding_box": {
+        "from": [-318.0, 99.0, 308.0],
+        "to": [-312.0, 108.0, 313.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 113.0
+    },
+    {
+      "bounding_box": {
+        "from": [-322.0, 99.0, 308.0],
+        "to": [-318.0, 108.0, 313.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 113.0
+    },
+    {
+      "bounding_box": {
+        "from": [-358.0, 116.0, 319.0],
+        "to": [-353.0, 127.0, 324.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 129.0
+    },
+    {
+      "bounding_box": {
+        "from": [-352.0, 116.0, 319.0],
+        "to": [-347.0, 127.0, 324.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 129.0
+    },
+    {
+      "bounding_box": {
+        "from": [-108.0, 105.0, 305.0],
+        "to": [-103.0, 113.0, 310.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 128.0
+    },
+    {
+      "bounding_box": {
+        "from": [-253.0, 80.0, 371.0],
+        "to": [-248.0, 92.0, 376.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 100.0
+    },
+    {
+      "bounding_box": {
+        "from": [-253.0, 80.0, 366.0],
+        "to": [-248.0, 92.0, 371.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 100.0
+    },
+    {
+      "bounding_box": {
+        "from": [-120.0, 109.0, 330.0],
+        "to": [-116.0, 114.0, 334.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 133.0
+    },
+    {
+      "bounding_box": {
+        "from": [-268.0, 69.0, 65.0],
+        "to": [-263.0, 74.0, 70.0]
+      },
+      "target_velocity": 0.3,
+      "target_y": 82.0
+    },
+    {
+      "bounding_box": {
+        "from": [-231.0, 67.0, 4.0],
+        "to": [-226.0, 77.0, 9.0]
+      },
+      "lift_multiplier": 1.9
+    },
+    {
+      "bounding_box": {
+        "from": [-151.0, 57.0, -78.0],
+        "to": [-146.0, 63.0, -73.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 67.0
+    },
+    {
+      "bounding_box": {
+        "from": [-149.0, 39.0, 109.0],
+        "to": [-144.0, 49.0, 114.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 50.0
+    },
+    {
+      "bounding_box": {
+        "from": [-176.0, 40.0, 107.0],
+        "to": [-171.0, 47.0, 112.0]
+      },
+      "target_velocity": 0.5,
+      "target_y": 53.0
+    }
+  ]
+}

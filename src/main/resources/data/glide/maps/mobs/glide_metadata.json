@@ -1,0 +1,11 @@
+{
+  "id": "glide:mobs",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [264.0, 244.0, 271.0],
+    "rotation": [16.0, 90.0]
+  }
+}

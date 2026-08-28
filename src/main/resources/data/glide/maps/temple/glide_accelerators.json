@@ -1,0 +1,486 @@
+{
+  "boosters": [
+    {
+      "bounding_box": {
+        "from": [74.0, 159.0, 62.0],
+        "to": [81.0, 167.0, 72.0]
+      },
+      "target_velocity": 1.6,
+      "direction": "north"
+    },
+    {
+      "bounding_box": {
+        "from": [48.0, 134.0, 59.0],
+        "to": [55.0, 140.0, 69.0]
+      },
+      "target_velocity": 1.6,
+      "direction": "south"
+    },
+    {
+      "bounding_box": {
+        "from": [95.0, 134.0, 55.0],
+        "to": [102.0, 140.0, 65.0]
+      },
+      "target_velocity": 1.4,
+      "direction": "south"
+    },
+    {
+      "bounding_box": {
+        "from": [84.0, 138.0, 221.0],
+        "to": [94.0, 144.0, 228.0]
+      },
+      "target_velocity": 1.4,
+      "direction": "west",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [89.0, 135.0, 262.0],
+        "to": [99.0, 142.0, 269.0]
+      },
+      "target_velocity": 1.6,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [172.0, 143.0, 205.0],
+        "to": [182.0, 149.0, 212.0]
+      },
+      "target_velocity": 1.3,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [243.0, 114.0, 186.0],
+        "to": [250.0, 121.0, 196.0]
+      },
+      "target_velocity": 1.7,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [279.0, 119.0, 214.0],
+        "to": [289.0, 125.0, 221.0]
+      },
+      "target_velocity": 1.2,
+      "direction": "west",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [253.0, 38.0, -27.0],
+        "to": [260.0, 44.0, -17.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [253.0, 24.0, 98.0],
+        "to": [260.0, 31.0, 108.0]
+      },
+      "target_velocity": 1.6,
+      "direction": "south",
+      "directional": true
+    }
+  ],
+  "thermals": [
+    {
+      "bounding_box": {
+        "from": [16.0, 236.0, -178.0],
+        "to": [112.0, 250.0, -125.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [16.0, 225.0, -125.0],
+        "to": [112.0, 250.0, -10.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [16.0, 215.0, -10.0],
+        "to": [128.0, 250.0, 112.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [32.0, 176.0, 116.0],
+        "to": [128.0, 210.0, 288.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [128.0, 193.0, 185.0],
+        "to": [192.0, 210.0, 288.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [192.0, 200.0, 155.0],
+        "to": [311.0, 210.0, 272.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [312.0, 173.0, 178.0],
+        "to": [336.0, 185.0, 240.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [208.0, 180.0, -64.0],
+        "to": [288.0, 200.0, 150.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [282.0, 64.0, 16.0],
+        "to": [304.0, 85.0, 96.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [192.0, 66.0, 16.0],
+        "to": [222.0, 85.0, 96.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [224.0, 60.0, 304.0],
+        "to": [304.0, 75.0, 384.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [90.0, 190.0, -45.0],
+        "to": [95.0, 199.0, -40.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 199.0
+    },
+    {
+      "bounding_box": {
+        "from": [55.0, 153.0, 161.0],
+        "to": [60.0, 162.0, 166.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 159.0
+    },
+    {
+      "bounding_box": {
+        "from": [50.0, 158.0, 183.0],
+        "to": [55.0, 164.0, 188.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 166.0
+    },
+    {
+      "bounding_box": {
+        "from": [71.0, 131.0, 120.0],
+        "to": [86.0, 145.0, 135.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 148.0
+    },
+    {
+      "bounding_box": {
+        "from": [86.0, 132.0, 123.0],
+        "to": [96.0, 145.0, 134.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 146.0
+    },
+    {
+      "bounding_box": {
+        "from": [56.0, 134.0, 121.0],
+        "to": [71.0, 145.0, 131.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 146.0
+    },
+    {
+      "bounding_box": {
+        "from": [152.0, 137.0, 263.0],
+        "to": [157.0, 145.0, 268.0]
+      },
+      "target_velocity": 0.65,
+      "target_y": 145.0
+    },
+    {
+      "bounding_box": {
+        "from": [152.0, 137.0, 268.0],
+        "to": [157.0, 145.0, 273.0]
+      },
+      "target_velocity": 0.65,
+      "target_y": 145.0
+    },
+    {
+      "bounding_box": {
+        "from": [162.0, 139.0, 261.0],
+        "to": [167.0, 153.0, 266.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 153.0
+    },
+    {
+      "bounding_box": {
+        "from": [166.0, 139.0, 265.0],
+        "to": [171.0, 153.0, 270.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 153.0
+    },
+    {
+      "bounding_box": {
+        "from": [163.0, 144.0, 250.0],
+        "to": [168.0, 160.0, 255.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 162.0
+    },
+    {
+      "bounding_box": {
+        "from": [168.0, 145.0, 250.0],
+        "to": [173.0, 161.0, 255.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 164.0
+    },
+    {
+      "bounding_box": {
+        "from": [106.0, 151.0, 174.0],
+        "to": [111.0, 159.0, 179.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 165.0
+    },
+    {
+      "bounding_box": {
+        "from": [98.0, 156.0, 266.0],
+        "to": [103.0, 160.0, 271.0]
+      },
+      "target_velocity": 0.5,
+      "target_y": 165.0
+    },
+    {
+      "bounding_box": {
+        "from": [59.0, 137.0, 235.0],
+        "to": [64.0, 144.0, 240.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 143.0
+    },
+    {
+      "bounding_box": {
+        "from": [205.0, 142.0, 199.0],
+        "to": [210.0, 151.0, 204.0]
+      },
+      "target_velocity": 0.8,
+      "target_y": 153.0
+    },
+    {
+      "bounding_box": {
+        "from": [205.0, 142.0, 213.0],
+        "to": [210.0, 150.0, 218.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 151.0
+    },
+    {
+      "bounding_box": {
+        "from": [221.0, 151.0, 239.0],
+        "to": [226.0, 159.0, 244.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 162.0
+    },
+    {
+      "bounding_box": {
+        "from": [244.0, 146.0, 206.0],
+        "to": [249.0, 154.0, 211.0]
+      },
+      "target_velocity": 3.0,
+      "target_y": 159.0
+    },
+    {
+      "bounding_box": {
+        "from": [286.0, 142.0, 184.0],
+        "to": [291.0, 147.0, 189.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 147.0
+    },
+    {
+      "bounding_box": {
+        "from": [286.0, 141.0, 228.0],
+        "to": [291.0, 146.0, 233.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 147.0
+    },
+    {
+      "bounding_box": {
+        "from": [234.0, 106.0, 114.0],
+        "to": [239.0, 116.0, 119.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 123.0
+    },
+    {
+      "bounding_box": {
+        "from": [257.0, 118.0, 68.0],
+        "to": [262.0, 132.0, 73.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 133.0
+    },
+    {
+      "bounding_box": {
+        "from": [228.0, 130.0, 21.0],
+        "to": [233.0, 139.0, 26.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 140.0
+    },
+    {
+      "bounding_box": {
+        "from": [233.0, 105.0, 59.0],
+        "to": [238.0, 115.0, 64.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 115.0
+    },
+    {
+      "bounding_box": {
+        "from": [256.0, 104.0, -19.0],
+        "to": [261.0, 112.0, -14.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 114.0
+    },
+    {
+      "bounding_box": {
+        "from": [247.0, 94.0, 19.0],
+        "to": [252.0, 101.0, 24.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 108.0
+    },
+    {
+      "bounding_box": {
+        "from": [247.0, 85.0, -29.0],
+        "to": [252.0, 93.0, -24.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 106.0
+    },
+    {
+      "bounding_box": {
+        "from": [255.0, 29.0, 0.0],
+        "to": [258.0, 33.0, 3.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 32.0
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 17.0, 114.0],
+        "to": [265.0, 44.0, 122.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 17.0, 131.0],
+        "to": [265.0, 44.0, 138.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 17.0, 147.0],
+        "to": [265.0, 44.0, 154.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 17.0, 115.0],
+        "to": [253.0, 44.0, 122.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 17.0, 131.0],
+        "to": [253.0, 44.0, 138.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 17.0, 147.0],
+        "to": [253.0, 44.0, 154.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 31.0, -26.0],
+        "to": [253.0, 46.0, -19.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 31.0, -10.0],
+        "to": [253.0, 46.0, -3.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [248.0, 31.0, 6.0],
+        "to": [253.0, 46.0, 13.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 31.0, -26.0],
+        "to": [265.0, 46.0, -19.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 31.0, -10.0],
+        "to": [265.0, 46.0, -3.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [260.0, 31.0, 6.0],
+        "to": [265.0, 46.0, 13.0]
+      },
+      "lift_multiplier": 1.8
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "glide:canyon",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [179.0, 237.0, -287.0],
+    "rotation": [0.0, 0.0]
+  }
+}

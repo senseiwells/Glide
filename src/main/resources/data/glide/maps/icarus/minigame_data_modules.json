@@ -1,6 +1,9 @@
 [
   "arcade:world",
-  "glide:addon",
+  "glide:accelerators",
+  "glide:checkpoints",
+  "glide:metadata",
   "glide:music",
-  "glide:resource_pack"
+  "glide:resource_pack",
+  "glide:rings"
 ]

@@ -1,0 +1,11 @@
+{
+  "id": "glide:shrunk",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [157.0, 200.0, 49.0],
+    "rotation": [0.0, 90.0]
+  }
+}

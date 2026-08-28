@@ -1,0 +1,337 @@
+[
+  {
+    "position": [-80.5, 187.5, 39.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-0.5, 172.5, 5.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-131.5, 147.5, 171.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-121.5, 154.5, 92.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-13.5, 173.5, 259.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [126.5, 139.5, -160.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-147.5, 174.5, -41.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-103.5, 163.5, -118.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-30.5, 166.5, 172.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-86.5, 180.5, 233.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-24.5, 160.5, 264.5],
+    "axis": "y",
+    "color": "blue"
+  },
+  {
+    "position": [49.5, 178.5, -141.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-26.5, 155.5, -71.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-35.5, 178.5, 242.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-52.5, 138.5, 186.5],
+    "axis": "x",
+    "color": "blue"
+  },
+  {
+    "position": [-85.5, 164.5, 127.5],
+    "axis": "z",
+    "color": "blue"
+  },
+  {
+    "position": [-60.5, 151.5, 202.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-53.5, 136.5, 176.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-128.5, 145.5, 194.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-148.5, 146.5, 275.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-137.5, 173.5, 120.5],
+    "axis": "z",
+    "color": "yellow"
+  },
+  {
+    "position": [-5.5, 165.5, 278.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-3.5, 165.5, 39.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-94.5, 153.5, -110.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [15.5, 145.5, -123.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [64.5, 169.5, -135.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [165.5, 123.5, -153.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-54.5, 140.5, -80.5],
+    "axis": "z",
+    "color": "yellow"
+  },
+  {
+    "position": [-103.5, 174.5, 13.5],
+    "axis": "z",
+    "color": "yellow"
+  },
+  {
+    "position": [-117.5, 139.5, -50.5],
+    "axis": "z",
+    "color": "yellow"
+  },
+  {
+    "position": [-42.5, 166.5, 93.5],
+    "axis": "z",
+    "color": "yellow"
+  },
+  {
+    "position": [-52.5, 180.5, 149.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-30.5, 163.5, 180.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-72.5, 171.5, 221.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-76.5, 177.5, 243.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [-39.5, 172.5, 225.5],
+    "axis": "x",
+    "color": "yellow"
+  },
+  {
+    "position": [32.5, 174.5, 19.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-61.5, 181.5, 64.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-67.5, 181.5, 138.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-80.5, 171.5, 190.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-29.5, 171.5, 181.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-84.5, 170.5, 230.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-39.5, 179.5, 228.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-5.5, 156.5, 278.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-74.5, 165.5, 269.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-148.5, 155.5, 276.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-139.5, 144.5, 268.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-149.5, 138.5, 213.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-128.5, 144.5, 184.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-102.5, 135.5, 237.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-127.5, 132.5, 229.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-62.5, 150.5, 184.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-41.5, 136.5, 202.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-38.5, 147.5, 220.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-40.5, 152.5, 246.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-126.5, 153.5, 231.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-123.5, 183.5, 168.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-119.5, 170.5, 116.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-128.5, 161.5, -31.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-24.5, 166.5, 27.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [-112.5, 155.5, -77.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-94.5, 142.5, -109.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-55.5, 151.5, -93.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [-4.5, 148.5, -128.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [39.5, 145.5, -147.5],
+    "axis": "z",
+    "color": "green"
+  },
+  {
+    "position": [66.5, 143.5, -184.5],
+    "axis": "x",
+    "color": "green"
+  },
+  {
+    "position": [163.5, 118.5, -165.5],
+    "axis": "x",
+    "color": "green"
+  }
+]
