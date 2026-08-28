@@ -1,4 +1,4 @@
-package me.senseiwells.glide.addon.serialization
+package me.senseiwells.glide.module.template
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

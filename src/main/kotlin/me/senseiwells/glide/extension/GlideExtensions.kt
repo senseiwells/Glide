@@ -5,7 +5,7 @@ import net.casual.arcade.events.utils.register
 import net.casual.arcade.extensions.event.PlayerExtensionEvent
 
 object GlideExtensions {
-    fun register() {
+    fun registerEvents() {
         GlobalEventHandler.Server.register<PlayerExtensionEvent> {
             it.addExtension(::PlayerGlideExtension)
         }

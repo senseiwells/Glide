@@ -3,7 +3,7 @@ package me.senseiwells.glide.minigame.command
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import me.senseiwells.glide.addon.GlideAddons
+import me.senseiwells.glide.module.GlideModules
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlideRoundMode
@@ -31,7 +31,7 @@ object GlideCommand: CommandTree<CommandSourceStack> {
             requiresAdminOrPermission()
             literal("create") {
                 argument("map", IdentifierArgument.id()) {
-                    suggests { _ -> GlideAddons.ids().map(Any::toString) }
+                    suggests { _ -> GlideModules.ids().map(Any::toString) }
                     argument("mode", EnumArgument.enumeration<GlideMode>()) {
                         literal("solo") {
                             executes { ctx -> createSoloGlideMinigame(ctx, ctx.source.playerOrException) }
@@ -77,8 +77,8 @@ object GlideCommand: CommandTree<CommandSourceStack> {
         players: Collection<ServerPlayer>
     ): Int {
         val source = context.source
-        val addon = GlideAddons.get(map) ?: return source.fail("No such glide map with id $map")
-        val minigame = GlideMinigame.create(source.server, UUID.randomUUID(), addon, round, mode)
+        val modules = GlideModules.get(map) ?: return source.fail("No such glide map with id $map")
+        val minigame = GlideMinigame.create(source.server, UUID.randomUUID(), modules, round, mode)
         for (player in players) {
             minigame.players.add(player)
         }
