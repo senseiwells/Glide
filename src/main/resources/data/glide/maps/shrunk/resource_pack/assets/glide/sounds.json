@@ -1,0 +1,26 @@
+{
+  "music.shrunk.1": {
+    "sounds": [
+      {
+        "name": "glide:music.shrunk.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.shrunk.2": {
+    "sounds": [
+      {
+        "name": "glide:music.shrunk.2",
+        "stream": true
+      }
+    ]
+  },
+  "music.shrunk.3": {
+    "sounds": [
+      {
+        "name": "glide:music.shrunk.3",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "sound": "glide:music.body.1",
+    "duration": 3800
+  },
+  {
+    "sound": "glide:music.body.2",
+    "duration": 2980
+  },
+  {
+    "sound": "glide:music.body.3",
+    "duration": 3220
+  }
+]

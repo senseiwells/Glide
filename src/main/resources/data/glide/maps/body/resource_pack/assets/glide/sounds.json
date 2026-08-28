@@ -1,0 +1,26 @@
+{
+  "music.body.1": {
+    "sounds": [
+      {
+        "name": "glide:music.body.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.body.2": {
+    "sounds": [
+      {
+        "name": "glide:music.body.2",
+        "stream": true
+      }
+    ]
+  },
+  "music.body.3": {
+    "sounds": [
+      {
+        "name": "glide:music.body.3",
+        "stream": true
+      }
+    ]
+  }
+}

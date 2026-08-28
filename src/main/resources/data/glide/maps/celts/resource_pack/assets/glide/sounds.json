@@ -1,0 +1,18 @@
+{
+  "music.celts.1": {
+    "sounds": [
+      {
+        "name": "glide:music.celts.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.celts.2": {
+    "sounds": [
+      {
+        "name": "glide:music.celts.2",
+        "stream": true
+      }
+    ]
+  }
+}

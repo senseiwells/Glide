@@ -1,0 +1,26 @@
+{
+  "music.canyon.1": {
+    "sounds": [
+      {
+        "name": "glide:music.canyon.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.canyon.2": {
+    "sounds": [
+      {
+        "name": "glide:music.canyon.2",
+        "stream": true
+      }
+    ]
+  },
+  "music.canyon.3": {
+    "sounds": [
+      {
+        "name": "glide:music.canyon.3",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -1,4 +1,6 @@
 [
   "arcade:world",
-  "glide:addon"
+  "glide:addon",
+  "glide:music",
+  "glide:resource_pack"
 ]

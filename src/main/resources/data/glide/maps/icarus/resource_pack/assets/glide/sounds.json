@@ -1,0 +1,18 @@
+{
+  "music.icarus.1": {
+    "sounds": [
+      {
+        "name": "glide:music.icarus.1",
+        "stream": true
+      }
+    ]
+  },
+  "music.icarus.2": {
+    "sounds": [
+      {
+        "name": "glide:music.icarus.2",
+        "stream": true
+      }
+    ]
+  }
+}
