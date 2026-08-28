@@ -1,0 +1,1285 @@
+{
+  "thermals": [
+    {
+      "bounding_box": {
+        "from": [-103.0, 213.0, -2.0],
+        "to": [-42.0, 215.0, 309.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [-53.0, 175.0, 20.0],
+        "to": [-48.0, 184.0, 25.0]
+      },
+      "target_velocity": 0.4,
+      "target_y": 193.0
+    },
+    {
+      "bounding_box": {
+        "from": [-86.0, 172.0, 128.0],
+        "to": [-81.0, 190.0, 133.0]
+      },
+      "target_velocity": 0.56,
+      "target_y": 190.0
+    },
+    {
+      "bounding_box": {
+        "from": [-27.0, 156.0, 298.0],
+        "to": [-22.0, 164.0, 303.0]
+      },
+      "target_velocity": 0.4,
+      "target_y": 177.0
+    },
+    {
+      "bounding_box": {
+        "from": [-18.0, 137.0, 232.0],
+        "to": [-12.0, 155.0, 238.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 150.0
+    },
+    {
+      "bounding_box": {
+        "from": [-24.0, 124.0, 155.0],
+        "to": [-3.0, 150.0, 174.0]
+      },
+      "lift_multiplier": 1.8
+    },
+    {
+      "bounding_box": {
+        "from": [-96.0, 122.0, 177.0],
+        "to": [-91.0, 138.0, 182.0]
+      },
+      "target_velocity": 0.38,
+      "target_y": 140.0
+    },
+    {
+      "bounding_box": {
+        "from": [11.0, 75.0, 93.0],
+        "to": [16.0, 88.0, 102.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 102.0
+    },
+    {
+      "bounding_box": {
+        "from": [-9.0, 77.0, 93.0],
+        "to": [-4.0, 95.0, 98.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 102.0
+    },
+    {
+      "bounding_box": {
+        "from": [-12.0, 80.0, 82.0],
+        "to": [-7.0, 99.0, 87.0]
+      },
+      "target_velocity": 0.6,
+      "target_y": 102.0
+    },
+    {
+      "bounding_box": {
+        "from": [8.0, 88.0, 72.0],
+        "to": [13.0, 100.0, 78.0]
+      },
+      "target_velocity": 0.54,
+      "target_y": 100.0
+    },
+    {
+      "bounding_box": {
+        "from": [-67.0, 95.0, 64.0],
+        "to": [-63.0, 102.0, 69.0]
+      },
+      "target_velocity": 0.5,
+      "target_y": 100.0
+    },
+    {
+      "bounding_box": {
+        "from": [-72.0, 80.0, 33.0],
+        "to": [-67.0, 89.0, 38.0]
+      },
+      "target_velocity": 0.9,
+      "target_y": 98.0
+    },
+    {
+      "bounding_box": {
+        "from": [-89.0, 83.0, -3.0],
+        "to": [-84.0, 93.0, 2.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 100.0
+    },
+    {
+      "bounding_box": {
+        "from": [-86.0, 68.0, -47.0],
+        "to": [-75.0, 77.0, -37.0]
+      },
+      "lift_multiplier": 2.0
+    },
+    {
+      "bounding_box": {
+        "from": [-77.0, 91.0, -88.0],
+        "to": [-72.0, 104.0, -83.0]
+      },
+      "target_velocity": 0.48,
+      "target_y": 110.0
+    },
+    {
+      "bounding_box": {
+        "from": [5.0, 80.0, -53.0],
+        "to": [12.0, 88.0, -48.0]
+      },
+      "target_velocity": 0.57,
+      "target_y": 88.0
+    },
+    {
+      "bounding_box": {
+        "from": [-19.0, 80.0, -45.0],
+        "to": [-13.0, 100.0, -39.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 110.0
+    },
+    {
+      "bounding_box": {
+        "from": [-11.0, 87.0, -20.0],
+        "to": [-6.0, 105.0, -15.0]
+      },
+      "target_velocity": 0.7,
+      "target_y": 110.0
+    },
+    {
+      "bounding_box": {
+        "from": [112.0, 128.0, -11.0],
+        "to": [137.0, 137.0, 4.0]
+      },
+      "target_velocity": -0.4
+    },
+    {
+      "bounding_box": {
+        "from": [129.0, 94.0, -2.0],
+        "to": [135.0, 103.0, 5.0]
+      },
+      "target_velocity": 0.41,
+      "target_y": 107.0
+    },
+    {
+      "bounding_box": {
+        "from": [159.0, 92.0, 43.0],
+        "to": [164.0, 110.0, 48.0]
+      },
+      "target_velocity": 0.53,
+      "target_y": 107.0
+    },
+    {
+      "bounding_box": {
+        "from": [56.0, 92.0, 10.0],
+        "to": [61.0, 105.0, 15.0]
+      },
+      "target_velocity": 0.5,
+      "target_y": 110.0
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": 0,
+      "bounding_box": {
+        "from": [90.0, 188.0, -35.0],
+        "to": [100.0, 237.0, 21.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 1,
+      "bounding_box": {
+        "from": [43.0, 182.0, -34.0],
+        "to": [45.0, 238.0, 23.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 2,
+      "bounding_box": {
+        "from": [-30.0, 175.0, -34.0],
+        "to": [-28.0, 218.0, 18.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 3,
+      "bounding_box": {
+        "from": [-97.0, 166.0, 47.0],
+        "to": [-40.0, 238.0, 49.0]
+      },
+      "respawn_location": {
+        "position": [-67.0, 195.0, 35.0],
+        "rotation": [0.0, 0.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 28.0,
+          "location": {
+            "position": [-55.5, 174.5, 48.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 28.0,
+          "location": {
+            "position": [-77.5, 174.5, 48.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 4,
+      "bounding_box": {
+        "from": [-107.0, 164.0, 97.0],
+        "to": [-40.0, 219.0, 99.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 5,
+      "bounding_box": {
+        "from": [-95.0, 145.0, 199.0],
+        "to": [-36.0, 219.0, 201.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 6,
+      "bounding_box": {
+        "from": [-92.0, 150.0, 258.0],
+        "to": [-34.0, 191.0, 260.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 7,
+      "bounding_box": {
+        "from": [-28.0, 144.0, 272.0],
+        "to": [-26.0, 171.0, 305.0]
+      },
+      "respawn_location": {
+        "position": [-41.0, 161.0, 288.0],
+        "rotation": [0.0, -90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 19.0,
+          "location": {
+            "position": [-27.5, 149.5, 282.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 19.0,
+          "location": {
+            "position": [-27.5, 149.5, 294.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 8,
+      "bounding_box": {
+        "from": [-3.0, 139.0, 271.0],
+        "to": [-1.0, 182.0, 305.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 9,
+      "bounding_box": {
+        "from": [6.0, 134.0, 264.0],
+        "to": [58.0, 192.0, 266.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 10,
+      "bounding_box": {
+        "from": [7.0, 134.0, 233.0],
+        "to": [9.0, 166.0, 255.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 11,
+      "bounding_box": {
+        "from": [-38.0, 135.0, 218.0],
+        "to": [9.0, 166.0, 220.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 12,
+      "bounding_box": {
+        "from": [2.0, 132.0, 184.0],
+        "to": [20.0, 153.0, 186.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 12,
+      "bounding_box": {
+        "from": [-14.0, 140.0, 184.0],
+        "to": [-4.0, 159.0, 186.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 12,
+      "bounding_box": {
+        "from": [-25.0, 140.0, 184.0],
+        "to": [-16.0, 149.0, 186.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 13,
+      "bounding_box": {
+        "from": [-58.0, 138.0, 139.0],
+        "to": [-56.0, 157.0, 161.0]
+      },
+      "respawn_location": {
+        "position": [-37.0, 153.0, 153.0],
+        "rotation": [0.0, 90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 15.0,
+          "location": {
+            "position": [-57.5, 141.5, 157.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 15.0,
+          "location": {
+            "position": [-57.5, 141.5, 146.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 14,
+      "bounding_box": {
+        "from": [-109.0, 122.0, 160.0],
+        "to": [-68.0, 156.0, 162.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 15,
+      "bounding_box": {
+        "from": [-61.0, 117.0, 170.0],
+        "to": [-59.0, 149.0, 189.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 16,
+      "bounding_box": {
+        "from": [36.0, 102.0, 158.0],
+        "to": [38.0, 148.0, 201.0]
+      },
+      "respawn_location": {
+        "position": [38.0, 138.0, 184.0],
+        "rotation": [0.0, -90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 39.0,
+          "location": {
+            "position": [37.5, 104.5, 173.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 39.0,
+          "location": {
+            "position": [37.5, 105.5, 193.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 17,
+      "bounding_box": {
+        "from": [56.0, 103.0, 172.0],
+        "to": [58.0, 134.0, 195.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 18,
+      "bounding_box": {
+        "from": [58.0, 99.0, 169.0],
+        "to": [111.0, 133.0, 171.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 19,
+      "bounding_box": {
+        "from": [50.0, 91.0, 140.0],
+        "to": [104.0, 117.0, 141.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 20,
+      "bounding_box": {
+        "from": [93.0, 78.0, 108.0],
+        "to": [113.0, 120.0, 109.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 21,
+      "bounding_box": {
+        "from": [72.0, 73.0, 91.0],
+        "to": [73.0, 92.0, 103.0]
+      },
+      "respawn_location": {
+        "position": [86.0, 91.0, 97.0],
+        "rotation": [0.0, 90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 20.0,
+          "location": {
+            "position": [73.5, 74.5, 104.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 20.0,
+          "location": {
+            "position": [73.5, 74.5, 90.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 22,
+      "bounding_box": {
+        "from": [21.0, 74.0, 80.0],
+        "to": [22.0, 105.0, 102.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 23,
+      "bounding_box": {
+        "from": [-34.0, 91.0, 58.0],
+        "to": [-33.0, 112.0, 75.0]
+      },
+      "respawn_location": {
+        "position": [-24.0, 109.0, 67.0],
+        "rotation": [0.0, 90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 17.0,
+          "location": {
+            "position": [-32.5, 96.5, 74.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 17.0,
+          "location": {
+            "position": [-32.5, 96.5, 61.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 24,
+      "bounding_box": {
+        "from": [-64.0, 68.0, 34.0],
+        "to": [-63.0, 117.0, 74.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 25,
+      "bounding_box": {
+        "from": [-100.0, 61.0, 4.0],
+        "to": [-59.0, 116.0, 5.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 26,
+      "bounding_box": {
+        "from": [-93.0, 65.0, -40.0],
+        "to": [-53.0, 123.0, -39.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 27,
+      "bounding_box": {
+        "from": [-56.0, 71.0, -88.0],
+        "to": [-55.0, 150.0, -38.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 28,
+      "bounding_box": {
+        "from": [-37.0, 97.0, -42.0],
+        "to": [-30.0, 110.0, -35.0]
+      },
+      "respawn_location": {
+        "position": [-34.0, 105.0, -38.0],
+        "rotation": [0.0, -45.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 10.0,
+          "location": {
+            "position": [-30.5, 101.5, -41.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 10.0,
+          "location": {
+            "position": [-36.5, 101.5, -35.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 28,
+      "bounding_box": {
+        "from": [-34.0, 76.0, -52.0],
+        "to": [-11.0, 129.0, -51.0]
+      },
+      "respawn_location": {
+        "position": [-33.0, 98.0, -71.0],
+        "rotation": [0.0, -45.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 23.0,
+          "location": {
+            "position": [-32.5, 81.5, -51.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 23.0,
+          "location": {
+            "position": [-10.5, 81.5, -51.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 28,
+      "bounding_box": {
+        "from": [-11.0, 77.0, -80.0],
+        "to": [-10.0, 110.0, -51.0]
+      },
+      "respawn_location": {
+        "position": [-33.0, 98.0, -71.0],
+        "rotation": [0.0, -45.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 23.0,
+          "location": {
+            "position": [-10.5, 81.5, -70.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 23.0,
+          "location": {
+            "position": [-10.5, 81.5, -51.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 29,
+      "bounding_box": {
+        "from": [19.0, 106.0, -10.0],
+        "to": [20.0, 125.0, 2.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 29,
+      "bounding_box": {
+        "from": [34.0, 86.0, -26.0],
+        "to": [35.0, 96.0, -16.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 30,
+      "bounding_box": {
+        "from": [73.0, 91.0, -26.0],
+        "to": [74.0, 121.0, 1.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 31,
+      "bounding_box": {
+        "from": [129.0, 108.0, -10.0],
+        "to": [130.0, 125.0, 2.0]
+      },
+      "respawn_location": {
+        "position": [122.0, 119.0, -3.0],
+        "rotation": [0.0, -90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 13.0,
+          "location": {
+            "position": [129.5, 108.5, -7.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 13.0,
+          "location": {
+            "position": [129.5, 108.5, 0.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 31,
+      "bounding_box": {
+        "from": [128.0, -4.0, -12.0],
+        "to": [129.0, 104.0, 8.0]
+      },
+      "respawn_location": {
+        "position": [125.0, 101.0, 1.0],
+        "rotation": [0.0, -90.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 8.0,
+          "location": {
+            "position": [128.5, 96.5, -2.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 8.0,
+          "location": {
+            "position": [128.5, 96.5, 5.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 32,
+      "bounding_box": {
+        "from": [150.0, 90.0, 20.0],
+        "to": [211.0, 150.0, 22.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 33,
+      "bounding_box": {
+        "from": [150.0, 85.0, 25.0],
+        "to": [151.0, 125.0, 70.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 34,
+      "bounding_box": {
+        "from": [111.0, 81.0, 17.0],
+        "to": [112.0, 116.0, 51.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 35,
+      "bounding_box": {
+        "from": [62.0, 92.0, 1.0],
+        "to": [63.0, 120.0, 36.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 36,
+      "bounding_box": {
+        "from": [22.0, 91.0, 41.0],
+        "to": [55.0, 130.0, 42.0]
+      },
+      "respawn_location": {
+        "position": [38.0, 104.0, 40.0],
+        "rotation": [0.0, 0.0]
+      },
+      "beacon_beams": [
+        {
+          "length": 35.0,
+          "location": {
+            "position": [52.5, 94.5, 41.5],
+            "rotation": [-90.0, 0.0]
+          }
+        },
+        {
+          "length": 35.0,
+          "location": {
+            "position": [25.5, 94.5, 41.5],
+            "rotation": [-90.0, 0.0]
+          }
+        }
+      ],
+      "type": "glide:respawn"
+    },
+    {
+      "id": 37,
+      "bounding_box": {
+        "from": [21.0, 82.0, 39.0],
+        "to": [57.0, 83.0, 69.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 38,
+      "bounding_box": {
+        "from": [27.0, 28.0, 87.0],
+        "to": [53.0, 63.0, 89.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 39,
+      "bounding_box": {
+        "from": [23.0, 25.0, 136.0],
+        "to": [54.0, 68.0, 138.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 40,
+      "bounding_box": {
+        "from": [27.0, 25.0, 177.0],
+        "to": [55.0, 51.0, 178.0]
+      },
+      "type": "glide:progress"
+    },
+    {
+      "id": 41,
+      "bounding_box": {
+        "from": [30.0, 24.0, 217.0],
+        "to": [55.0, 98.0, 218.0]
+      },
+      "type": "glide:finish"
+    }
+  ],
+  "rings": [
+    {
+      "position": [-72.5, 200.5, 71.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [-61.5, 151.5, 204.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [26.5, 174.5, 279.5],
+      "axis": "x",
+      "color": "blue"
+    },
+    {
+      "position": [-8.5, 151.5, 182.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [-75.5, 144.5, 162.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [77.5, 112.5, 134.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [68.5, 89.5, 97.5],
+      "axis": "x",
+      "color": "blue"
+    },
+    {
+      "position": [12.5, 96.5, 90.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [-81.5, 110.5, -0.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [-48.5, 113.5, -77.5],
+      "axis": "x",
+      "color": "blue"
+    },
+    {
+      "position": [161.5, 106.5, 21.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [71.5, 97.5, 9.5],
+      "axis": "x",
+      "color": "blue"
+    },
+    {
+      "position": [44.5, 109.5, 38.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [38.5, 37.5, 82.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [39.5, 56.5, 139.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [31.5, 44.5, 187.5],
+      "axis": "z",
+      "color": "blue"
+    },
+    {
+      "position": [-16.5, 187.5, -21.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [-57.5, 185.5, 76.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-63.5, 187.5, 204.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-45.5, 159.5, 269.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [16.5, 145.5, 266.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-1.5, 148.5, 221.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-19.5, 144.5, 185.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-57.5, 139.5, 182.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [-82.5, 100.5, 43.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-9.5, 84.5, -61.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [88.5, 106.5, 140.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [103.5, 97.5, 108.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-0.5, 104.5, 71.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [-46.5, 96.5, -51.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [85.5, 100.5, -16.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [185.5, 107.5, 21.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [130.5, 111.5, 47.5],
+      "axis": "x",
+      "color": "yellow"
+    },
+    {
+      "position": [33.5, 103.5, 39.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [37.5, 66.5, 56.5],
+      "axis": "y",
+      "color": "yellow"
+    },
+    {
+      "position": [45.5, 43.5, 137.5],
+      "axis": "z",
+      "color": "yellow"
+    },
+    {
+      "position": [-10.5, 195.5, 0.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-67.5, 191.5, 32.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-83.5, 180.5, 100.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-75.5, 170.5, 163.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-87.5, 155.5, 237.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-69.5, 160.5, 286.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-1.5, 154.5, 288.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [39.5, 152.5, 266.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [12.5, 140.5, 186.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-97.5, 136.5, 159.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [-64.5, 122.5, 182.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [11.5, 123.5, 183.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-18.5, 84.5, -47.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [87.5, 121.5, 184.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [70.5, 106.5, 158.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [103.5, 87.5, 108.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [23.5, 78.5, 97.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-65.5, 82.5, 66.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [118.5, 90.5, 43.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [38.5, 114.5, -3.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-81.5, 71.5, 32.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [115.5, 118.5, -3.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [-66.5, 80.5, -66.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [181.5, 98.5, 21.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [72.5, 99.5, 29.5],
+      "axis": "x",
+      "color": "green"
+    },
+    {
+      "position": [43.5, 78.5, 53.5],
+      "axis": "y",
+      "color": "green"
+    },
+    {
+      "position": [44.5, 33.5, 187.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [38.5, 31.5, 207.5],
+      "axis": "z",
+      "color": "green"
+    },
+    {
+      "position": [31.5, 32.5, 136.5],
+      "axis": "z",
+      "color": "green"
+    }
+  ],
+  "spawn": {
+    "position": [93.0, 232.0, -5.0],
+    "rotation": [0.0, 90.0]
+  },
+  "boosters": [
+    {
+      "bounding_box": {
+        "from": [-79.0, 172.0, 95.0],
+        "to": [-74.0, 176.0, 103.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-89.0, 154.0, 195.0],
+        "to": [-82.0, 161.0, 205.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "south",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-40.0, 149.0, 285.0],
+        "to": [-30.0, 156.0, 292.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [2.0, 138.0, 242.0],
+        "to": [12.0, 145.0, 249.0]
+      },
+      "target_velocity": 1.3,
+      "direction": "west"
+    },
+    {
+      "bounding_box": {
+        "from": [-48.0, 140.0, 149.0],
+        "to": [-38.0, 147.0, 156.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "west"
+    },
+    {
+      "bounding_box": {
+        "from": [-28.0, 118.0, 180.0],
+        "to": [-18.0, 125.0, 187.0]
+      },
+      "target_velocity": 2.0,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [58.0, 75.0, 95.0],
+        "to": [70.0, 81.0, 100.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "west",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [57.0, 87.0, 96.0],
+        "to": [64.0, 91.0, 99.0]
+      },
+      "target_velocity": 1.3,
+      "direction": "west",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-79.0, 84.0, -4.0],
+        "to": [-74.0, 89.0, 3.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "north",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [-83.0, 80.0, -36.0],
+        "to": [-78.0, 85.0, -31.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "north"
+    },
+    {
+      "bounding_box": {
+        "from": [-53.0, 74.0, -79.0],
+        "to": [-43.0, 81.0, -72.0]
+      },
+      "target_velocity": 1.7,
+      "direction": "east"
+    },
+    {
+      "bounding_box": {
+        "from": [33.0, 87.0, -26.0],
+        "to": [42.0, 95.0, -19.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "east"
+    },
+    {
+      "bounding_box": {
+        "from": [24.0, 108.0, -7.0],
+        "to": [34.0, 118.0, 0.0]
+      },
+      "target_velocity": 1.8,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [100.0, 108.0, -7.0],
+        "to": [110.0, 114.0, 0.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "east",
+      "directional": true
+    },
+    {
+      "bounding_box": {
+        "from": [127.0, 82.0, 44.0],
+        "to": [137.0, 93.0, 51.0]
+      },
+      "target_velocity": 2.0,
+      "direction": "west"
+    },
+    {
+      "bounding_box": {
+        "from": [129.0, 94.0, 27.0],
+        "to": [139.0, 100.0, 34.0]
+      },
+      "target_velocity": 1.5,
+      "direction": "west"
+    }
+  ],
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "id": "glide:cavern",
+  "name": ""
+}
