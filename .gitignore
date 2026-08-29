@@ -9,4 +9,7 @@ run/
 /run-datagen/
 /.kotlin/
 
-/src/main/resources/data/glide/maps/**/resource_pack/assets/minecraft
+.DS_Store
+
+/src/main/resources/data/glide/maps/**/resource_pack/assets/minecraft_arr
+/mismatched-textures.txt
