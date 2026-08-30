@@ -13,7 +13,7 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.gui.*
 import me.senseiwells.glide.gui.debug.SidebarDebugGlideVelocityElement
 import me.senseiwells.glide.gui.debug.SidebarDebugVelocityElement
-import me.senseiwells.glide.minigame.command.ContextualGlideCommand
+import me.senseiwells.glide.minigame.command.GlideMinigameCommand
 import me.senseiwells.glide.module.GlideAcceleratorsData
 import me.senseiwells.glide.module.GlideCheckpointsData
 import me.senseiwells.glide.module.GlideDimensionTypeData
@@ -296,7 +296,7 @@ class GlideMinigame(
             set(GameRules.ADVANCE_TIME, false)
         }
 
-        this.commands.register(ContextualGlideCommand(this))
+        this.commands.register(GlideMinigameCommand(this))
 
         this.effects.setInvisiblePredicate({ observee, observer ->
             observer != observee && observee.distanceToSqr(observer) < 6 * 6

@@ -4,6 +4,7 @@ import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.module.GlideMetadataData
 import me.senseiwells.glide.module.GlideModules
 import net.casual.arcade.minigame.data.MinigameDataModules.Companion.get
+import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.string.SnakeCase
 import net.casual.arcade.utils.string.TitleCase
 import net.casual.arcade.utils.string.convertCasing
@@ -11,6 +12,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 
 object GlideLobbyComponents {
+    val STARTING_IN = ComponentUtils.translatableWithArgs("glide.lobby.starting.in")
+
     val BY_VOTE = Component.translatable("glide.lobby.byVote")
     val RANDOM = Component.translatable("glide.lobby.random")
 

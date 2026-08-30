@@ -6,7 +6,6 @@ import net.casual.arcade.minigame.settings.GameSetting
 import net.casual.arcade.minigame.settings.MinigameSettings
 import net.casual.arcade.minigame.settings.display.MenuGameSetting
 import net.casual.arcade.minigame.settings.display.MenuGameSettingBuilder
-import net.casual.arcade.minigame.settings.display.MenuGameSettingBuilder.Companion.time
 import net.casual.arcade.minigame.utils.item
 import net.casual.arcade.utils.ItemUtils.styledLore
 import net.casual.arcade.utils.TimeUtils.Seconds
@@ -14,12 +13,15 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
+import java.util.*
 
 class GlideLobbySettings(
     minigame: GlideLobbyMinigame,
     maps: Collection<Identifier>
 ): MinigameSettings(minigame, Component.translatable("glide.lobby.settings")) {
-    val map: GameSetting<GlideSelection<Identifier>> = this.register(
+    private val displays = ArrayList<MenuGameSetting<*>>()
+
+    val map: GameSetting<GlideSelection<Identifier>> = this.registerGlide(
         selection(Identifier.CODEC, maps, GlideLobbyComponents::map) {
             name = "map"
             display = item(Items.FILLED_MAP, Component.translatable("glide.lobby.settings.map.name"))
@@ -28,7 +30,7 @@ class GlideLobbySettings(
         }
     )
 
-    val mode: GameSetting<GlideSelection<GlideMode>> = this.register(
+    val mode: GameSetting<GlideSelection<GlideMode>> = this.registerGlide(
         selection(GlideMode.CODEC, GlideMode.entries, GlideLobbyComponents::mode, GlideMode::getSerializedName) {
             name = "mode"
             display = item(Items.CLOCK, Component.translatable("glide.lobby.settings.mode.name"))
@@ -37,7 +39,7 @@ class GlideLobbySettings(
         }
     )
 
-    val rounds: GameSetting<GlideSelection<Int>> = this.register(
+    val rounds: GameSetting<GlideSelection<Int>> = this.registerGlide(
         selection(Codec.INT, ROUND_OPTIONS, GlideLobbyComponents::rounds) {
             name = "rounds"
             display = item(Items.PAPER, Component.translatable("glide.lobby.settings.rounds.name"))
@@ -46,28 +48,43 @@ class GlideLobbySettings(
         }
     )
 
-    val votingDuration: GameSetting<MinecraftTimeDuration> = this.register(time {
-        name = "voting_duration"
-        display = item(Items.BELL, Component.translatable("glide.lobby.settings.votingDuration.name"))
-            .styledLore(Component.translatable("glide.lobby.settings.votingDuration.desc"))
-        value = 30.Seconds
-        for (seconds in intArrayOf(15, 30, 60, 120)) {
-            option("${seconds}s", Component.literal("${seconds}s"), seconds.Seconds)
+    val startDelay: GameSetting<Optional<MinecraftTimeDuration>> = this.registerGlide(
+        optionalTime {
+            name = "start_delay"
+            display = item(Items.BELL, Component.translatable("glide.lobby.settings.startDelay.name"))
+                .styledLore(
+                    Component.translatable("glide.lobby.settings.startDelay.desc.1"),
+                    Component.translatable("glide.lobby.settings.startDelay.desc.2")
+                )
+            value = Optional.of(60.Seconds)
+            option("indefinite", Component.translatable("glide.lobby.indefinite"), Optional.empty())
+            for (seconds in intArrayOf(30, 60, 120, 180)) {
+                option("${seconds}s", Component.literal("${seconds}s"), Optional.of(seconds.Seconds))
+            }
         }
-    })
+    )
 
-    val countdownDuration: GameSetting<MinecraftTimeDuration> = this.register(time {
-        name = "countdown_duration"
-        display = item(Items.REPEATER, Component.translatable("glide.lobby.settings.countdownDuration.name"))
-            .styledLore(Component.translatable("glide.lobby.settings.countdownDuration.desc"))
-        value = 10.Seconds
-        for (seconds in intArrayOf(5, 10, 20, 30)) {
-            option("${seconds}s", Component.literal("${seconds}s"), seconds.Seconds)
-        }
-    })
+    fun displays(): List<MenuGameSetting<*>> {
+        return this.displays
+    }
+
+    private fun <T: Any> registerGlide(display: MenuGameSetting<T>): GameSetting<T> {
+        this.displays.add(display)
+        return this.register(display)
+    }
 
     companion object {
         val ROUND_OPTIONS: List<Int> = listOf(1, 3, 5, 7, 10)
+
+        private fun optionalTime(
+            block: MenuGameSettingBuilder<Optional<MinecraftTimeDuration>>.() -> Unit
+        ): MenuGameSetting<Optional<MinecraftTimeDuration>> {
+            val codec = MinecraftTimeDuration.CODEC.optionalFieldOf("duration").codec()
+            val builder = MenuGameSettingBuilder { name, value, values ->
+                GameSetting(name, value, values, codec)
+            }
+            return builder.apply(block).build()
+        }
 
         private fun <T: Any> selection(
             codec: Codec<T>,

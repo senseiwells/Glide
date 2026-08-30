@@ -29,31 +29,31 @@ import java.util.UUID
 object GlideCommand: CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
         return CommandTree.buildLiteral("glide") {
-            requiresAdminOrPermission()
-            literal("lobby") {
-                literal("create") {
+            literal("create") {
+                requiresAdminOrPermission()
+                literal("lobby") {
                     executes { ctx -> createGlideLobby(ctx, listOf(ctx.source.playerOrException)) }
                     argument("players", EntityArgument.players()) {
                         executes(::createGlideLobby)
                     }
                 }
-            }
-            literal("create") {
-                argument("map", IdentifierArgument.id()) {
-                    suggests { _ -> GlideModules.ids().map(Any::toString) }
-                    argument("mode", EnumArgument.enumeration<GlideMode>()) {
-                        literal("solo") {
-                            executes { ctx -> createSoloGlideMinigame(ctx, ctx.source.playerOrException) }
-                            argument("player", EntityArgument.player()) {
-                                executes(::createSoloGlideMinigame)
+                literal("map") {
+                    argument("map", IdentifierArgument.id()) {
+                        suggests { _ -> GlideModules.ids().map(Any::toString) }
+                        argument("mode", EnumArgument.enumeration<GlideMode>()) {
+                            literal("solo") {
+                                executes { ctx -> createSoloGlideMinigame(ctx, ctx.source.playerOrException) }
+                                argument("player", EntityArgument.player()) {
+                                    executes(::createSoloGlideMinigame)
+                                }
                             }
-                        }
-                        literal("multi") {
-                            executes { ctx -> createMultiGlideMinigame(ctx, listOf(ctx.source.playerOrException), 3) }
-                            argument("rounds", IntegerArgumentType.integer(1, 10)) {
-                                executes { ctx -> createMultiGlideMinigame(ctx, listOf(ctx.source.playerOrException)) }
-                                argument("players", EntityArgument.players()) {
-                                    executes(::createMultiGlideMinigame)
+                            literal("multi") {
+                                executes { ctx -> createMultiGlideMinigame(ctx, listOf(ctx.source.playerOrException), 3) }
+                                argument("rounds", IntegerArgumentType.integer(1, 10)) {
+                                    executes { ctx -> createMultiGlideMinigame(ctx, listOf(ctx.source.playerOrException)) }
+                                    argument("players", EntityArgument.players()) {
+                                        executes(::createMultiGlideMinigame)
+                                    }
                                 }
                             }
                         }

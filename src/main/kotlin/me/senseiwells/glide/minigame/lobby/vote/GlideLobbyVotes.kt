@@ -7,23 +7,27 @@ import me.senseiwells.glide.minigame.lobby.GlideConfiguration
 import me.senseiwells.glide.minigame.lobby.GlideLobbySettings
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.Items
 import net.minecraft.util.RandomSource
 
 class GlideLobbyVotes(lobby: GlideLobbyMinigame) {
     val map: GlideVote<Identifier> = GlideVote(
         "map",
+        Items.FILLED_MAP,
         lobby.settings.map,
         lobby::availableMaps,
         GlideLobbyComponents::map
     )
     val mode: GlideVote<GlideMode> = GlideVote(
         "mode",
+        Items.CLOCK,
         lobby.settings.mode,
         { GlideMode.entries },
         GlideLobbyComponents::mode
     )
     val rounds: GlideVote<Int> = GlideVote(
         "rounds",
+        Items.PAPER,
         lobby.settings.rounds,
         { GlideLobbySettings.ROUND_OPTIONS },
         GlideLobbyComponents::rounds
