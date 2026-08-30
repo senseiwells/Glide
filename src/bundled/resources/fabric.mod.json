@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "glide",
+  "version": "${version}",
+  "name": "Glide",
+  "description": "Legacy Edition Glide Minigame",
+  "authors": [
+    "Sensei"
+  ],
+  "contact": {
+
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "me.senseiwells.glide.GlideMod"
+      },
+      {
+        "adapter": "kotlin",
+        "value": "me.senseiwells.glide.server.GlideServer"
+      }
+    ],
+    "arcade-datagen": [
+      {
+        "adapter": "kotlin",
+        "value": "me.senseiwells.glide.datagen.GlideResourceGenerator"
+      }
+    ]
+  },
+  "mixins": [
+    "glide.mixins.json"
+  ],
+  "depends": {
+    "fabric-api": ">=${fabric_api_dependency}",
+    "fabricloader": ">=${fabric_loader_dependency}",
+    "fabric-language-kotlin": ">=${fabric_kotlin_dependency}",
+    "minecraft": "${minecraft_dependency}"
+  }
+}

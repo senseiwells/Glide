@@ -5,14 +5,9 @@ import me.senseiwells.glide.extension.GlideExtensions
 import me.senseiwells.glide.item.GlideItems
 import me.senseiwells.glide.minigame.GlideMinigameFactory
 import me.senseiwells.glide.minigame.GlideStats
-import me.senseiwells.glide.minigame.command.GlideCommand
 import me.senseiwells.glide.minigame.lobby.GlideLobbyMinigameFactory
 import me.senseiwells.glide.module.GlideModules
 import me.senseiwells.glide.utils.GlideRegistries
-import net.casual.arcade.commands.register
-import net.casual.arcade.events.GlobalEventHandler
-import net.casual.arcade.events.server.ServerRegisterCommandEvent
-import net.casual.arcade.events.utils.register
 import net.casual.arcade.minigame.utils.MinigameRegistries
 import net.casual.arcade.utils.Identifier
 import net.casual.arcade.utils.serialization.codec.CodecProvider.Companion.register
@@ -45,9 +40,5 @@ object GlideMod: ModInitializer {
 
         GlideMinigameFactory.register(MinigameRegistries.MINIGAME_FACTORY)
         GlideLobbyMinigameFactory.register(MinigameRegistries.MINIGAME_FACTORY)
-
-        GlobalEventHandler.Server.register<ServerRegisterCommandEvent> {
-            it.register(GlideCommand)
-        }
     }
 }
