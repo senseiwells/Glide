@@ -294,6 +294,7 @@ class GlideMinigame(
             set(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0)
             set(GameRules.ADVANCE_WEATHER, false)
             set(GameRules.ADVANCE_TIME, false)
+            set(GameRules.LOCATOR_BAR, false)
         }
 
         this.commands.register(GlideMinigameCommand(this))

@@ -332,6 +332,7 @@ class GlideLobbyMinigame(
                 set(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0)
                 set(GameRules.RANDOM_TICK_SPEED, 0)
                 set(GameRules.ADVANCE_WEATHER, false)
+                set(GameRules.LOCATOR_BAR, false)
             }
             when {
                 data.timeOfDay.isEmpty -> clockState(paused = false)

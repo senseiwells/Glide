@@ -69,10 +69,10 @@ object GlideCommand: CommandTree<CommandSourceStack> {
     ): Int {
         val source = context.source
         val lobby = GlideLobbyMinigame.create(source.server, UUID.randomUUID())
+        lobby.start()
         for (player in players) {
             lobby.players.add(player)
         }
-        lobby.start()
         return source.success("Successfully created glide lobby!")
     }
 
