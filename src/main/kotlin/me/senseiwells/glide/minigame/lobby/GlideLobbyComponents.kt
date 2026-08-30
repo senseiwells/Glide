@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 
 object GlideLobbyComponents {
-    val VOTING = Component.translatable("glide.lobby.voting")
+    val BY_VOTE = Component.translatable("glide.lobby.byVote")
     val RANDOM = Component.translatable("glide.lobby.random")
 
     fun map(map: Identifier): Component {

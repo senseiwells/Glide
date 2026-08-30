@@ -1,7 +1,6 @@
 package me.senseiwells.glide.minigame.lobby.vote
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import me.senseiwells.glide.font.GlideComponents
 import me.senseiwells.glide.minigame.lobby.GlideLobbyComponents
 import me.senseiwells.glide.minigame.lobby.GlideSelection
 import net.casual.arcade.minigame.settings.GameSetting
@@ -19,7 +18,7 @@ class GlideVote<T: Any>(
     private val votes = Object2ObjectOpenHashMap<UUID, T>()
 
     val enabled: Boolean
-        get() = this.setting.get() == GlideSelection.Voting
+        get() = this.setting.get() == GlideSelection.ByVote
 
     fun options(): List<T> {
         return this.options.invoke()
@@ -31,7 +30,7 @@ class GlideVote<T: Any>(
 
     fun selectionName(): Component {
         return when (val selection = this.setting.get()) {
-            is GlideSelection.Voting -> GlideLobbyComponents.VOTING
+            is GlideSelection.ByVote -> GlideLobbyComponents.BY_VOTE
             is GlideSelection.Random -> GlideLobbyComponents.RANDOM
             is GlideSelection.Selected -> this.name(selection.value)
         }
@@ -73,7 +72,7 @@ class GlideVote<T: Any>(
         if (selection is GlideSelection.Selected) {
             return selection.value
         }
-        if (selection is GlideSelection.Voting) {
+        if (selection is GlideSelection.ByVote) {
             val winner = this.winner(random)
             if (winner != null) {
                 return winner

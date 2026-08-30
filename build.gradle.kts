@@ -93,8 +93,6 @@ java {
 loom {
     mods {
         create("glide") {
-            // The bundled source set must come first, fabric loader reads
-            // the mod's metadata from the first path in the group
             sourceSet(bundled)
             sourceSet(main)
         }
