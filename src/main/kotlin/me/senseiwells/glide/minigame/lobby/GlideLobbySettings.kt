@@ -81,7 +81,7 @@ class GlideLobbySettings(
                 GameSetting(name, value, values, selection)
             }
             builder.apply(block)
-            builder.option("voting", GlideLobbyComponents.VOTING, GlideSelection.Voting)
+            builder.option("by_vote", GlideLobbyComponents.BY_VOTE, GlideSelection.ByVote)
             builder.option("random", GlideLobbyComponents.RANDOM, GlideSelection.Random)
             for (option in options) {
                 builder.option(id.invoke(option), namer.invoke(option), GlideSelection.Selected(option))
