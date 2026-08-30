@@ -1,10 +1,12 @@
 package me.senseiwells.glide.minigame.lobby
 
+import kotlinx.coroutines.Job
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.MultiGlideRoundMode
 import me.senseiwells.glide.minigame.lobby.command.GlideLobbyCommand
+import me.senseiwells.glide.minigame.lobby.gui.GlideLobbyCountdown
 import me.senseiwells.glide.minigame.lobby.vote.GlideLobbyVotes
 import me.senseiwells.glide.minigame.lobby.vote.GlideVote
 import me.senseiwells.glide.module.GlideLobbyData
@@ -28,6 +30,7 @@ import net.casual.arcade.minigame.events.MinigameRemovePlayerEvent
 import net.casual.arcade.minigame.managers.MinigameLevelManager.SpawnLocation
 import net.casual.arcade.minigame.phase.Phase
 import net.casual.arcade.minigame.utils.MinigameResources
+import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.pack.PackInfo
 import net.casual.arcade.pack.utils.PackInfoRef
 import net.casual.arcade.utils.entity.teleportTo
@@ -35,10 +38,12 @@ import net.casual.arcade.utils.level.resetToDefault
 import net.casual.arcade.utils.level.set
 import net.casual.arcade.utils.math.location.LocationWithLevel
 import net.casual.arcade.utils.player.clearPlayerInventory
+import net.casual.arcade.utils.player.displayName
 import net.casual.arcade.utils.player.clearTitle
 import net.casual.arcade.utils.player.resetExperience
 import net.casual.arcade.utils.player.resetHealth
 import net.casual.arcade.utils.player.resetHunger
+import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.visuals.elements.UniversalElement
 import net.casual.arcade.virtual.visuals.sidebar.DynamicVirtualSidebar
 import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
@@ -53,6 +58,7 @@ import net.minecraft.world.level.GameType
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes
 import net.minecraft.world.level.gamerules.GameRules
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 class GlideLobbyMinigame(
     server: MinecraftServer,
@@ -63,6 +69,10 @@ class GlideLobbyMinigame(
     override val settings: GlideLobbySettings = GlideLobbySettings(this, this.availableMaps())
 
     private val sidebar = DynamicVirtualSidebar(this.server)
+
+    private var countdownJob: Job? = null
+    val countdown: GlideLobbyCountdown = GlideLobbyCountdown(this)
+
 
     val level: ServerLevel = this.createLevel()
     val votes: GlideLobbyVotes = GlideLobbyVotes(this)
@@ -85,13 +95,62 @@ class GlideLobbyMinigame(
         return this.votes.resolve(this.level.random)
     }
 
-    fun startTransition() {
-        if (this.phase != GlideLobbyPhase.Waiting || this.glide != null) {
+    fun startCountdown(delay: MinecraftTimeDuration?) {
+        this.stopCountdown()
+
+        if (delay == null || this.phase != GlideLobbyPhase.Starting || this.glide != null) {
             return
         }
-        when {
-            this.votes.any() -> this.setPhase(GlideLobbyPhase.Voting)
-            else -> this.setPhase(GlideLobbyPhase.Countdown)
+        this.countdownJob = this.launchPhased {
+            try {
+                countdown.transition(delay, players = players::all)
+            } finally {
+                countdown.stop()
+            }
+            startGlide()
+        }
+    }
+
+    fun stopCountdown() {
+        this.countdownJob?.cancel()
+        this.countdownJob = null
+    }
+
+    fun isReady(player: ServerPlayer): Boolean {
+        return this.tags.has(player, READY)
+    }
+
+    fun readyCount(): Int {
+        return this.tags.getUUIDsFor(READY).size
+    }
+
+    fun setReady(player: ServerPlayer, ready: Boolean): Boolean {
+        val changed = when {
+            ready -> this.tags.add(player, READY)
+            else -> this.tags.remove(player, READY)
+        }
+        if (!changed) {
+            return false
+        }
+        val key = if (ready) "glide.lobby.ready" else "glide.lobby.unready"
+        this.chat.broadcast(
+            Component.translatable(key, player.displayName(), this.readyCount(), this.players.playingPlayerCount)
+        )
+        this.checkAllReady()
+        return true
+    }
+
+    fun clearReady() {
+        this.tags.clear(READY)
+    }
+
+    private fun checkAllReady() {
+        if (this.phase != GlideLobbyPhase.Starting || this.glide != null) {
+            return
+        }
+        val playing = this.players.playing
+        if (playing.isNotEmpty() && playing.all(this::isReady)) {
+            this.startGlide()
         }
     }
 
@@ -148,6 +207,10 @@ class GlideLobbyMinigame(
             return
         }
         glide.players.transferTo(this)
+
+        if (this.phase == GlideLobbyPhase.Waiting && this.players.onlinePlayerCount > 0) {
+            this.setPhase(GlideLobbyPhase.Starting)
+        }
     }
 
     @Listener
@@ -156,6 +219,10 @@ class GlideLobbyMinigame(
         this.levels.spawn = SpawnLocation.global(this.spawn())
 
         this.commands.register(GlideLobbyCommand(this))
+
+        this.settings.startDelay.addListener { _, _, value ->
+            this.startCountdown(value.getOrNull())
+        }
 
         this.sidebar.setTitle(UniversalElement.constant(Component.translatable("glide.lobby.title")))
         this.sidebar.row(0).set(SidebarComponent.EMPTY)
@@ -212,11 +279,22 @@ class GlideLobbyMinigame(
         if (!this.players.isAdmin(player)) {
             player.setGameMode(GameType.ADVENTURE)
         }
+
+        if (this.phase == GlideLobbyPhase.Waiting && this.glide == null) {
+            this.setPhase(GlideLobbyPhase.Starting)
+        }
     }
 
     @Listener
     private fun onRemovePlayer(event: MinigameRemovePlayerEvent) {
         this.votes.retract(event.player)
+        this.tags.remove(event.player, READY)
+
+        if (this.players.onlinePlayerCount == 0) {
+            this.setPhase(GlideLobbyPhase.Waiting)
+            return
+        }
+        this.checkAllReady()
     }
 
     @Listener
@@ -266,6 +344,8 @@ class GlideLobbyMinigame(
 
     companion object {
         val ID = GlideMod.id("lobby")
+
+        private val READY = GlideMod.id("ready")
 
         fun create(server: MinecraftServer, uuid: UUID): GlideLobbyMinigame {
             return GlideLobbyMinigame(server, uuid, GlideModules.lobby(server))

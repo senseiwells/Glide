@@ -6,11 +6,13 @@ import me.senseiwells.glide.minigame.lobby.GlideSelection
 import net.casual.arcade.minigame.settings.GameSetting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.Item
 import net.minecraft.util.RandomSource
 import java.util.*
 
 class GlideVote<T: Any>(
     val id: String,
+    val icon: Item,
     private val setting: GameSetting<GlideSelection<T>>,
     private val options: () -> List<T>,
     private val namer: (T) -> Component
@@ -22,6 +24,10 @@ class GlideVote<T: Any>(
 
     fun options(): List<T> {
         return this.options.invoke()
+    }
+
+    fun title(): Component {
+        return Component.translatable("glide.lobby.vote.${this.id}")
     }
 
     fun name(option: T): Component {
@@ -46,6 +52,11 @@ class GlideVote<T: Any>(
 
     fun voteOf(player: ServerPlayer): T? {
         return this.votes[player.uuid]
+    }
+
+    fun voteNameOf(player: ServerPlayer): Component? {
+        val vote = this.voteOf(player) ?: return null
+        return this.name(vote)
     }
 
     fun retract(player: ServerPlayer): Boolean {

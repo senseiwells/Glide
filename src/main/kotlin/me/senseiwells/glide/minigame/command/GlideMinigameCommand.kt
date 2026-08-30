@@ -8,14 +8,16 @@ import net.casual.arcade.commands.CommandTree
 import net.casual.arcade.commands.argument
 import net.casual.arcade.commands.literal
 import net.casual.arcade.commands.success
+import net.casual.arcade.minigame.utils.MinigameUtils.requiresAdminOrPermission
 import net.casual.arcade.utils.player.username
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 
-class ContextualGlideCommand(private val glide: GlideMinigame): CommandTree<CommandSourceStack> {
+class GlideMinigameCommand(private val glide: GlideMinigame): CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
-        return GlideCommand.create(buildContext).apply {
+        return CommandTree.buildLiteral("glide") {
+            requiresAdminOrPermission()
             literal("start-ending-round") {
                 executes(::startEndingRound)
             }
