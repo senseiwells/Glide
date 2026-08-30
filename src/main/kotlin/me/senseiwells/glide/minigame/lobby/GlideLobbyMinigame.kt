@@ -33,6 +33,7 @@ import net.casual.arcade.minigame.utils.MinigameResources
 import net.casual.arcade.minigame.utils.MinigameUtils.launchPhased
 import net.casual.arcade.pack.PackInfo
 import net.casual.arcade.pack.utils.PackInfoRef
+import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.entity.teleportTo
 import net.casual.arcade.utils.level.resetToDefault
 import net.casual.arcade.utils.level.set
@@ -270,6 +271,15 @@ class GlideLobbyMinigame(
     @Listener
     private fun onAddPlayer(event: MinigameAddPlayerEvent) {
         val player = event.player
+
+        val glide = this.glide
+        if (glide != null) {
+            GlobalTickedScheduler.Server.later {
+                glide.players.add(player)
+            }
+            return
+        }
+
         player.stopFallFlying()
         player.clearTitle()
         player.clearPlayerInventory()
@@ -280,7 +290,7 @@ class GlideLobbyMinigame(
             player.setGameMode(GameType.ADVENTURE)
         }
 
-        if (this.phase == GlideLobbyPhase.Waiting && this.glide == null) {
+        if (this.phase == GlideLobbyPhase.Waiting) {
             this.setPhase(GlideLobbyPhase.Starting)
         }
     }
