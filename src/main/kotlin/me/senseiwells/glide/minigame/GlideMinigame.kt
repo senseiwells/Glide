@@ -363,6 +363,7 @@ class GlideMinigame(
                 }
             } else {
                 player.teleportTo(this.startPos.x, this.startPos.y, this.startPos.z)
+                player.startFallFlying()
             }
         }
     }
@@ -370,8 +371,9 @@ class GlideMinigame(
     @Listener(flags = ListenerFlags.IS_PLAYING)
     private fun onPlayerHorizontalFlyFallCollision(event: PlayerHorizontalFlyFallCollisionEvent) {
         val (player) = event
-        player.hurtServer(player.level(), player.damageSources().flyIntoWall(), 2.0F)
-        player.playSound(player.fallSounds.small, 1.0F, 1.0F)
+        if (player.hurtServer(player.level(), player.damageSources().flyIntoWall(), 2.0F)) {
+            player.playSound(player.fallSounds.small, 1.0F, 1.0F)
+        }
 
         event.cancel()
     }
