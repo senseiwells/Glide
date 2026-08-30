@@ -1,0 +1,7 @@
+{
+  "spawn": {
+    "type": "arcade:exact",
+    "position": [-340.5, 57.0, -340.5],
+    "rotation": [0.0, -90.0]
+  }
+}
