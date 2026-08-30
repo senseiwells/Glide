@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile
 import it.unimi.dsi.fastutil.objects.Object2IntFunction
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import kotlinx.io.bytestring.encodeToByteString
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.checkpoint.IndexedCheckpoints
 import me.senseiwells.glide.event.PlayerHorizontalFlyFallCollisionEvent
@@ -87,7 +86,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.util.Unit
-import net.minecraft.world.attribute.EnvironmentAttributes
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.Pose
@@ -120,8 +118,7 @@ class GlideMinigame(
     }
 
     private val metadata: GlideMetadataData = this.modules.get()!!
-
-    val checkpoints: IndexedCheckpoints = this.modules.get<GlideCheckpointsData>()!!.checkpoints
+    private val checkpoints: IndexedCheckpoints = this.modules.get<GlideCheckpointsData>()!!.checkpoints
 
     private val checkpointBossbar = VirtualBossbar()
     private val startPos = this.metadata.spawn
@@ -140,7 +137,7 @@ class GlideMinigame(
     private var placement = 1
     private var roundEnding = false
 
-    private var winning: GameProfile? = null
+    private var winner: GameProfile? = null
 
     var ticks = 0
         private set
@@ -149,8 +146,12 @@ class GlideMinigame(
         this.checkpointBossbar.title.set(GlideComponents.CHECKPOINT.withShiftedDownFont(12))
     }
 
-    fun getWinner(): String {
-        return this.winning?.name ?: "Unknown"
+    fun checkpoints(): IndexedCheckpoints {
+        return this.checkpoints
+    }
+
+    fun winner(): String {
+        return this.winner?.name ?: "Unknown"
     }
 
     override fun phases(): Collection<Phase<GlideMinigame>> {
@@ -190,7 +191,7 @@ class GlideMinigame(
     }
 
     fun endRound() {
-        this.winning = this.mode.getUpdatedWinner(this, this.winning)
+        this.winner = this.mode.getUpdatedWinner(this, this.winner)
 
         this.end.setTitle(GlideComponents.ROUND_END.withShiftedDownFont(12))
         for (player in this.players) {
