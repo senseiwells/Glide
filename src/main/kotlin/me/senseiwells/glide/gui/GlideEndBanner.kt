@@ -20,7 +20,7 @@ open class GlideEndBanner(
 
     override fun getBannerText(player: ServerPlayer): Component {
         val component = when {
-            this.glide.round.shouldDisplayWinner() -> GlideComponents.PLAYER_WON.generate(this.glide.getWinner())
+            this.glide.round.shouldDisplayWinner() -> GlideComponents.PLAYER_WON.generate(this.glide.winner())
             !player.glide.finished -> GlideComponents.DNF
             else -> this.glide.mode.getBannerScore(player)
         }
