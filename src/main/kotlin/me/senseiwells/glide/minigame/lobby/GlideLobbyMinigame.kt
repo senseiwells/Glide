@@ -15,6 +15,7 @@ import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.utils.unboostHealth
 import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
+import net.casual.arcade.events.server.player.PlayerLeaveEvent
 import net.casual.arcade.events.server.player.PlayerVoidDamageEvent
 import net.casual.arcade.events.utils.register
 import net.casual.arcade.minigame.Minigame
@@ -184,6 +185,11 @@ class GlideLobbyMinigame(
             configuration.mode
         )
         glide.events.register<MinigameCloseEvent> { this.returnToLobby(glide) }
+        glide.events.register<PlayerLeaveEvent>(priority = 10_000) {
+            if (glide.players.onlinePlayerCount == 0) {
+                glide.close()
+            }
+        }
 
         this.glide = glide
         this.players.transferTo(glide)
