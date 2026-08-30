@@ -8,7 +8,8 @@
 ## About The Project
 
 This project aims to re-implement Minecraft Legacy Console Edition's
-[glide minigame](https://minecraft.wiki/w/Glide_(mini_game)) completely server-side.
+[glide minigame](https://minecraft.wiki/w/Glide_(mini_game)) completely server-side
+for Minecraft Java Edition.
 
 This is part of the [Legacy Edition Minigames Project](https://www.legacyminigames.net/).
 
