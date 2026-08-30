@@ -13,5 +13,25 @@
   "glide.dnf": "DNF",
   "glide.playerWon": "%s won!",
 
-  "glide.checkpoint": "Checkpoint!"
+  "glide.checkpoint": "Checkpoint!",
+
+  "glide.lobby.title": "Glide Lobby",
+  "glide.lobby.rounds": "%s Rounds",
+  "glide.lobby.random": "Random",
+  "glide.lobby.voting": "Voting...",
+  "glide.lobby.sidebar.map": "Map",
+  "glide.lobby.sidebar.mode": "Mode",
+  "glide.lobby.sidebar.rounds": "Rounds",
+
+  "glide.lobby.settings": "Glide Lobby Settings",
+  "glide.lobby.settings.map.name": "Map",
+  "glide.lobby.settings.map.desc": "The glide map that will be played, or whether the players vote for it",
+  "glide.lobby.settings.mode.name": "Mode",
+  "glide.lobby.settings.mode.desc": "Whether the map is played as time or score attack, or whether the players vote for it",
+  "glide.lobby.settings.rounds.name": "Rounds",
+  "glide.lobby.settings.rounds.desc": "How many rounds of the map are played, or whether the players vote for it",
+  "glide.lobby.settings.votingDuration.name": "Voting Duration",
+  "glide.lobby.settings.votingDuration.desc": "How long the players have to vote for",
+  "glide.lobby.settings.countdownDuration.name": "Countdown Duration",
+  "glide.lobby.settings.countdownDuration.desc": "How long the countdown before the minigame starts is"
 }

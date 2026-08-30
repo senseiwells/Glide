@@ -9,6 +9,7 @@ import me.senseiwells.glide.minigame.GlideMode
 import me.senseiwells.glide.minigame.GlideRoundMode
 import me.senseiwells.glide.minigame.MultiGlideRoundMode
 import me.senseiwells.glide.minigame.SoloGlideRoundMode
+import me.senseiwells.glide.minigame.lobby.GlideLobbyMinigame
 import net.casual.arcade.commands.CommandTree
 import net.casual.arcade.commands.argument
 import net.casual.arcade.commands.arguments.EnumArgument
@@ -29,6 +30,14 @@ object GlideCommand: CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
         return CommandTree.buildLiteral("glide") {
             requiresAdminOrPermission()
+            literal("lobby") {
+                literal("create") {
+                    executes { ctx -> createGlideLobby(ctx, listOf(ctx.source.playerOrException)) }
+                    argument("players", EntityArgument.players()) {
+                        executes(::createGlideLobby)
+                    }
+                }
+            }
             literal("create") {
                 argument("map", IdentifierArgument.id()) {
                     suggests { _ -> GlideModules.ids().map(Any::toString) }
@@ -52,6 +61,19 @@ object GlideCommand: CommandTree<CommandSourceStack> {
                 }
             }
         }
+    }
+
+    private fun createGlideLobby(
+        context: CommandContext<CommandSourceStack>,
+        players: Collection<ServerPlayer> = EntityArgument.getPlayers(context, "players")
+    ): Int {
+        val source = context.source
+        val lobby = GlideLobbyMinigame.create(source.server, UUID.randomUUID())
+        for (player in players) {
+            lobby.players.add(player)
+        }
+        lobby.start()
+        return source.success("Successfully created glide lobby!")
     }
 
     private fun createSoloGlideMinigame(
