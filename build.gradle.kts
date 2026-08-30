@@ -10,7 +10,7 @@ plugins {
     java
 }
 
-val modVersion = "0.2.0"
+val modVersion = "1.0.0"
 version = "${modVersion}+${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 
@@ -26,6 +26,13 @@ repositories {
     mavenCentral()
 }
 
+val main: SourceSet = sourceSets.main.get()
+val bundled: SourceSet = sourceSets.create("bundled") {
+    compileClasspath += main.compileClasspath + main.output
+    runtimeClasspath += main.runtimeClasspath + main.output
+}
+
+@Suppress("AvoidDuplicateDependencies", "RedundantSuppression") // lmao thanks IntelliJ
 dependencies {
     minecraft(libs.minecraft)
     implementation(libs.fabric.loader)
@@ -35,25 +42,48 @@ dependencies {
     implementation(libs.arcade)
     implementation(libs.arcade.datagen)
     implementation(libs.polymer.core)
+
+    include(libs.arcade)
+    include(libs.polymer.core)
 }
 
-tasks {
-    processResources {
-        inputs.property("version", project.version)
-        filesMatching("fabric.mod.json") {
-            expand(mutableMapOf(
-                "version" to modVersion,
-                "minecraft_dependency" to libs.versions.minecraft.get(),
-                "fabric_loader_dependency" to libs.versions.fabric.loader.get(),
-                "fabric_api_dependency" to libs.versions.fabric.api.get(),
-                "fabric_kotlin_dependency" to libs.versions.fabric.kotlin.get()
-            ))
+val expansions = mapOf(
+    "version" to modVersion,
+    "minecraft_dependency" to libs.versions.minecraft.get(),
+    "fabric_loader_dependency" to libs.versions.fabric.loader.get(),
+    "fabric_api_dependency" to libs.versions.fabric.api.get(),
+    "fabric_kotlin_dependency" to libs.versions.fabric.kotlin.get()
+)
+
+tasks.withType<ProcessResources>().configureEach {
+    inputs.properties(expansions)
+    filesMatching("fabric.mod.json") {
+        expand(expansions)
+    }
+}
+
+val mainResources = main.output.resourcesDir
+
+tasks.jar {
+    from(bundled.output)
+    from("LICENSE")
+
+    filesMatching("fabric.mod.json") {
+        if (file.parentFile == mainResources) {
+            exclude()
         }
     }
+}
 
-    jar {
-        from("LICENSE")
-    }
+val devJar = tasks.register<Jar>("devJar") {
+    description = "The glide dev jar"
+    archiveClassifier = "dev"
+    from(main.output)
+    from("LICENSE")
+}
+
+tasks.assemble {
+    dependsOn(devJar)
 }
 
 java {
@@ -61,11 +91,25 @@ java {
 }
 
 loom {
+    mods {
+        create("glide") {
+            // The bundled source set must come first, fabric loader reads
+            // the mod's metadata from the first path in the group
+            sourceSet(bundled)
+            sourceSet(main)
+        }
+    }
+
     runs {
+        remove(getByName("client"))
+
+        named("server") {
+            sourceSet = bundled.name
+        }
         create("datagenClient") {
             client()
-            programArgs("--arcade-datagen")
-            runDir = "run-datagen"
+            programArguments.add("--arcade-datagen")
+            runDirectory = layout.projectDirectory.dir("run-datagen")
         }
     }
 }
@@ -75,6 +119,7 @@ publishing {
         create<MavenPublication>("mavenJava") {
             artifactId = "glide"
             from(components["java"])
+            artifact(devJar)
         }
     }
 }
