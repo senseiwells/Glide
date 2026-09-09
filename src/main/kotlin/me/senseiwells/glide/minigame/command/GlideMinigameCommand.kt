@@ -41,7 +41,7 @@ class GlideMinigameCommand(private val glide: GlideMinigame): CommandTree<Comman
     }
 
     private fun endRound(context: CommandContext<CommandSourceStack>): Int {
-        this.glide.setPhase(GlidePhase.Finish)
+        this.glide.phases.set(GlidePhase.Finish)
         return context.source.success("Successfully ending the glide round!")
     }
 

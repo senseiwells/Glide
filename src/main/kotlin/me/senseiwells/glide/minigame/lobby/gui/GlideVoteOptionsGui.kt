@@ -31,7 +31,7 @@ class GlideVoteOptionsGui<T: Any>(
     }
 
     override fun valid(): Boolean {
-        return this.lobby.phase == GlideLobbyPhase.Starting && this.vote.enabled
+        return this.lobby.state.isAt(GlideLobbyPhase.Starting) && this.vote.enabled
     }
 
     private fun pages(): Int {

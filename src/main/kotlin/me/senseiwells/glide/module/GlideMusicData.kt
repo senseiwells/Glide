@@ -2,7 +2,9 @@ package me.senseiwells.glide.module
 
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.minigame.data.MinigameDataModule
+import net.casual.arcade.minigame.data.MinigameData
+import net.casual.arcade.minigame.data.MinigameDataProvider
+import net.casual.arcade.minigame.data.MinigameDataType
 import net.casual.arcade.utils.file.ReadableArchive
 import net.casual.arcade.utils.file.ReadableArchive.Companion.parseJson
 import net.casual.arcade.utils.impl.Sound
@@ -15,8 +17,12 @@ import net.minecraft.sounds.SoundSource
 
 class GlideMusicData(
     val music: List<TimedSound>
-): MinigameDataModule {
-    companion object: MinigameDataModule.Provider {
+): MinigameData {
+    override fun type(): MinigameDataType<*> {
+        return type
+    }
+
+    companion object: MinigameDataProvider<GlideMusicData> {
         private const val MUSIC_FILE = "glide_music.json"
 
         private val TIMED_MUSIC_CODEC = RecordCodecBuilder.create { instance ->
@@ -26,9 +32,9 @@ class GlideMusicData(
             ).apply(instance, ::createTimedMusic)
         }
 
-        override val id: Identifier = GlideMod.id("music")
+        override val type = MinigameDataType<GlideMusicData>(GlideMod.id("music"))
 
-        override fun get(archive: ReadableArchive, server: MinecraftServer): MinigameDataModule {
+        override fun get(archive: ReadableArchive, server: MinecraftServer): GlideMusicData {
             val music = archive.parseJson(MUSIC_FILE, TIMED_MUSIC_CODEC.listOf(), server).getOrThrow()
             return GlideMusicData(music)
         }

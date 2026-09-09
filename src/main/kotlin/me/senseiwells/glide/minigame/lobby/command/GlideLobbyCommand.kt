@@ -56,7 +56,7 @@ class GlideLobbyCommand(private val lobby: GlideLobbyMinigame): CommandTree<Comm
     }
 
     private fun ready(context: CommandContext<CommandSourceStack>): Int {
-        if (this.lobby.phase != GlideLobbyPhase.Starting) {
+        if (!this.lobby.state.isAt(GlideLobbyPhase.Starting)) {
             return context.source.fail("The glide lobby isn't starting yet!")
         }
         val player = context.source.playerOrException
@@ -68,7 +68,7 @@ class GlideLobbyCommand(private val lobby: GlideLobbyMinigame): CommandTree<Comm
     }
 
     private fun openVote(context: CommandContext<CommandSourceStack>): Int {
-        if (this.lobby.phase != GlideLobbyPhase.Starting) {
+        if (!this.lobby.state.isAt(GlideLobbyPhase.Starting)) {
             return context.source.fail("There isn't a glide vote running right now!")
         }
         val open = this.lobby.votes.all().filter(GlideVote<*>::enabled)

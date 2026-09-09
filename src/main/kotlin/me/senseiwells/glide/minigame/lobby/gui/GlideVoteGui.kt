@@ -27,7 +27,7 @@ class GlideVoteGui(
     }
 
     override fun valid(): Boolean {
-        return this.lobby.phase == GlideLobbyPhase.Starting
+        return this.lobby.state.isAt(GlideLobbyPhase.Starting)
     }
 
     private fun load() {

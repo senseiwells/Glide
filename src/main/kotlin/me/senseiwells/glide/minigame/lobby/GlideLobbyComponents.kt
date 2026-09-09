@@ -1,9 +1,8 @@
 package me.senseiwells.glide.minigame.lobby
 
 import me.senseiwells.glide.minigame.GlideMode
-import me.senseiwells.glide.module.GlideMetadataData
+import me.senseiwells.glide.module.GlideMetaData
 import me.senseiwells.glide.module.GlideModules
-import net.casual.arcade.minigame.data.MinigameDataModules.Companion.get
 import net.casual.arcade.utils.ComponentUtils
 import net.casual.arcade.utils.string.SnakeCase
 import net.casual.arcade.utils.string.TitleCase
@@ -18,7 +17,7 @@ object GlideLobbyComponents {
     val RANDOM = Component.translatable("glide.lobby.random")
 
     fun map(map: Identifier): Component {
-        val name = GlideModules.get(map)?.get<GlideMetadataData>()?.name
+        val name = GlideModules.get(map)?.get(GlideMetaData.type)?.name
         if (name == null || name.string.isEmpty()) {
             return Component.literal(map.path.convertCasing(SnakeCase, TitleCase))
         }
