@@ -1,6 +1,5 @@
 package me.senseiwells.glide.minigame
 
-import com.mojang.authlib.GameProfile
 import it.unimi.dsi.fastutil.objects.Object2IntFunction
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -30,6 +29,7 @@ import net.casual.arcade.minigame.data.MinigameDataSet
 import net.casual.arcade.minigame.data.impl.MinigameWorldData
 import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.phase.MinigamePhaseLifetime
+import net.casual.arcade.minigame.scope.MinigameScope
 import net.casual.arcade.minigame.utils.MinigameResources
 import net.casual.arcade.observer.utils.asObserver
 import net.casual.arcade.pack.PackInfo
@@ -40,7 +40,6 @@ import net.casual.arcade.pack.utils.PackInfoRef
 import net.casual.arcade.pack.utils.ResourcePackUtils
 import net.casual.arcade.pack.utils.ResourcePackUtils.toPackInfo
 import net.casual.arcade.pack.utils.withShiftedDownFont
-import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.scheduler.utils.launch
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.TimeUtils.Ticks
@@ -55,7 +54,6 @@ import net.casual.arcade.utils.player.*
 import net.casual.arcade.utils.registries.isOf
 import net.casual.arcade.utils.registries.toKey
 import net.casual.arcade.utils.scoreboard.getOrCreateTeam
-import net.casual.arcade.utils.server.player
 import net.casual.arcade.virtual.visuals.bossbar.VirtualBossbar
 import net.casual.arcade.virtual.visuals.sidebar.DynamicVirtualSidebar
 import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
@@ -117,9 +115,12 @@ class GlideMinigame(
     private val frozenPlayers = Object2ObjectOpenHashMap<UUID, Vec3>()
 
     private var placement = 1
-    private var roundEnding = false
+    private var racingScope: MinigameScope? = null
 
     private var winner: NameAndId? = null
+
+    private val racing: Boolean
+        get() = this.state >= GlidePhase.Active && this.state < GlidePhase.Finish
 
     val level: ServerLevel
         get() = this.levels.require(LEVEL_ID)
@@ -140,10 +141,15 @@ class GlideMinigame(
     }
 
     fun displayCheckpointNotificationTo(player: ServerPlayer) {
-        this.checkpointBossbar.startObservingAndSendPackets(player.asObserver())
-        // 2 Seconds, then 1 second fade
-        GlobalTickedScheduler.Server.schedule(3.Seconds) {
-            this.checkpointBossbar.stopObservingAndSendPackets(player.asObserver())
+        val observer = player.asObserver()
+        this.scopes.current.launch {
+            checkpointBossbar.startObservingAndSendPackets(observer)
+            try {
+                // 2 Seconds, then 1 second fade
+                delay(3.Seconds)
+            } finally {
+                checkpointBossbar.stopObservingAndSendPackets(observer)
+            }
         }
     }
 
@@ -151,63 +157,22 @@ class GlideMinigame(
         this.players.setSpectating(player)
         player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
 
-        val tracker = this.trackers.remove(player.uuid) ?: return
-        val updated = player.glide.updateBests(this.metadata.id, this, this.ticks.Ticks, tracker.finish())
-        if (updated) {
+        val tracker = this.trackers.remove(player.uuid)
+        if (tracker != null && player.glide.updateBests(this.metadata.id, this, this.ticks.Ticks, tracker.finish())) {
             this.scheduler.schedule(1.Seconds) {
                 player.sendSound(this.mode.getPersonalBestSound(), static = true)
             }
         }
 
-        val remaining = this.players.playingPlayerCount
-        if (remaining > 0) {
-            if (this.placement == 2) {
-                this.startEndingRound()
-            } else {
-                this.sendFinish(player)
-            }
-        } else {
-            this.phases.set(GlidePhase.Finish)
-        }
-    }
-
-    fun endRound() {
-        this.winner = this.mode.getUpdatedWinner(this, this.winner)
-
-        this.end.setTitle(GlideComponents.ROUND_END.withShiftedDownFont(12))
-        for (player in this.players) {
-            this.players.setSpectating(player)
-            this.removeBannerUI(player)
-            player.glide.resetAnimation()
-            this.end.addPlayer(player)
-        }
-        val scope = this.scopes.create(MinigamePhaseLifetime.Current)
-        scope.launch {
-            delay(1.Seconds)
-            end.transition(4.Seconds, players = players::all)
-            delay(1.Seconds)
-            val result = round.finishRound()
-            if (result == GlideRoundMode.RoundResult.Restart) {
-                restart()
-            } else {
-                complete()
-            }
+        when {
+            this.players.playingPlayerCount == 0 -> this.phases.set(GlidePhase.Finish)
+            this.placement == 2 -> this.phases.set(GlidePhase.Ending)
+            else -> this.sendFinish(player)
         }
     }
 
     fun restart() {
-        this.placement = 1
-        this.ticks = 0
-        this.roundEnding = false
-        this.trackers.clear()
-
-        this.phases.set(GlidePhase.Waiting)
-
-        for (player in this.players) {
-            this.players.setSpectating(player)
-            player.teleportTo(this.startPos.with(this.level))
-            this.players.setPlaying(player)
-        }
+        this.phases.request(GlidePhase.Waiting)
     }
 
     fun freezePlayer(player: ServerPlayer) {
@@ -220,29 +185,22 @@ class GlideMinigame(
         this.frozenPlayers.remove(player.uuid)
     }
 
-    fun startEndingRound() {
-        if (this.roundEnding) {
-            return
-        }
-
-        this.roundEnding = true
-        for (player in this.players) {
-            this.sendFinish(player)
-        }
-        val scope = this.scopes.create(MinigamePhaseLifetime.Current)
-        scope.launch {
-            finish.transition(60.Seconds, players = players::all)
-            phases.set(GlidePhase.Finish)
-        }
-    }
-
     private fun sendFinish(player: ServerPlayer) {
         this.removeBannerUI(player)
         player.glide.resetAnimation()
         this.finish.addPlayer(player)
-        this.scheduler.schedule(5.Seconds) {
+        this.racingScope().schedule(5.Seconds) {
             this.finish.removePlayer(player, title = false)
         }
+    }
+
+    private fun racingScope(): MinigameScope {
+        var scope = this.racingScope
+        if (scope == null || scope.closed) {
+            scope = this.scopes.create(MinigamePhaseLifetime.During(GlidePhase.Active, GlidePhase.Ending))
+            this.racingScope = scope
+        }
+        return scope
     }
 
     @Listener
@@ -328,7 +286,7 @@ class GlideMinigame(
                     player.hurtServer(player.level(), player.damageSources().flyIntoWall(), 2.0F)
                 }
 
-                if (this.state.isAt(GlidePhase.Active)) {
+                if (this.racing) {
                     val tracker = this.trackers[player.uuid] ?: return
                     if (this.ticks % GlideTrailTracker.TICK_INTERVAL == 0) {
                         tracker.update(player.position())
@@ -384,12 +342,11 @@ class GlideMinigame(
         )
         player.sendSystemMessage(Component.empty(), true)
 
-        val scope = this.scopes.create(MinigamePhaseLifetime.Current)
-        scope.schedule(1.Seconds) {
+        this.racingScope().schedule(1.Seconds) {
             this.unfreezePlayer(player)
             this.sidebar.startObservingAndSendPackets(player.asObserver())
             this.respawnPlayer(player)
-            if (this.roundEnding) {
+            if (this.state.isAt(GlidePhase.Ending)) {
                 this.finish.addPlayer(player, shield = false)
             }
         }
@@ -397,17 +354,16 @@ class GlideMinigame(
 
     @Listener
     private fun onServerTick(event: ServerTickEvent) {
-        if (this.state.isAt(GlidePhase.Active) && !this.paused && this.level.tickRateManager().runsNormally()) {
+        if (this.racing && !this.paused && this.level.tickRateManager().runsNormally()) {
             this.ticks++
         }
 
         this.tickBanners()
         this.tickProgress()
 
-        for ((uuid, index) in this.playerIndices) {
-            val player = event.server.player(uuid) ?: continue
-            if (!player.isSpectator && !this.players.isSpectating(player)) {
-                this.sendProgress(player, index)
+        for (player in this.players.playing) {
+            if (!player.isSpectator) {
+                this.sendProgress(player, this.playerIndices.getInt(player.uuid))
             }
         }
         for (player in this.players.spectating) {
@@ -441,7 +397,7 @@ class GlideMinigame(
         player.glide.respawnLocation = this.startPos
         player.glide.reset()
         this.setPlayerPlayingState(player)
-        if (this.state < GlidePhase.Active) {
+        if (!this.racing) {
             player.verticalCollision = false
             this.freezePlayer(player)
 
@@ -475,7 +431,7 @@ class GlideMinigame(
 
     @Listener(filters = [ListenerFilter.IsPlaying])
     private fun onPlayerSneak(event: PlayerSetSneakingEvent) {
-        if (!this.state.isAt(GlidePhase.Active)) {
+        if (!this.racing) {
             return
         }
 
@@ -533,10 +489,21 @@ class GlideMinigame(
         this.phases.coroutines[GlidePhase.Waiting] = this::runWaitingLogic
         this.phases.coroutines[GlidePhase.Countdown] = this::runCountdownLogic
         this.phases.coroutines[GlidePhase.Active] = this::runActiveLogic
+        this.phases.coroutines[GlidePhase.Ending] = this::runEndingLogic
         this.phases.coroutines[GlidePhase.Finish] = this::runFinishLogic
     }
 
     private suspend fun runWaitingLogic() {
+        this.placement = 1
+        this.ticks = 0
+        this.trackers.clear()
+
+        for (player in this.players) {
+            this.players.setSpectating(player)
+            player.teleportTo(this.startPos.with(this.level))
+            this.players.setPlaying(player)
+        }
+
         ResourcePackUtils.awaitPacks(this.players)
     }
 
@@ -552,10 +519,37 @@ class GlideMinigame(
         awaitCancellation()
     }
 
+    private suspend fun runEndingLogic() {
+        for (player in this.players) {
+            this.sendFinish(player)
+        }
+        this.finish.transition(60.Seconds, players = this.players::all)
+    }
+
     private suspend fun runFinishLogic() {
-        this.settings.canTakeDamage.set(false)
-        this.endRound()
-        awaitCancellation()
+        try {
+            this.settings.canTakeDamage.set(false)
+            this.winner = this.mode.getUpdatedWinner(this, this.winner)
+
+            this.end.setTitle(GlideComponents.ROUND_END.withShiftedDownFont(12))
+            for (player in this.players) {
+                this.players.setSpectating(player)
+                this.removeBannerUI(player)
+                player.glide.resetAnimation()
+                this.end.addPlayer(player)
+            }
+
+            delay(1.Seconds)
+            this.end.transition(4.Seconds, players = this.players::all)
+            delay(1.Seconds)
+
+            when (this.round.finishRound()) {
+                GlideRoundMode.RoundResult.Restart -> this.restart()
+                GlideRoundMode.RoundResult.Complete -> this.complete()
+            }
+        } finally {
+            this.settings.canTakeDamage.set(true)
+        }
     }
 
     private fun respawnPlayer(player: ServerPlayer) {
@@ -583,7 +577,7 @@ class GlideMinigame(
         player.setVelocityAndMark(0.0, 0.0, 0.0)
 
         // Ensure the player has loaded the chunks
-        GlobalTickedScheduler.Server.schedule(1.Ticks) {
+        this.scheduler.schedule(1.Ticks) {
             val elytra = ItemStack(Items.ELYTRA)
             elytra.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
             player.setItemSlot(EquipmentSlot.CHEST, elytra)

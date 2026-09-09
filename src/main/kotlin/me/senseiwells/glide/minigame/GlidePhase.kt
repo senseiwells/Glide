@@ -6,5 +6,6 @@ enum class GlidePhase: MinigamePhase {
     Waiting,
     Countdown,
     Active,
+    Ending,
     Finish
 }

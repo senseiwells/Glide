@@ -5,7 +5,6 @@ import me.senseiwells.glide.font.GlideFont
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.sound.GlideSounds
 import net.casual.arcade.pack.utils.withShiftedDownFont
-import net.casual.arcade.scheduler.GlobalTickedScheduler
 import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.component.color
 import net.casual.arcade.utils.component.shadowless
@@ -62,7 +61,7 @@ class GlideStartBanner(private val glide: GlideMinigame): GlideBanner(glide.serv
             player.sendSound(GlideSounds.COUNTDOWN_START)
         }
         this.setTitle(GlideComponents.STARTED.withShiftedDownFont(12))
-        GlobalTickedScheduler.Server.schedule(2.Seconds) {
+        this.glide.scheduler.schedule(2.Seconds) {
             super.afterTransition(players)
         }
     }

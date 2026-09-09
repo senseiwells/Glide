@@ -1,6 +1,5 @@
 package me.senseiwells.glide.minigame.lobby
 
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import me.senseiwells.glide.GlideMod
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
@@ -17,24 +16,22 @@ import me.senseiwells.glide.utils.unboostHealth
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
 import net.casual.arcade.events.server.player.PlayerLeaveEvent
 import net.casual.arcade.events.server.player.PlayerVoidDamageEvent
+import net.casual.arcade.events.utils.await
 import net.casual.arcade.minigame.Minigame
 import net.casual.arcade.minigame.annotation.Listener
 import net.casual.arcade.minigame.data.MinigameDataSet
 import net.casual.arcade.minigame.data.impl.MinigameWorldData
 import net.casual.arcade.minigame.events.*
 import net.casual.arcade.minigame.managers.MinigameLevelManager.SpawnLocation
-import net.casual.arcade.minigame.phase.MinigamePhaseLifetime
 import net.casual.arcade.minigame.utils.MinigameResources
 import net.casual.arcade.pack.PackInfo
 import net.casual.arcade.pack.utils.PackInfoRef
 import net.casual.arcade.scheduler.GlobalTickedScheduler
-import net.casual.arcade.scheduler.utils.launch
 import net.casual.arcade.utils.entity.teleportTo
 import net.casual.arcade.utils.level.resetToDefault
 import net.casual.arcade.utils.level.set
 import net.casual.arcade.utils.math.location.LocationWithLevel
 import net.casual.arcade.utils.player.*
-import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.visuals.elements.UniversalElement
 import net.casual.arcade.virtual.visuals.sidebar.DynamicVirtualSidebar
 import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
@@ -61,43 +58,14 @@ class GlideLobbyMinigame(
 
     private val sidebar = DynamicVirtualSidebar(this.server)
 
-    private var countdownJob: Job? = null
-    val countdown: GlideLobbyCountdown = GlideLobbyCountdown(this)
+    private val countdown: GlideLobbyCountdown = GlideLobbyCountdown(this)
+    private var glide: GlideMinigame? = null
 
     val level: ServerLevel get() = this.levels.require(LEVEL_ID)
     val votes: GlideLobbyVotes = GlideLobbyVotes(this)
 
-    var glide: GlideMinigame? = null
-        private set
-
     fun availableMaps(): List<Identifier> {
         return GlideModules.ids().toList()
-    }
-
-    fun configuration(): GlideConfiguration? {
-        return this.votes.resolve(this.level.random)
-    }
-
-    fun startCountdown(delay: MinecraftTimeDuration?) {
-        this.stopCountdown()
-
-        if (delay == null || !this.state.isAt(GlideLobbyPhase.Starting) || this.glide != null) {
-            return
-        }
-        val scope = this.scopes.create(MinigamePhaseLifetime.Current)
-        this.countdownJob = scope.launch {
-            try {
-                countdown.transition(delay, players = players::all)
-            } finally {
-                countdown.stop()
-            }
-            startGlide()
-        }
-    }
-
-    fun stopCountdown() {
-        this.countdownJob?.cancel()
-        this.countdownJob = null
     }
 
     fun isReady(player: ServerPlayer): Boolean {
@@ -128,60 +96,18 @@ class GlideLobbyMinigame(
         this.tags.clear(READY)
     }
 
+    fun teleport(player: ServerPlayer) {
+        player.teleportTo(this.spawn())
+    }
+
     private fun checkAllReady() {
-        if (!this.state.isAt(GlideLobbyPhase.Starting) || this.glide != null) {
+        if (!this.state.isAt(GlideLobbyPhase.Starting)) {
             return
         }
         val playing = this.players.playing
         if (playing.isNotEmpty() && playing.all(this::isReady)) {
-            this.startGlide()
+            this.phases.set(GlideLobbyPhase.Playing)
         }
-    }
-
-    fun startGlide() {
-        if (this.players.onlinePlayerCount == 0) {
-            GlideMod.logger.error("Glide lobby failed to start, it has no players")
-            this.phases.set(GlideLobbyPhase.Waiting)
-            return
-        }
-
-        val configuration = this.configuration()
-        if (configuration == null) {
-            GlideMod.logger.error("Glide lobby failed to start, it has no available maps")
-            this.phases.set(GlideLobbyPhase.Waiting)
-            return
-        }
-
-        val modules = GlideModules.get(configuration.map)
-        if (modules == null) {
-            GlideMod.logger.error("Glide lobby failed to start, no such map ${configuration.map}")
-            this.phases.set(GlideLobbyPhase.Waiting)
-            return
-        }
-
-        val glide = GlideMinigame.create(
-            this.server,
-            UUID.randomUUID(),
-            modules,
-            MultiGlideRoundMode(configuration.rounds),
-            configuration.mode
-        )
-        glide.events.register<MinigameCloseEvent> { this.returnToLobby(glide) }
-        glide.events.register<PlayerLeaveEvent>(priority = 10_000) {
-            if (glide.players.onlinePlayerCount == 0) {
-                glide.close()
-            }
-        }
-
-        this.glide = glide
-        this.players.transferTo(glide)
-        glide.start()
-
-        this.phases.set(GlideLobbyPhase.Waiting)
-    }
-
-    fun teleport(player: ServerPlayer) {
-        player.teleportTo(this.spawn())
     }
 
     private fun spawn(): LocationWithLevel<ServerLevel> {
@@ -196,10 +122,38 @@ class GlideLobbyMinigame(
             return
         }
         glide.players.transferTo(this)
+        this.phases.set(GlideLobbyPhase.Waiting)
+    }
 
-        if (this.state.isAt(GlideLobbyPhase.Waiting) && this.players.onlinePlayerCount > 0) {
-            this.phases.set(GlideLobbyPhase.Starting)
+    private fun configuration(): GlideConfiguration? {
+        return this.votes.resolve(this.level.random)
+    }
+
+    private fun createGlide(): GlideMinigame? {
+        if (this.players.onlinePlayerCount == 0) {
+            GlideMod.logger.error("Glide lobby failed to start, it has no players")
+            return null
         }
+
+        val configuration = this.configuration()
+        if (configuration == null) {
+            GlideMod.logger.error("Glide lobby failed to start, it has no available maps")
+            return null
+        }
+
+        val modules = GlideModules.get(configuration.map)
+        if (modules == null) {
+            GlideMod.logger.error("Glide lobby failed to start, no such map ${configuration.map}")
+            return null
+        }
+
+        return GlideMinigame.create(
+            this.server,
+            UUID.randomUUID(),
+            modules,
+            MultiGlideRoundMode(configuration.rounds),
+            configuration.mode
+        )
     }
 
     @Listener
@@ -211,8 +165,10 @@ class GlideLobbyMinigame(
 
         this.commands.register(GlideLobbyCommand(this))
 
-        this.settings.startDelay.addListener { _, _, value ->
-            this.startCountdown(value.getOrNull())
+        this.settings.startDelay.addListener { _, _, _ ->
+            if (this.state.isAt(GlideLobbyPhase.Starting)) {
+                this.phases.set(GlideLobbyPhase.Starting, force = true)
+            }
         }
 
         this.sidebar.setTitle(UniversalElement.constant(Component.translatable("glide.lobby.title")))
@@ -279,10 +235,6 @@ class GlideLobbyMinigame(
         if (!this.players.isAdmin(player)) {
             player.setGameMode(GameType.ADVENTURE)
         }
-
-        if (this.state.isAt(GlideLobbyPhase.Waiting)) {
-            this.phases.set(GlideLobbyPhase.Starting)
-        }
     }
 
     @Listener
@@ -290,6 +242,9 @@ class GlideLobbyMinigame(
         this.votes.retract(event.player)
         this.tags.remove(event.player, READY)
 
+        if (this.state.isAt(GlideLobbyPhase.Playing)) {
+            return
+        }
         if (this.players.onlinePlayerCount == 0) {
             this.phases.set(GlideLobbyPhase.Waiting)
             return
@@ -345,21 +300,46 @@ class GlideLobbyMinigame(
     private fun initializePhases() {
         this.phases.coroutines[GlideLobbyPhase.Waiting] = this::runWaitingLogic
         this.phases.coroutines[GlideLobbyPhase.Starting] = this::runStartingLogic
+        this.phases.coroutines[GlideLobbyPhase.Playing] = this::runPlayingLogic
     }
 
     private suspend fun runWaitingLogic() {
-        awaitCancellation()
+        this.votes.clear()
+        this.clearReady()
+
+        while (this.players.onlinePlayerCount == 0) {
+            this.events.await<MinigameAddPlayerEvent>()
+        }
     }
 
     private suspend fun runStartingLogic() {
         try {
-            this.votes.clear()
-            this.clearReady()
-            this.startCountdown(this.settings.startDelay.get().getOrNull())
-            awaitCancellation()
+            val delay = this.settings.startDelay.get().getOrNull() ?: awaitCancellation()
+            this.countdown.transition(delay, players = this.players::all)
         } finally {
-            this.stopCountdown()
+            this.countdown.stop()
         }
+    }
+
+    private suspend fun runPlayingLogic() {
+        val glide = this.createGlide()
+        if (glide == null) {
+            this.phases.set(GlideLobbyPhase.Waiting)
+            return
+        }
+
+        glide.scopes.root.register<MinigameCloseEvent> { this.returnToLobby(glide) }
+        glide.scopes.root.register<PlayerLeaveEvent>(priority = 10_000) {
+            if (glide.players.onlinePlayerCount == 0) {
+                glide.close()
+            }
+        }
+
+        this.glide = glide
+        this.players.transferTo(glide)
+        glide.start()
+
+        awaitCancellation()
     }
 
     companion object {

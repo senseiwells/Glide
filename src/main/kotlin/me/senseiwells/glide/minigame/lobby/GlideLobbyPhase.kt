@@ -4,5 +4,6 @@ import net.casual.arcade.minigame.phase.MinigamePhase
 
 enum class GlideLobbyPhase: MinigamePhase {
     Waiting,
-    Starting
+    Starting,
+    Playing
 }
