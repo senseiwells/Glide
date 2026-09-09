@@ -2,7 +2,7 @@ package me.senseiwells.glide.minigame.lobby.gui
 
 import me.senseiwells.glide.minigame.lobby.GlideLobbySettings
 import net.casual.arcade.guis.core.container.ContainerGui
-import net.casual.arcade.guis.utils.SlotClickAction
+import net.casual.arcade.minigame.utils.addSettingDisplay
 import net.casual.arcade.utils.ItemUtils.named
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -11,8 +11,8 @@ import net.minecraft.world.item.Items
 class GlideSettingsGui(
     player: ServerPlayer,
     private val settings: GlideLobbySettings
-): ContainerGui(player, GlideGuis.type(GlideGuis.rows(settings.displays().size) + 1), false) {
-    private val displays = this.settings.displays()
+): ContainerGui(player, GlideGuis.type(GlideGuis.rows(enabled.size) + 1), false) {
+    private val displays = enabled.map { property -> property.get(this.settings) }
     private val positions = GlideGuis.slots(this.displays.size, GlideGuis.rows(this.displays.size))
 
     init {
@@ -31,12 +31,7 @@ class GlideSettingsGui(
                 this.clearSlot(slot)
                 continue
             }
-            this.setSlot(slot, setting.displayWithLore()) { action ->
-                if (action.isMouse && action != SlotClickAction.MouseDoubleClick) {
-                    setting.cycle(if (action.isRight) -1 else 1)
-                    this.load()
-                }
-            }
+            this.addSettingDisplay(slot, setting)
         }
         for (slot in footer..< this.getContainerSize()) {
             this.setSlot(slot, GlideGuis.filler())
@@ -44,5 +39,9 @@ class GlideSettingsGui(
         this.setSlot(footer + GlideGuis.ROW / 2, Items.BARRIER.named(Component.translatable("glide.lobby.gui.close"))) {
             this.openParentOrClose()
         }
+    }
+
+    companion object {
+        private val enabled = listOf(GlideLobbySettings::map, GlideLobbySettings::mode, GlideLobbySettings::rounds, GlideLobbySettings::startDelay)
     }
 }
