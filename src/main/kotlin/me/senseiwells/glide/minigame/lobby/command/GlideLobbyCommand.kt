@@ -39,13 +39,13 @@ class GlideLobbyCommand(private val lobby: GlideLobbyMinigame): CommandTree<Comm
     }
 
     private fun start(context: CommandContext<CommandSourceStack>): Int {
-        if (this.lobby.glide != null) {
+        if (this.lobby.state.isAt(GlideLobbyPhase.Playing)) {
             return context.source.fail("The glide lobby is already playing a minigame!")
         }
         if (this.lobby.players.onlinePlayerCount == 0) {
             return context.source.fail("The glide lobby has no players!")
         }
-        this.lobby.startGlide()
+        this.lobby.phases.set(GlideLobbyPhase.Playing)
         return context.source.success("Successfully started the glide minigame!")
     }
 
