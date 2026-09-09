@@ -68,6 +68,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.players.NameAndId
 import net.minecraft.util.Mth
 import net.minecraft.util.Unit
 import net.minecraft.world.damagesource.DamageTypes
@@ -118,7 +119,7 @@ class GlideMinigame(
     private var placement = 1
     private var roundEnding = false
 
-    private var winner: GameProfile? = null
+    private var winner: NameAndId? = null
 
     val level: ServerLevel
         get() = this.levels.require(LEVEL_ID)
@@ -185,7 +186,12 @@ class GlideMinigame(
             delay(1.Seconds)
             end.transition(4.Seconds, players = players::all)
             delay(1.Seconds)
-            round.onRoundFinished(this@GlideMinigame)
+            val result = round.finishRound()
+            if (result == GlideRoundMode.RoundResult.Restart) {
+                restart()
+            } else {
+                complete()
+            }
         }
     }
 
