@@ -1,14 +1,14 @@
 package me.senseiwells.glide.minigame.lobby.vote
 
 import me.senseiwells.glide.minigame.GlideMode
-import me.senseiwells.glide.minigame.lobby.GlideLobbyMinigame
-import me.senseiwells.glide.minigame.lobby.GlideLobbyComponents
 import me.senseiwells.glide.minigame.lobby.GlideConfiguration
+import me.senseiwells.glide.minigame.lobby.GlideLobbyComponents
+import me.senseiwells.glide.minigame.lobby.GlideLobbyMinigame
 import me.senseiwells.glide.minigame.lobby.GlideLobbySettings
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.Items
 import net.minecraft.util.RandomSource
+import net.minecraft.world.item.Items
 
 class GlideLobbyVotes(lobby: GlideLobbyMinigame) {
     val map: GlideVote<Identifier> = GlideVote(

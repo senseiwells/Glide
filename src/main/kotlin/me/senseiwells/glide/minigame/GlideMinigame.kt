@@ -20,7 +20,6 @@ import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.sound.GlideSounds
 import me.senseiwells.glide.tracker.GlideTrailTracker
 import me.senseiwells.glide.utils.boostHealth
-import net.casual.arcade.dimensions.level.builder.CustomLevelBuilder
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
 import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.events.server.player.*
