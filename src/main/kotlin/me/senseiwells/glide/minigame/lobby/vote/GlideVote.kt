@@ -6,8 +6,8 @@ import me.senseiwells.glide.minigame.lobby.GlideSelection
 import net.casual.arcade.minigame.settings.GameSetting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.Item
 import net.minecraft.util.RandomSource
+import net.minecraft.world.item.Item
 import java.util.*
 
 class GlideVote<T: Any>(

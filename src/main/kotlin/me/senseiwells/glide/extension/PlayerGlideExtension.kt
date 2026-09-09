@@ -10,7 +10,6 @@ import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
-import me.senseiwells.glide.entity.accelerator.BoosterAccelerator
 import me.senseiwells.glide.entity.accelerator.StaticThermalAccelerator
 import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.ring.Ring

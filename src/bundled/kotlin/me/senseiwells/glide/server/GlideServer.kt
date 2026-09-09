@@ -9,7 +9,7 @@ import net.casual.arcade.minigame.utils.MinigameUtils.getMinigame
 import net.casual.arcade.utils.player.hasPermission
 import net.fabricmc.api.ModInitializer
 import net.minecraft.server.permissions.PermissionLevel
-import java.util.UUID
+import java.util.*
 
 object GlideServer: ModInitializer {
     private var lobby: GlideLobbyMinigame? = null
