@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
 open class GlideEndBanner(
-    private val glide: GlideMinigame
+    protected val glide: GlideMinigame
 ): GlideBanner(glide.server) {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         return this.glide.mode.getBannerShield(frame).wrap().shadowless()
