@@ -14,6 +14,7 @@ import me.senseiwells.glide.module.GlideModules
 import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.utils.unboostHealth
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
+import net.casual.arcade.events.server.ServerTickEvent
 import net.casual.arcade.events.server.player.PlayerLeaveEvent
 import net.casual.arcade.events.server.player.PlayerVoidDamageEvent
 import net.casual.arcade.events.utils.await
@@ -27,6 +28,7 @@ import net.casual.arcade.minigame.utils.MinigameResources
 import net.casual.arcade.pack.PackInfo
 import net.casual.arcade.pack.utils.PackInfoRef
 import net.casual.arcade.scheduler.GlobalTickedScheduler
+import net.casual.arcade.utils.TimeUtils.Seconds
 import net.casual.arcade.utils.entity.teleportTo
 import net.casual.arcade.utils.level.resetToDefault
 import net.casual.arcade.utils.level.set
@@ -100,6 +102,22 @@ class GlideLobbyMinigame(
         player.teleportTo(this.spawn())
     }
 
+    fun initializeGlideMinigame(glide: GlideMinigame) {
+        glide.scopes.root.register<MinigameCloseEvent> { this.returnToLobby(glide) }
+
+        var emptyTicks = 0
+        glide.scopes.root.register<ServerTickEvent> {
+            if (glide.players.onlinePlayerCount == 0) {
+                emptyTicks++
+                if (emptyTicks > 10.Seconds.ticks) {
+                    glide.close()
+                }
+            } else {
+                emptyTicks = 0
+            }
+        }
+    }
+
     private fun checkAllReady() {
         if (!this.state.isAt(GlideLobbyPhase.Starting)) {
             return
@@ -115,14 +133,14 @@ class GlideLobbyMinigame(
     }
 
     private fun returnToLobby(glide: GlideMinigame) {
-        if (this.glide === glide) {
-            this.glide = null
-        }
         if (this.closed) {
             return
         }
+        if (this.glide === glide) {
+            this.glide = null
+            this.phases.set(GlideLobbyPhase.Waiting)
+        }
         glide.players.transferTo(this)
-        this.phases.set(GlideLobbyPhase.Waiting)
     }
 
     private fun configuration(): GlideConfiguration? {
@@ -328,12 +346,7 @@ class GlideLobbyMinigame(
             return
         }
 
-        glide.scopes.root.register<MinigameCloseEvent> { this.returnToLobby(glide) }
-        glide.scopes.root.register<PlayerLeaveEvent>(priority = 10_000) {
-            if (glide.players.onlinePlayerCount == 0) {
-                glide.close()
-            }
-        }
+        this.initializeGlideMinigame(glide)
 
         this.glide = glide
         this.players.transferTo(glide)

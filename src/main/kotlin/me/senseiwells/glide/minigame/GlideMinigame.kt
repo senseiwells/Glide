@@ -154,8 +154,9 @@ class GlideMinigame(
     }
 
     fun markPlayerFinished(player: ServerPlayer) {
+        val placement = this.placement++
         this.players.setSpectating(player)
-        player.sendSound(GlideSounds.getFinishSound(this.placement++), static = true)
+        player.sendSound(GlideSounds.getFinishSound(placement), static = true)
 
         val tracker = this.trackers.remove(player.uuid)
         if (tracker != null && player.glide.updateBests(this.metadata.id, this, this.ticks.Ticks, tracker.finish())) {
@@ -166,7 +167,7 @@ class GlideMinigame(
 
         when {
             this.players.playingPlayerCount == 0 -> this.phases.set(GlidePhase.Finish)
-            this.placement == 2 -> this.phases.set(GlidePhase.Ending)
+            this.placement == 3 -> this.phases.set(GlidePhase.Ending)
             else -> this.sendFinish(player)
         }
     }
