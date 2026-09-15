@@ -1,4 +1,4 @@
-#version 460
+#version 330
 
 #moj_import <minecraft:fog.glsl>
 #moj_import <minecraft:dynamictransforms.glsl>
