@@ -2,6 +2,7 @@
 
 #moj_import <minecraft:fog.glsl>
 #moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <minecraft:globals.glsl>
 
 uniform sampler2D Sampler0;
 
@@ -52,24 +53,17 @@ void main() {
     faceVertexColor.a = 1.0;
 #endif
 
+    if (faceVertexColor.a < 0.26) { // Janky transparency check that should go in the dissolve ifdef but can't because that's not right?????
+        color.a = (sphericalVertexDistance / 3.0);
+    }
     color *= faceVertexColor * ColorModulator;
+    
 #ifndef NO_OVERLAY
     color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
 #endif
 #ifndef EMISSIVE
     color *= lightMapColor;
 #endif
-
-    // == Glide Start ==
-    // Start Fade out, for players, friendly invisibles have an alpha of 0.26x
-    if (faceVertexColor.a < 0.26 && sphericalVertexDistance < 16.0) {
-        // Most players have a transparent second layer.
-        if (color.a < 0.1) {
-            discard;
-        }
-        color.a = sphericalVertexDistance / 16.0;
-    }
-    // == Glide End ==
 
     fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
 }
