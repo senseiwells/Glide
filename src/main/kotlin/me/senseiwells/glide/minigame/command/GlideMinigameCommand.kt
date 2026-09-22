@@ -2,6 +2,7 @@ package me.senseiwells.glide.minigame.command
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.minigame.GlideMinigame
 import me.senseiwells.glide.minigame.GlidePhase
 import net.casual.arcade.commands.CommandTree
@@ -36,17 +37,18 @@ class GlideMinigameCommand(private val glide: GlideMinigame): CommandTree<Comman
     }
 
     private fun startEndingRound(context: CommandContext<CommandSourceStack>): Int {
-        this.glide.startEndingRound()
+        this.glide.phases.set(GlidePhase.Ending)
         return context.source.success("Successfully started ending the glide round!")
     }
 
     private fun endRound(context: CommandContext<CommandSourceStack>): Int {
-        this.glide.setPhase(GlidePhase.Finish)
+        this.glide.phases.set(GlidePhase.Finish)
         return context.source.success("Successfully ending the glide round!")
     }
 
     private fun markAsFinished(context: CommandContext<CommandSourceStack>): Int {
         val target = EntityArgument.getPlayer(context, "target")
+        target.glide.collideWithFinishLine()
         this.glide.markPlayerFinished(target)
         return context.source.success("Successfully marked ${target.username} as finished!")
     }

@@ -3,24 +3,29 @@ package me.senseiwells.glide.module
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.minigame.data.MinigameDataModule
+import net.casual.arcade.minigame.data.MinigameData
+import net.casual.arcade.minigame.data.MinigameDataProvider
+import net.casual.arcade.minigame.data.MinigameDataType
 import net.casual.arcade.utils.file.ReadableArchive
 import net.casual.arcade.utils.file.ReadableArchive.Companion.parseJson
 import net.casual.arcade.utils.math.location.providers.LocationProvider
-import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import java.util.*
 
 class GlideLobbyData(
     val spawn: LocationProvider = LocationProvider.DEFAULT,
     val timeOfDay: Optional<Int> = Optional.empty()
-): MinigameDataModule {
-    companion object: MinigameDataModule.Provider {
+): MinigameData {
+    override fun type(): MinigameDataType<*> {
+        return type
+    }
+
+    companion object: MinigameDataProvider<GlideLobbyData> {
         private const val LOBBY_DATA_FILE = "glide_lobby_data.json"
 
         val DEFAULT = GlideLobbyData()
 
-        override val id: Identifier = GlideMod.id("lobby_data")
+        override val type = MinigameDataType<GlideLobbyData>(GlideMod.id("lobby_data"))
 
         val codec: Codec<GlideLobbyData> = RecordCodecBuilder.create { instance ->
             instance.group(
