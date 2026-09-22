@@ -1,66 +1,100 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:light.glsl>
-#moj_import <minecraft:fog.glsl>
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:sample_lightmap.glsl>
+#include <minecraft:light.glsl>
+#include <minecraft:fog.glsl>
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
+#include <minecraft:sample_lightmap.glsl>
+// == Glide Start ==
+#include <glide:glide.glsl>
+// == Glide End ==
 
-#moj_import <minecraft:globals.glsl>
-#moj_import <glide:glide.glsl>
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec2 UV0;
+layout(location = 3) in ivec2 UV1;
+layout(location = 4) in ivec2 UV2;
+#ifdef GLINT_SPECIAL
+layout(location = 5) in vec2 UV3;
+#endif
+layout(location = 6) in vec3 Normal;
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
-in ivec2 UV1;
-in ivec2 UV2;
-in vec3 Normal;
-
-uniform sampler2D Sampler2;
-
-out float sphericalVertexDistance;
-out float cylindricalVertexDistance;
-out vec4 vertexColor;
-out vec2 texCoord0;
-
-
+// == Glide Start ==
 uniform sampler2D Sampler0;
-flat out int objectType; //See glide.glsl
-out vec3 cornerTex1;
-out vec3 cornerTex2;
-out vec3 cornerTex3;
-out vec4 normal;
-out float height;
+// == Glide End ==
+#ifndef OIT_ALPHA_ONLY
+uniform sampler2D Sampler1;
+uniform sampler2D Sampler2;
+#endif
+
+// == Glide Start ==
+layout(location = 0) out float sphericalVertexDistance;
+layout(location = 1) out float cylindricalVertexDistance;
+// == Glide End ==
+layout(location = 2) out vec4 vertexColor;
+#ifndef OIT_ALPHA_ONLY
+layout(location = 3) out vec4 lightMapColor;
+layout(location = 4) out vec4 overlayColor;
+#endif
+
+layout(location = 5) out vec2 texCoord0;
+#ifdef GLINT
+layout(location = 6) out vec2 texCoordGlint;
+#endif
+
+// == Glide Start ==
+layout(location = 7) flat out int marker;
+layout(location = 8) out float height;
+layout(location = 9) out vec2 quadCoord;
+layout(location = 10) flat out float anchorV;
+// == Glide End ==
 
 void main() {
-    vec3 pos = Position;
-    normal = ProjMat * ModelViewMat * vec4(Normal, 0.0);
+    // == Glide Start ==
+    sphericalVertexDistance = fog_spherical_distance(Position);
+    cylindricalVertexDistance = fog_cylindrical_distance(Position);
+    // == Glide End ==
 
-    sphericalVertexDistance = fog_spherical_distance(pos);
-    cylindricalVertexDistance = fog_cylindrical_distance(pos);
-
-    vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color) * sample_lightmap(Sampler2, UV2);
+    vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color);
+    #ifndef OIT_ALPHA_ONLY
+    lightMapColor = sample_lightmap(Sampler2, UV2);
+    overlayColor = texelFetch(Sampler1, UV1, 0);
+    #endif
 
     texCoord0 = UV0;
-    
-    objectType = get_object_from_texture(texture(Sampler0, texCoord0));
-    
-    height = get_heights(objectType, UV2);
-    
-    if (objectType == THERMAL) {
-        texCoord0 = get_thermal_texcoords((1.0 / textureSize(Sampler0, 0)), gl_VertexID, texCoord0);
-        if (gl_VertexID % 4 == 0 || gl_VertexID % 4 == 3) {
+
+    // == Glide Start ==
+    vec3 pos = Position;
+    int corner;
+    marker = findMarker(Sampler0, texCoord0, corner);
+    quadCoord = QUAD_CORNERS[corner < 0 ? gl_VertexIndex % 4 : corner];
+    height = 0.0;
+
+    if (marker == MARKER_THERMAL) {
+        vec2 texel = 1.0 / vec2(textureSize(Sampler0, 0));
+        texCoord0 += (1.0 - 2.0 * quadCoord) * texel;
+
+        height = float(UV2.x) / 16.0 + float(UV2.y);
+        if (quadCoord.y == 0.0) {
             pos.y += height;
         }
+    } else if (marker == MARKER_BEACON_BEAM || marker == MARKER_BEACON_SHELL) {
+        height = float(UV2.x) / 16.0 + float(UV2.y);
     }
-    
-    
-    cornerTex1 = vec3(0.0);
-    cornerTex2 = vec3(0.0);
-    cornerTex3 = vec3(0.0);
-    if (gl_VertexID % 4 == 0) cornerTex1 = vec3(texCoord0, 1.0);
-    if (gl_VertexID % 4 == 2) cornerTex2 = vec3(texCoord0, 1.0);
-    if (gl_VertexID % 2 == 1) cornerTex3 = vec3(texCoord0, 1.0);
-    
+
+    anchorV = texCoord0.y;
+    // == Glide End ==
+
+    #ifdef GLINT
+    #ifdef GLINT_SPECIAL
+    texCoordGlint = (TextureMat * vec4(UV3, 0.0, 1.0)).xy;
+    #else
+    texCoordGlint = (TextureMat * vec4(UV0, 0.0, 1.0)).xy;
+    #endif
+    #endif
+
+    // == Glide Start ==
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
+    // == Glide End ==
 }

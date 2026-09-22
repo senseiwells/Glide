@@ -6,23 +6,19 @@ plugins {
     kotlin("jvm").version(jvmVersion)
     kotlin("plugin.serialization").version(jvmVersion)
     alias(libs.plugins.fabric.loom)
+    alias(libs.plugins.joystick)
     `maven-publish`
     java
 }
 
-val modVersion = "1.0.3"
+val modVersion = "1.0.4"
 version = "${modVersion}+${libs.versions.minecraft.get()}"
 group = "me.senseiwells"
 
 repositories {
     mavenLocal()
-    maven("https://maven.supersanta.me/snapshots")
-    maven("https://maven.parchmentmc.org/")
-    maven("https://jitpack.io")
     maven("https://ueaj.dev/maven")
     maven("https://maven.nucleoid.xyz")
-    maven("https://maven.maxhenkel.de/repository/public")
-    maven("https://maven.mcbrawls.net/releases/")
     mavenCentral()
 }
 
@@ -32,19 +28,18 @@ val bundled: SourceSet = sourceSets.create("bundled") {
     runtimeClasspath += main.runtimeClasspath + main.output
 }
 
-@Suppress("AvoidDuplicateDependencies", "RedundantSuppression") // lmao thanks IntelliJ
 dependencies {
     minecraft(libs.minecraft)
     implementation(libs.fabric.loader)
     implementation(libs.fabric.api)
     implementation(libs.fabric.kotlin)
 
-    implementation(libs.arcade)
-    implementation(libs.arcade.datagen)
-    implementation(libs.polymer.core)
+    include(implementation(libs.polymer.core.get())!!)
+}
 
-    include(libs.arcade)
-    include(libs.polymer.core)
+arcade {
+    version = libs.versions.arcade
+    modules("arcade", "datagen")
 }
 
 val expansions = mapOf(
