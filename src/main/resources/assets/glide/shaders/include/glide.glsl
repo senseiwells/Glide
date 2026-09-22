@@ -1,67 +1,55 @@
-#version 330
+#ifndef GLIDE_GLSL
+#define GLIDE_GLSL
 
-#define THERMAL 1
-#define BOOST 2
-#define OMNIBOOST 3
-#define BEACONBEAM 4
-#define BEACONSHELL 5
+const int MARKER_NONE = 0;
+const int MARKER_THERMAL = 1;
+const int MARKER_BOOST = 2;
+const int MARKER_OMNI_BOOST = 3;
+const int MARKER_BEACON_BEAM = 4;
+const int MARKER_BEACON_SHELL = 5;
 
-#define THERMALCOLOR ivec4(201, 217, 228, 255)
-#define BOOSTCOLOR ivec4(255, 185, 0, 255)
-#define OMNIBOOSTCOLOR ivec4(230, 100, 47, 255)
-#define BEACONBEAMCOLOR ivec4(0, 255, 0, 255)
-#define BEACONSHELLCOLOR ivec4(0, 83, 255, 255)
+const ivec3 BOOST_KEY = ivec3(255, 185, 0);
+const ivec3 OMNI_BOOST_KEY = ivec3(230, 100, 47);
+const ivec3 BEACON_BEAM_KEY = ivec3(0, 255, 0);
+const ivec3 BEACON_SHELL_KEY = ivec3(0, 83, 255);
 
+const ivec2 THERMAL_KEY_RG = ivec2(201, 217);
+const int THERMAL_KEY_B = 228;
+const int THERMAL_CORNER_B = 224;
 
+const float THERMAL_REPEAT = 128.0;
+const float BOOST_REPEAT = 16.0;
+const float BEACON_REPEAT = 16.0;
 
-int get_object_from_texture(vec4 color) {
-	ivec4 scaledColor = ivec4(color * 255.0 + 0.5);
-	
-	if (scaledColor == THERMALCOLOR) {
-		return THERMAL;
-	}
-	if (scaledColor == BOOSTCOLOR) {
-		return BOOST;
-	}
-	if (scaledColor == OMNIBOOSTCOLOR) {
-		return OMNIBOOST;
-	}
-	if (scaledColor == BEACONBEAMCOLOR) {
-		return BEACONBEAM;
-	}
-	if (scaledColor == BEACONSHELLCOLOR) {
-		return BEACONSHELL;
-	}
-	
-	return 0;
+const vec2 QUAD_CORNERS[4] = vec2[4](
+    vec2(0.0, 0.0),
+    vec2(0.0, 1.0),
+    vec2(1.0, 1.0),
+    vec2(1.0, 0.0)
+);
+
+bool isKey(vec4 color, ivec3 key) {
+    return ivec3(round(color.rgb * 255.0)) == key;
 }
 
-vec2 get_thermal_texcoords(vec2 texel, int vertId, vec2 texCoord) {
-        switch (vertId % 4) {
-            case 0:
-            return texCoord + vec2(1.0, 1.0) * texel;
-            case 1:
-            return texCoord + vec2(1.0, -1.0) * texel;
-            case 2:
-            return texCoord + vec2(-1.0, -1.0) * texel;
-            case 3:
-            return texCoord + vec2(-1.0, 1.0) * texel;
+int findMarker(sampler2D tex, vec2 coord, out int corner) {
+    ivec2 size = textureSize(tex, 0);
+    ivec2 texel = clamp(ivec2(floor(coord * vec2(size))), ivec2(0), size - 1);
+    ivec4 key = ivec4(round(texelFetch(tex, texel, 0) * 255.0));
+    corner = -1;
+    if (key.a == 255) {
+        if (key.rg == THERMAL_KEY_RG && key.b >= THERMAL_CORNER_B && key.b <= THERMAL_KEY_B) {
+            if (key.b < THERMAL_KEY_B) {
+                corner = key.b - THERMAL_CORNER_B;
+            }
+            return MARKER_THERMAL;
         }
-        return texCoord;
+        if (key.rgb == BOOST_KEY) return MARKER_BOOST;
+        if (key.rgb == OMNI_BOOST_KEY) return MARKER_OMNI_BOOST;
+        if (key.rgb == BEACON_BEAM_KEY) return MARKER_BEACON_BEAM;
+        if (key.rgb == BEACON_SHELL_KEY) return MARKER_BEACON_SHELL;
+    }
+    return MARKER_NONE;
 }
 
-float get_heights(int objectType, ivec2 uv) {
-switch(objectType) {
-	case THERMAL:
-		return uv.x / 16.0 + uv.y;
-	case BOOST:
-		return uv.x / 50.0 + uv.y;
-	case OMNIBOOST:
-		return uv.x / 50.0 + uv.y;
-	case BEACONBEAM:
-		return uv.x / 16.0 + uv.y;
-	case BEACONSHELL:
-		return uv.x / 16.0 + uv.y;		
-}
-return 0.0;
-}
+#endif
