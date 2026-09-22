@@ -3,7 +3,9 @@ package me.senseiwells.glide.module
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import me.senseiwells.glide.GlideMod
-import net.casual.arcade.minigame.data.MinigameDataModule
+import net.casual.arcade.minigame.data.MinigameData
+import net.casual.arcade.minigame.data.MinigameDataProvider
+import net.casual.arcade.minigame.data.MinigameDataType
 import net.casual.arcade.utils.file.ReadableArchive
 import net.casual.arcade.utils.file.ReadableArchive.Companion.parseJson
 import net.casual.arcade.utils.math.location.Location
@@ -13,36 +15,40 @@ import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 
-class GlideMetadataData(
+class GlideMetaData(
     val id: Identifier,
     val name: Component,
     val description: Component,
     val authors: List<String>,
     val version: String,
     val spawn: Location
-): MinigameDataModule {
-    companion object: MinigameDataModule.Provider {
+): MinigameData {
+    override fun type(): MinigameDataType<*> {
+        return type
+    }
+
+    companion object: MinigameDataProvider<GlideMetaData> {
         private const val METADATA_FILE = "glide_metadata.json"
         private val ID_CODEC = Identifier.CODEC.fieldOfAny("id", "addon_id")
 
-        override val id: Identifier = GlideMod.id("metadata")
+        override val type = MinigameDataType<GlideMetaData>(GlideMod.id("metadata"))
 
-        val codec: Codec<GlideMetadataData> = RecordCodecBuilder.create { instance ->
+        val codec: Codec<GlideMetaData> = RecordCodecBuilder.create { instance ->
             instance.group(
-                ID_CODEC.forGetter(GlideMetadataData::id),
-                ComponentSerialization.CODEC.fieldOf("name").forGetter(GlideMetadataData::name),
-                ComponentSerialization.CODEC.fieldOf("description").forGetter(GlideMetadataData::description),
-                Codec.STRING.listOf().fieldOf("authors").forGetter(GlideMetadataData::authors),
-                Codec.STRING.fieldOf("version").forGetter(GlideMetadataData::version),
-                Location.CODEC.fieldOf("spawn").forGetter(GlideMetadataData::spawn)
-            ).apply(instance, ::GlideMetadataData)
+                ID_CODEC.forGetter(GlideMetaData::id),
+                ComponentSerialization.CODEC.fieldOf("name").forGetter(GlideMetaData::name),
+                ComponentSerialization.CODEC.fieldOf("description").forGetter(GlideMetaData::description),
+                Codec.STRING.listOf().fieldOf("authors").forGetter(GlideMetaData::authors),
+                Codec.STRING.fieldOf("version").forGetter(GlideMetaData::version),
+                Location.CODEC.fieldOf("spawn").forGetter(GlideMetaData::spawn)
+            ).apply(instance, ::GlideMetaData)
         }
 
-        override fun get(archive: ReadableArchive, server: MinecraftServer): GlideMetadataData {
+        override fun get(archive: ReadableArchive, server: MinecraftServer): GlideMetaData {
             return this.get(archive)
         }
 
-        fun get(archive: ReadableArchive): GlideMetadataData {
+        fun get(archive: ReadableArchive): GlideMetaData {
             return archive.parseJson(METADATA_FILE, this.codec).getOrThrow()
         }
 

@@ -3,9 +3,9 @@ package me.senseiwells.glide.minigame.lobby
 import com.mojang.serialization.Codec
 import me.senseiwells.glide.minigame.GlideMode
 import net.casual.arcade.minigame.settings.GameSetting
+import net.casual.arcade.minigame.settings.GameSettingBuilder
+import net.casual.arcade.minigame.settings.GameSettingType
 import net.casual.arcade.minigame.settings.MinigameSettings
-import net.casual.arcade.minigame.settings.display.MenuGameSetting
-import net.casual.arcade.minigame.settings.display.MenuGameSettingBuilder
 import net.casual.arcade.minigame.utils.item
 import net.casual.arcade.utils.ItemUtils.styledLore
 import net.casual.arcade.utils.TimeUtils.Seconds
@@ -19,9 +19,7 @@ class GlideLobbySettings(
     minigame: GlideLobbyMinigame,
     maps: Collection<Identifier>
 ): MinigameSettings(minigame, Component.translatable("glide.lobby.settings")) {
-    private val displays = ArrayList<MenuGameSetting<*>>()
-
-    val map: GameSetting<GlideSelection<Identifier>> = this.registerGlide(
+    val map: GameSetting<GlideSelection<Identifier>> = this.register(
         selection(Identifier.CODEC, maps, GlideLobbyComponents::map) {
             name = "map"
             display = item(Items.FILLED_MAP, Component.translatable("glide.lobby.settings.map.name"))
@@ -30,7 +28,7 @@ class GlideLobbySettings(
         }
     )
 
-    val mode: GameSetting<GlideSelection<GlideMode>> = this.registerGlide(
+    val mode: GameSetting<GlideSelection<GlideMode>> = this.register(
         selection(GlideMode.CODEC, GlideMode.entries, GlideLobbyComponents::mode, GlideMode::getSerializedName) {
             name = "mode"
             display = item(Items.CLOCK, Component.translatable("glide.lobby.settings.mode.name"))
@@ -39,7 +37,7 @@ class GlideLobbySettings(
         }
     )
 
-    val rounds: GameSetting<GlideSelection<Int>> = this.registerGlide(
+    val rounds: GameSetting<GlideSelection<Int>> = this.register(
         selection(Codec.INT, ROUND_OPTIONS, GlideLobbyComponents::rounds) {
             name = "rounds"
             display = item(Items.PAPER, Component.translatable("glide.lobby.settings.rounds.name"))
@@ -48,7 +46,7 @@ class GlideLobbySettings(
         }
     )
 
-    val startDelay: GameSetting<Optional<MinecraftTimeDuration>> = this.registerGlide(
+    val startDelay: GameSetting<Optional<MinecraftTimeDuration>> = this.register(
         optionalTime {
             name = "start_delay"
             display = item(Items.BELL, Component.translatable("glide.lobby.settings.startDelay.name"))
@@ -64,25 +62,14 @@ class GlideLobbySettings(
         }
     )
 
-    fun displays(): List<MenuGameSetting<*>> {
-        return this.displays
-    }
-
-    private fun <T: Any> registerGlide(display: MenuGameSetting<T>): GameSetting<T> {
-        this.displays.add(display)
-        return this.register(display)
-    }
-
     companion object {
         val ROUND_OPTIONS: List<Int> = listOf(1, 3, 5, 7, 10)
 
         private fun optionalTime(
-            block: MenuGameSettingBuilder<Optional<MinecraftTimeDuration>>.() -> Unit
-        ): MenuGameSetting<Optional<MinecraftTimeDuration>> {
+            block: GameSettingBuilder<Optional<MinecraftTimeDuration>>.() -> Unit
+        ): GameSetting<Optional<MinecraftTimeDuration>> {
             val codec = MinecraftTimeDuration.CODEC.optionalFieldOf("duration").codec()
-            val builder = MenuGameSettingBuilder { name, value, values ->
-                GameSetting(name, value, values, codec)
-            }
+            val builder = GameSettingBuilder(GameSettingType(codec))
             return builder.apply(block).build()
         }
 
@@ -91,12 +78,10 @@ class GlideLobbySettings(
             options: Iterable<T>,
             namer: (T) -> Component,
             id: (T) -> String = Any::toString,
-            block: MenuGameSettingBuilder<GlideSelection<T>>.() -> Unit
-        ): MenuGameSetting<GlideSelection<T>> {
+            block: GameSettingBuilder<GlideSelection<T>>.() -> Unit
+        ): GameSetting<GlideSelection<T>> {
             val selection = GlideSelection.codec(codec)
-            val builder = MenuGameSettingBuilder { name, value, values ->
-                GameSetting(name, value, values, selection)
-            }
+            val builder = GameSettingBuilder(GameSettingType(selection))
             builder.apply(block)
             builder.option("by_vote", GlideLobbyComponents.BY_VOTE, GlideSelection.ByVote)
             builder.option("random", GlideLobbyComponents.RANDOM, GlideSelection.Random)

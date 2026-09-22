@@ -14,6 +14,7 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.players.NameAndId
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.StringRepresentable
 import kotlin.math.max
@@ -69,19 +70,19 @@ enum class GlideMode: StringRepresentable {
         return null
     }
 
-    fun getUpdatedWinner(glide: GlideMinigame, leading: GameProfile?): GameProfile? {
+    fun getUpdatedWinner(glide: GlideMinigame, leading: NameAndId?): NameAndId? {
         val comparator = when (this) {
             TimeAttack -> Comparator.comparingInt {
                 glide.stats.getOrCreateStat(it.id, GlideStats.BEST_TIME).value
             }
-            ScoreAttack -> Comparator.comparingInt<GameProfile> {
+            ScoreAttack -> Comparator.comparingInt<NameAndId> {
                 glide.stats.getOrCreateStat(it.id, GlideStats.BEST_SCORE).value
             }.reversed()
         }
 
         val current = glide.players.all.minWithOrNull(
-            Comparator.comparing(ServerPlayer::getGameProfile, comparator)
-        )?.gameProfile ?: return leading
+            Comparator.comparing(ServerPlayer::nameAndId, comparator)
+        )?.nameAndId() ?: return leading
 
         if (leading == null) {
             return current

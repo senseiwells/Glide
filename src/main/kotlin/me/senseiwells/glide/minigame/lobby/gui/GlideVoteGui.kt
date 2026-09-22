@@ -27,7 +27,7 @@ class GlideVoteGui(
     }
 
     override fun valid(): Boolean {
-        return this.lobby.phase == GlideLobbyPhase.Starting
+        return this.lobby.state.isAt(GlideLobbyPhase.Starting)
     }
 
     private fun load() {
@@ -43,8 +43,7 @@ class GlideVoteGui(
     }
 
     private fun display(vote: GlideVote<*>): ItemStack {
-        val voted = vote.voteNameOf(this.player)
-        val lore = when (voted) {
+        val lore = when (val voted = vote.voteNameOf(this.player)) {
             null -> Component.translatable("glide.lobby.gui.notVoted")
             else -> Component.translatable("glide.lobby.gui.yourVote", voted)
         }

@@ -26,7 +26,12 @@ sealed interface GlideRoundMode {
 
     fun mayPlayerRestart(player: ServerPlayer): Boolean
 
-    fun onRoundFinished(glide: GlideMinigame)
+    fun finishRound(): RoundResult
+
+    enum class RoundResult {
+        Restart,
+        Complete
+    }
 
     sealed interface Provider {
         fun create(): GlideRoundMode
@@ -69,8 +74,8 @@ data object SoloGlideRoundMode: GlideRoundMode, GlideRoundMode.Provider {
         return !player.glide.finished && !player.isSpectator
     }
 
-    override fun onRoundFinished(glide: GlideMinigame) {
-        glide.complete()
+    override fun finishRound(): GlideRoundMode.RoundResult {
+        return GlideRoundMode.RoundResult.Complete
     }
 
     override fun create(): GlideRoundMode {
@@ -110,12 +115,11 @@ class MultiGlideRoundMode(private val rounds: Int): GlideRoundMode {
         return false
     }
 
-    override fun onRoundFinished(glide: GlideMinigame) {
+    override fun finishRound(): GlideRoundMode.RoundResult {
         if (++this.round <= this.rounds) {
-            glide.restart()
-        } else {
-            glide.complete()
+            return GlideRoundMode.RoundResult.Restart
         }
+        return GlideRoundMode.RoundResult.Complete
     }
 
     class Provider(val rounds: Int): GlideRoundMode.Provider {

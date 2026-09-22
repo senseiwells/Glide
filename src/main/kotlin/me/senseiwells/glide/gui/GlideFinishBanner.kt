@@ -12,19 +12,21 @@ import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-class GlideFinishBanner(glide: GlideMinigame): GlideEndBanner(glide) {
+class GlideFinishBanner(
+    private val glide: GlideMinigame
+): GlideBanner(glide.server) {
     override fun getBannerShield(player: ServerPlayer, frame: Int): Component {
         if (!player.glide.finished) {
             return GlideFont.Banner.stopwatchShield(frame).wrap().shadowless()
         }
-        return super.getBannerShield(player, frame)
+        return this.glide.mode.getBannerShield(frame).wrap().shadowless()
     }
 
     override fun getBannerText(player: ServerPlayer,): Component {
         val component = when {
             !player.glide.finished -> GlideComponents.HURRY_UP
             player.glide.wasPersonalBest -> GlideComponents.PERSONAL_BEST
-            else -> return super.getBannerText(player)
+            else -> this.glide.mode.getBannerScore(player)
         }
         return component.color(0x444444).shadowless().withShiftedDownFont(29)
     }
