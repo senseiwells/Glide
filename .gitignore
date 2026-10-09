@@ -8,3 +8,8 @@ run/
 /rules/
 /run-datagen/
 /.kotlin/
+
+.DS_Store
+
+/src/main/resources/data/glide/maps/**/resource_pack/assets/minecraft_arr
+/mismatched-textures.txt

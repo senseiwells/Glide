@@ -4,12 +4,11 @@ import me.senseiwells.glide.font.GlideFont
 import net.casual.arcade.pack.font.spacing.SpacingFontResources
 import net.casual.arcade.utils.Identifier
 import net.casual.arcade.utils.TimeUtils.format
+import net.casual.arcade.utils.component.font
 import net.casual.arcade.utils.time.MinecraftTimeDuration
 import net.casual.arcade.virtual.visuals.elements.UniversalElement
 import net.casual.arcade.virtual.visuals.sidebar.SidebarComponent
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.FontDescription
-import net.minecraft.network.chat.Style
 import net.minecraft.server.MinecraftServer
 
 class GlobalSidebarTimerElement(
@@ -26,7 +25,7 @@ class GlobalSidebarTimerElement(
             .append(SpacingFontResources.spaced(-16))
             .append(GlideFont.Timer.getMinutesHand(minutesHandIndex))
         return SidebarComponent.withCustomScore(
-            Component.literal(elapsed.format()).withStyle(Style.EMPTY.withFont(FontDescription.Resource(Identifier("glide","bignumbers")))),
+            Component.literal(elapsed.format()).font(Identifier("glide", "big_numbers")),
             Component.empty().append(stopwatch).append(SpacingFontResources.spaced(5))
         )
     }

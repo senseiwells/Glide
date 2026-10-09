@@ -1,124 +1,100 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:light.glsl>
-#moj_import <minecraft:fog.glsl>
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:sample_lightmap.glsl>
+#include <minecraft:light.glsl>
+#include <minecraft:fog.glsl>
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
+#include <minecraft:sample_lightmap.glsl>
+// == Glide Start ==
+#include <glide:glide.glsl>
+// == Glide End ==
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
-in ivec2 UV1;
-in ivec2 UV2;
-in vec3 Normal;
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec2 UV0;
+layout(location = 3) in ivec2 UV1;
+layout(location = 4) in ivec2 UV2;
+#ifdef GLINT_SPECIAL
+layout(location = 5) in vec2 UV3;
+#endif
+layout(location = 6) in vec3 Normal;
 
 // == Glide Start ==
 uniform sampler2D Sampler0;
 // == Glide End ==
+#ifndef OIT_ALPHA_ONLY
 uniform sampler2D Sampler1;
 uniform sampler2D Sampler2;
-
-out float sphericalVertexDistance;
-out float cylindricalVertexDistance;
-out vec4 vertexColor;
-out vec4 lightMapColor;
-out vec4 overlayColor;
-
-out vec2 texCoord0;
+#endif
 
 // == Glide Start ==
-const int MARKER_NONE = 0;
-const int MARKER_THERMAL = 1;
-const int MARKER_BOOST = 2;
-const int MARKER_OMNI_BOOST = 3;
-const int MARKER_BEACON_BEAM = 4;
-const int MARKER_BEACON_SHELL = 5;
+layout(location = 0) out float sphericalVertexDistance;
+layout(location = 1) out float cylindricalVertexDistance;
+// == Glide End ==
+layout(location = 2) out vec4 vertexColor;
+#ifndef OIT_ALPHA_ONLY
+layout(location = 3) out vec4 lightMapColor;
+layout(location = 4) out vec4 overlayColor;
+#endif
 
-flat out int marker;
-out float height;
-out vec3 cornerTex1;
-out vec3 cornerTex2;
-out vec3 cornerTex3;
+layout(location = 5) out vec2 texCoord0;
+#ifdef GLINT
+layout(location = 6) out vec2 texCoordGlint;
+#endif
 
-// Glide's models are drawn from sprites that are framed with a solid key
-// colour, and every quad of such a model has its corner UVs sitting on that
-// frame. Sampling the texel under a vertex therefore tells us which of the
-// animated models (if any) the quad belongs to.
-// Returns MARKER_NONE for any sprite that isn't one of ours.
-int findMarker(sampler2D tex, vec2 coord) {
-    ivec2 size = textureSize(tex, 0);
-    ivec2 texel = clamp(ivec2(floor(coord * vec2(size))), ivec2(0), size - 1);
-    ivec4 key = ivec4(round(texelFetch(tex, texel, 0) * 255.0));
-    if (key.a == 255) {
-        if (key.rgb == ivec3(201, 217, 228)) return MARKER_THERMAL;
-        if (key.rgb == ivec3(255, 185, 0)) return MARKER_BOOST;
-        if (key.rgb == ivec3(230, 100, 47)) return MARKER_OMNI_BOOST;
-        if (key.rgb == ivec3(0, 255, 0)) return MARKER_BEACON_BEAM;
-        if (key.rgb == ivec3(0, 83, 255)) return MARKER_BEACON_SHELL;
-    }
-    return MARKER_NONE;
-}
+// == Glide Start ==
+layout(location = 7) flat out int marker;
+layout(location = 8) out float height;
+layout(location = 9) out vec2 quadCoord;
+layout(location = 10) flat out float anchorV;
 // == Glide End ==
 
 void main() {
+    // == Glide Start ==
     sphericalVertexDistance = fog_spherical_distance(Position);
     cylindricalVertexDistance = fog_cylindrical_distance(Position);
+    // == Glide End ==
 
     vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color);
+    #ifndef OIT_ALPHA_ONLY
     lightMapColor = sample_lightmap(Sampler2, UV2);
     overlayColor = texelFetch(Sampler1, UV1, 0);
+    #endif
 
     texCoord0 = UV0;
 
     // == Glide Start ==
     vec3 pos = Position;
-    int corner = gl_VertexID % 4;
-
-    marker = findMarker(Sampler0, texCoord0);
+    int corner;
+    marker = findMarker(Sampler0, texCoord0, corner);
+    quadCoord = QUAD_CORNERS[corner < 0 ? gl_VertexIndex % 4 : corner];
     height = 0.0;
 
     if (marker == MARKER_THERMAL) {
-        // Pull the corners a texel inside the frame, so the region we scroll
-        // is the sprite itself rather than the key colour around it.
         vec2 texel = 1.0 / vec2(textureSize(Sampler0, 0));
-        switch (corner) {
-            case 0:
-                texCoord0 += vec2(1.0, 1.0) * texel;
-                break;
-            case 1:
-                texCoord0 += vec2(1.0, -1.0) * texel;
-                break;
-            case 2:
-                texCoord0 += vec2(-1.0, -1.0) * texel;
-                break;
-            case 3:
-                texCoord0 += vec2(-1.0, 1.0) * texel;
-                break;
-        }
-    }
+        texCoord0 += (1.0 - 2.0 * quadCoord) * texel;
 
-    // Each of these is only written by one vertex of a triangle, so dividing
-    // the interpolated xy by the interpolated z recovers that vertex's UV in
-    // the fragment shader, which gives us the quad's region of the atlas.
-    cornerTex1 = vec3(0.0);
-    cornerTex2 = vec3(0.0);
-    cornerTex3 = vec3(0.0);
-    if (corner == 0) cornerTex1 = vec3(texCoord0, 1.0);
-    if (corner == 2) cornerTex2 = vec3(texCoord0, 1.0);
-    if (gl_VertexID % 2 == 1) cornerTex3 = vec3(texCoord0, 1.0);
-
-    // The models are a single block tall; the entity packs the height it
-    // should be stretched to into its brightness override.
-    if (marker == MARKER_THERMAL) {
         height = float(UV2.x) / 16.0 + float(UV2.y);
-        if (corner == 0 || corner == 3) {
+        if (quadCoord.y == 0.0) {
             pos.y += height;
         }
     } else if (marker == MARKER_BEACON_BEAM || marker == MARKER_BEACON_SHELL) {
         height = float(UV2.x) / 16.0 + float(UV2.y);
     }
+
+    anchorV = texCoord0.y;
     // == Glide End ==
 
+    #ifdef GLINT
+    #ifdef GLINT_SPECIAL
+    texCoordGlint = (TextureMat * vec4(UV3, 0.0, 1.0)).xy;
+    #else
+    texCoordGlint = (TextureMat * vec4(UV0, 0.0, 1.0)).xy;
+    #endif
+    #endif
+
+    // == Glide Start ==
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
+    // == Glide End ==
 }

@@ -1,0 +1,11 @@
+{
+  "id": "glide:cavern",
+  "name": "",
+  "description": "",
+  "authors": [],
+  "version": "1.0.0",
+  "spawn": {
+    "position": [93.0, 232.0, -5.0],
+    "rotation": [0.0, 90.0]
+  }
+}

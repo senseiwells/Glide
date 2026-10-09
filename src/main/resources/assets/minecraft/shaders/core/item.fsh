@@ -1,74 +1,122 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:fog.glsl>
-#moj_import <minecraft:dynamictransforms.glsl>
 // == Glide Start ==
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
+// == Glide End ==
+#include <minecraft:fog.glsl>
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:oit.glsl>
+// == Glide Start ==
+#include <glide:glide.glsl>
 // == Glide End ==
 
 uniform sampler2D Sampler0;
 
-in float sphericalVertexDistance;
-in float cylindricalVertexDistance;
-in vec4 vertexColor;
-in vec4 lightMapColor;
-in vec4 overlayColor;
-in vec2 texCoord0;
+#ifdef GLINT
+uniform sampler2D GlintSampler;
+#endif
 
 // == Glide Start ==
-const int MARKER_NONE = 0;
-const int MARKER_THERMAL = 1;
-const int MARKER_BOOST = 2;
-const int MARKER_OMNI_BOOST = 3;
-const int MARKER_BEACON_BEAM = 4;
-const int MARKER_BEACON_SHELL = 5;
-
-flat in int marker;
-in float height;
-in vec3 cornerTex1;
-in vec3 cornerTex2;
-in vec3 cornerTex3;
+// Vanilla guards these behind OIT_ALPHA_ONLY. The marker fades below derive
+// alpha from the distance, so it has to survive every OIT pass or the
+// alpha-only passes would disagree with the accumulate pass.
+layout(location = 0) in float sphericalVertexDistance;
+layout(location = 1) in float cylindricalVertexDistance;
 // == Glide End ==
-
-out vec4 fragColor;
+layout(location = 2) in vec4 vertexColor;
+#ifndef OIT_ALPHA_ONLY
+layout(location = 3) in vec4 lightMapColor;
+layout(location = 4) in vec4 overlayColor;
+#endif
+layout(location = 5) in vec2 texCoord0;
+#ifdef GLINT
+layout(location = 6) in vec2 texCoordGlint;
+#endif
 
 // == Glide Start ==
-vec4 spriteBounds() {
-    vec2 corner1 = cornerTex1.xy / cornerTex1.z;
-    vec2 corner2 = cornerTex2.xy / cornerTex2.z;
-    vec2 corner3 = cornerTex3.xy / cornerTex3.z;
-    vec2 minUV = min(corner1, min(corner2, corner3));
-    vec2 maxUV = max(corner1, max(corner2, corner3));
-    return vec4(minUV, maxUV - minUV);
+layout(location = 7) flat in int marker;
+layout(location = 8) in float height;
+layout(location = 9) in vec2 quadCoord;
+layout(location = 10) flat in float anchorV;
+// == Glide End ==
+
+#ifndef OIT_ALPHA_ONLY
+layout(location = 0) out vec4 fragColor;
+#endif
+
+// == Glide Start ==
+float spriteStart(float spriteHeight) {
+    return texCoord0.y < anchorV ? anchorV - spriteHeight : anchorV;
 }
 
-vec4 scrolled(vec4 bounds, float scale, float offset) {
-    vec2 uv = texCoord0 - bounds.xy;
-    uv.y = uv.y * scale + offset;
-    return texture(Sampler0, mod(uv, bounds.zw) + bounds.xy);
+float measuredHeight(mat2 dTexCoord, mat2 dQuadCoord) {
+    float det = determinant(dQuadCoord);
+    det = abs(det) < 1e-14 ? (det < 0.0 ? -1e-14 : 1e-14) : det;
+    mat2 adjugate = mat2(dQuadCoord[1][1], -dQuadCoord[0][1], -dQuadCoord[1][0], dQuadCoord[0][0]);
+    mat2 quadToTex = dTexCoord * adjugate / det;
+    return abs(quadToTex[0].y) + abs(quadToTex[1].y);
 }
 
-bool isKey(vec4 color, ivec3 key) {
-    return ivec3(round(color.rgb * 255.0)) == key;
+vec4 scrolled(float start, float repeat, float scale, float offset) {
+    float local = texCoord0.y - start;
+    return textureLod(Sampler0, vec2(texCoord0.x, start + mod(local * scale + offset, repeat)), 0.0);
 }
 // == Glide End ==
+
+#ifndef OIT_ALPHA_ONLY
+vec4 calculateFinalColor(vec4 color) {
+    // == Glide Start ==
+    // Marker geometry is emissive, it takes neither the overlay nor the lightmap.
+    if (marker == MARKER_NONE) {
+    // == Glide End ==
+        color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
+        color *= lightMapColor;
+    // == Glide Start ==
+    }
+    // == Glide End ==
+
+    #ifdef GLINT
+    vec4 glintColor = GlintAlpha * texture(GlintSampler, texCoordGlint);// Glint color modulator?
+    // Matches BlendFuntion.GLINT
+    color.rgb += glintColor.rgb * glintColor.rgb;
+    #endif
+
+    #ifdef OIT_ACCUMULATE
+    color = sampleColorForAccumulation(color);
+    vec4 fogColor = vec4(FogColor.rgb * color.a, FogColor.a);
+    #else
+    vec4 fogColor = FogColor;
+    #endif
+
+    return apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, fogColor);
+}
+#endif
 
 void main() {
     // == Glide Start ==
+    vec4 color;
+
     if (marker != MARKER_NONE) {
-        vec4 bounds = spriteBounds();
-        vec4 color;
+        mat2 dTexCoord = mat2(dFdx(texCoord0), dFdy(texCoord0));
+        mat2 dQuadCoord = mat2(dFdx(quadCoord), dFdy(quadCoord));
+        float texel = 1.0 / float(textureSize(Sampler0, 0).y);
 
         if (marker == MARKER_THERMAL) {
-            color = scrolled(bounds, height / 8.0, GameTime * 64.0) * vec4(vec3(1.0), 2.0) * ColorModulator;
-            color.a *= min((texCoord0.y - bounds.y) * height / (sphericalVertexDistance / 20.0), 1.0);
+            float repeat = THERMAL_REPEAT * texel;
+            float start = spriteStart(repeat);
+            color = scrolled(start, repeat, height / 8.0, GameTime * 64.0) * vec4(vec3(1.0), 2.0) * ColorModulator;
+            color.a *= min((texCoord0.y - start) * height / (sphericalVertexDistance / 20.0), 1.0);
             color.a /= 2.1;
             if (color.a < 0.1) {
                 discard;
             }
         } else if (marker == MARKER_BOOST || marker == MARKER_OMNI_BOOST) {
-            vec4 sampled = scrolled(bounds, 0.55, GameTime * 32.0);
-            if (isKey(sampled, ivec3(255, 185, 0)) || isKey(sampled, ivec3(230, 100, 47))) {
+            float repeat = BOOST_REPEAT * texel;
+            float repeats = measuredHeight(dTexCoord, dQuadCoord) / repeat > 3.0 ? 5.0 : 1.0;
+            vec4 sampled = scrolled(spriteStart(repeat * repeats), repeat, 0.55, GameTime * 32.0);
+            // The frame is part of the region we scroll, so drop it.
+            if (isKey(sampled, BOOST_KEY) || isKey(sampled, OMNI_BOOST_KEY)) {
                 discard;
             }
 
@@ -80,8 +128,9 @@ void main() {
                 discard;
             }
         } else {
-            vec4 sampled = scrolled(bounds, height / 8.0, -GameTime * 128.0);
-            if (isKey(sampled, marker == MARKER_BEACON_BEAM ? ivec3(0, 255, 0) : ivec3(0, 83, 255))) {
+            float repeat = BEACON_REPEAT * texel;
+            vec4 sampled = scrolled(spriteStart(repeat), repeat, height / 8.0, -GameTime * 128.0);
+            if (isKey(sampled, marker == MARKER_BEACON_BEAM ? BEACON_BEAM_KEY : BEACON_SHELL_KEY)) {
                 discard;
             }
 
@@ -90,22 +139,27 @@ void main() {
                 color.a /= 5.0;
             }
         }
+    } else {
+    // == Glide End ==
+        color = texture(Sampler0, texCoord0);
+        #ifdef ALPHA_CUTOUT
+        if (color.a < ALPHA_CUTOUT) {
+            discard;
+        }
+        #endif
 
-        fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
-        return;
+        color *= vertexColor * ColorModulator;
+    // == Glide Start ==
     }
     // == Glide End ==
 
-    vec4 color = texture(Sampler0, texCoord0);
-#ifdef ALPHA_CUTOUT
-    if (color.a < ALPHA_CUTOUT) {
-        discard;
-    }
-#endif
+    #ifdef GLINT
+    color.a = max(color.a, GlintAlpha);
+    #endif
 
-    color *= vertexColor * ColorModulator;
-    color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
-    color *= lightMapColor;
-
-    fragColor = apply_fog(color, sphericalVertexDistance, cylindricalVertexDistance, FogEnvironmentalStart, FogEnvironmentalEnd, FogRenderDistanceStart, FogRenderDistanceEnd, FogColor);
+    #ifdef OIT_ALPHA_ONLY
+    executeAlphaOnlyPhase(gl_FragCoord.z, color.a);
+    #else
+    fragColor = calculateFinalColor(color);
+    #endif
 }

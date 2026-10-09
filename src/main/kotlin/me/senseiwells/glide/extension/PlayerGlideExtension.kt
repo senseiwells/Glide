@@ -10,7 +10,7 @@ import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
-import me.senseiwells.glide.entity.accelerator.BoosterAccelerator
+import me.senseiwells.glide.entity.accelerator.StaticThermalAccelerator
 import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
@@ -357,7 +357,7 @@ class PlayerGlideExtension(
 
         var lastOffset = playerOffset + 6
         if (this.lastRespawnCheckpointIndex != 0 && this.lastRespawnCheckpointTicks in 0..CHECKPOINT_TICKS) {
-            val distance = minigame.checkpoints.getPercentageDistance(this.lastRespawnCheckpointIndex)
+            val distance = minigame.checkpoints().getPercentageDistance(this.lastRespawnCheckpointIndex)
 
             val index = 5 - 5 * abs(2.0F * this.lastRespawnCheckpointTicks - CHECKPOINT_TICKS) / CHECKPOINT_TICKS
             val checkpointOffset = Mth.clamp(Math.round(distance * 300).toInt(), 0, 300)
@@ -381,7 +381,7 @@ class PlayerGlideExtension(
 
     private fun tickProgress(minigame: GlideMinigame) {
         val position = this.player.position()
-        val checkpoints = minigame.checkpoints
+        val checkpoints = minigame.checkpoints()
         val current = this.lastCrossedCheckpoint
         if (checkpoints.isFinish(current.index)) {
             this.progress = 100.0
@@ -408,8 +408,8 @@ class PlayerGlideExtension(
         // We only need to check if the player has collided with the previous
         // or next checkpoints, they shouldn't be able to skip checkpoints...
         val checkpoints = Iterables.concat(
-            minigame.checkpoints.get(this.lastCheckpointIndex - 1),
-            minigame.checkpoints.get(this.lastCheckpointIndex + 1)
+            minigame.checkpoints().get(this.lastCheckpointIndex - 1),
+            minigame.checkpoints().get(this.lastCheckpointIndex + 1)
         )
         for (checkpoint in checkpoints) {
             if (this.checkCollision(checkpoint, swept, minigame)) {
@@ -622,7 +622,7 @@ class PlayerGlideExtension(
         return GlideMod.id("glide_extension")
     }
 
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    @Suppress("TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun deserialize(input: ValueInput) {
         this.finished = input.getBooleanOr("finished", false)
         this.lastRespawnCheckpointIndex = input.getIntOr("last_respawn_checkpoint_index", 0)

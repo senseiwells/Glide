@@ -13,5 +13,44 @@
   "glide.dnf": "DNF",
   "glide.playerWon": "%s won!",
 
-  "glide.checkpoint": "Checkpoint!"
+  "glide.checkpoint": "Checkpoint!",
+
+  "glide.lobby.title": "Glide Lobby",
+  "glide.lobby.rounds": "%s Rounds",
+  "glide.lobby.random": "Random",
+  "glide.lobby.byVote": "By Vote",
+  "glide.lobby.indefinite": "Indefinite",
+  "glide.lobby.starting.in": "Time to game change: %s seconds",
+  "glide.lobby.ready": "%s is ready! (%s/%s)",
+  "glide.lobby.unready": "%s is no longer ready! (%s/%s)",
+  "glide.lobby.sidebar.map": "Map",
+  "glide.lobby.sidebar.mode": "Mode",
+  "glide.lobby.sidebar.rounds": "Rounds",
+
+  "glide.lobby.vote.map": "Map Vote",
+  "glide.lobby.vote.mode": "Mode Vote",
+  "glide.lobby.vote.rounds": "Rounds Vote",
+
+  "glide.lobby.gui.vote": "Glide Vote",
+  "glide.lobby.gui.votes": "Votes: %s",
+  "glide.lobby.gui.voted": "You voted for this",
+  "glide.lobby.gui.clickToVote": "Click to vote",
+  "glide.lobby.gui.yourVote": "Your vote: %s",
+  "glide.lobby.gui.notVoted": "You haven't voted yet",
+  "glide.lobby.gui.back": "Back",
+  "glide.lobby.gui.close": "Close",
+  "glide.lobby.gui.previous": "Previous Page (%s/%s)",
+  "glide.lobby.gui.next": "Next Page (%s/%s)",
+
+  "glide.lobby.settings": "Glide Lobby Settings",
+  "glide.lobby.settings.glide": "Glide Settings",
+  "glide.lobby.settings.map.name": "Map",
+  "glide.lobby.settings.map.desc": "The glide map that will be played",
+  "glide.lobby.settings.mode.name": "Mode",
+  "glide.lobby.settings.mode.desc": "Whether it's time or score attack",
+  "glide.lobby.settings.rounds.name": "Rounds",
+  "glide.lobby.settings.rounds.desc": "How many rounds are played",
+  "glide.lobby.settings.startDelay.name": "Start Delay",
+  "glide.lobby.settings.startDelay.desc.1": "How long until the minigame starts",
+  "glide.lobby.settings.startDelay.desc.2": "Indefinite requires everyone ready"
 }

@@ -1,13 +1,14 @@
 [versions]
-minecraft     = "26.2"
-fabric-loader = "0.19.3"
-fabric-api    = "0.154.2+26.2"
+minecraft     = "26.3"
+fabric-loader = "0.19.5"
+fabric-api    = "0.160.2+26.3"
 fabric-kotlin = "1.13.12+kotlin.2.4.0"
-polymer       = "0.17.0+26.2-rc-2"
-arcade        = "0.13.0-beta.18+26.2"
+polymer       = "0.18.0+26.3-rc-1"
+arcade        = "0.14.0-beta.7+26.3"
 
 # Plugins
 fabric-loom = "1.17-SNAPSHOT"
+joystick    = "1.0.3"
 
 [libraries]
 minecraft      = { module = "com.mojang:minecraft"                  , version.ref = "minecraft" }
@@ -15,8 +16,7 @@ fabric-loader  = { module = "net.fabricmc:fabric-loader"            , version.re
 fabric-api     = { module = "net.fabricmc.fabric-api:fabric-api"    , version.ref = "fabric-api" }
 fabric-kotlin  = { module = "net.fabricmc:fabric-language-kotlin"   , version.ref = "fabric-kotlin" }
 polymer-core   = { module = "eu.pb4:polymer-core"                   , version.ref = "polymer" }
-arcade         = { module = "net.casualchampionships:arcade"        , version.ref = "arcade" }
-arcade-datagen = { module = "net.casualchampionships:arcade-datagen", version.ref = "arcade" }
 
 [plugins]
-fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
+fabric-loom = { id = "net.fabricmc.fabric-loom"        , version.ref = "fabric-loom" }
+joystick    = { id = "net.casualchampionships.joystick", version.ref = "joystick"}
