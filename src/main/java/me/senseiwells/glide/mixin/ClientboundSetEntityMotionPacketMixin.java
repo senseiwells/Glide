@@ -20,11 +20,7 @@ public class ClientboundSetEntityMotionPacketMixin {
     )
     private static Vec3 getGlideDeltaMovement(Vec3 original, Entity entity) {
         if (entity instanceof ServerPlayer player) {
-            PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
-            double glideVerticalVelocity = glide.getGlideVerticalVelocity();
-            if (glideVerticalVelocity != 0.0) {
-                return new Vec3(original.x, glideVerticalVelocity * glide.getGlideNetworkScale(), original.z);
-            }
+            return PlayerGlideExtension.getGlide(player).getClientboundDeltaMovement(original);
         }
         return original;
     }

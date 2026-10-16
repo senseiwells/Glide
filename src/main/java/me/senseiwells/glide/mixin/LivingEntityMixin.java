@@ -63,10 +63,9 @@ public abstract class LivingEntityMixin extends Entity {
 	private void onMove(LivingEntity instance, MoverType moverType, Vec3 vec3, Operation<Void> original) {
 		if ((Object) this instanceof ServerPlayer player) {
 			PlayerGlideExtension glide = PlayerGlideExtension.getGlide(player);
-			vec3 = glide.modifyVelocityWithLift(vec3);
-			if (glide.isAppliedLiftDirty()) {
-				this.markHurt();
-			}
+			original.call(instance, moverType, glide.modifyVelocityWithLift(vec3));
+			glide.afterFallFlyingMove();
+			return;
 		}
 		original.call(instance, moverType, vec3);
 	}

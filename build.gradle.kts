@@ -19,6 +19,7 @@ repositories {
     mavenLocal()
     maven("https://ueaj.dev/maven")
     maven("https://maven.nucleoid.xyz")
+    maven("https://maven.blamejared.com")
     mavenCentral()
 }
 

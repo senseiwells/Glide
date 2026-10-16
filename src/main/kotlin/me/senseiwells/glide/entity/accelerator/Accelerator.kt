@@ -1,7 +1,6 @@
 package me.senseiwells.glide.entity.accelerator
 
 import eu.pb4.polymer.core.api.entity.PolymerEntity
-import me.senseiwells.glide.utils.intersects
 import net.casual.arcade.utils.entity.SynchedDataUtils
 import net.casual.arcade.utils.entity.createValue
 import net.casual.arcade.utils.impl.Sound
@@ -57,8 +56,9 @@ sealed class Accelerator(
         return this.entityData.get(SIZE)
     }
 
-    open fun shouldAcceleratePlayer(player: ServerPlayer, swept: Collection<AABB>): Boolean {
-        return this.boundingBox.intersects(swept)
+    open fun shouldAcceleratePlayer(player: ServerPlayer): Boolean {
+        val position = player.position()
+        return this.boundingBox.intersects(position, position)
     }
 
     override fun getPolymerEntityType(context: PacketContext): EntityType<*> {

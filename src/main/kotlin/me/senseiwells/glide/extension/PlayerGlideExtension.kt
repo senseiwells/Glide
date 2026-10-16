@@ -10,8 +10,6 @@ import me.senseiwells.glide.checkpoint.CheckpointData
 import me.senseiwells.glide.checkpoint.RespawnCheckpoint
 import me.senseiwells.glide.entity.GlideCollider
 import me.senseiwells.glide.entity.accelerator.Accelerator
-import me.senseiwells.glide.entity.accelerator.StaticThermalAccelerator
-import me.senseiwells.glide.entity.accelerator.ThermalAccelerator
 import me.senseiwells.glide.entity.ring.Ring
 import me.senseiwells.glide.entity.ring.RingType
 import me.senseiwells.glide.font.GlideFont
@@ -60,7 +58,9 @@ import java.util.*
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isRegularFile
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 class PlayerGlideExtension(
     player: ServerPlayer
@@ -122,8 +122,7 @@ class PlayerGlideExtension(
     // LivingEntity::qword_3E8 (This is an educated guess - Sensei)
     private var liftForceModifier = 1.0
 
-    var isAppliedLiftDirty = false
-        private set
+    private var wasSyncingGlideVelocity = false
 
     var animationTick = 0
         private set
@@ -161,8 +160,65 @@ class PlayerGlideExtension(
         return this.liftForceModifier
     }
 
-    fun getGlideNetworkScale(): Double {
-        return 0.9
+    fun afterFallFlyingMove() {
+        if (this.appliedLiftVelocity != 0.0) {
+            this.player.deltaMovement = this.player.deltaMovement.multiply(1.0, 0.0, 1.0)
+        }
+
+        val syncing = this.isModifyingFallFlying()
+        if (syncing || this.wasSyncingGlideVelocity) {
+            this.player.syncVelocity = true
+        }
+        this.wasSyncingGlideVelocity = syncing
+    }
+
+    fun getClientboundDeltaMovement(movement: Vec3): Vec3 {
+        if (!this.isModifyingFallFlying()) {
+            return movement
+        }
+
+        var target = this.simulateFallFlying(movement, this.liftForceModifier)
+        val glideVerticalVelocity = this.getGlideVerticalVelocity()
+        if (glideVerticalVelocity != 0.0) {
+            target = Vec3(target.x, glideVerticalVelocity, target.z)
+        }
+
+        var sent = target
+        repeat(CLIENTBOUND_INVERSION_ITERATIONS) {
+            sent = sent.add(target.subtract(this.simulateFallFlying(sent, 1.0)))
+        }
+        return sent
+    }
+
+    private fun isModifyingFallFlying(): Boolean {
+        return this.player.isFallFlying && (this.getGlideVerticalVelocity() != 0.0 || this.liftForceModifier != 1.0)
+    }
+
+    // Mirrors LivingEntity#updateFallFlyingMovement
+    private fun simulateFallFlying(movement: Vec3, liftForceModifier: Double): Vec3 {
+        val lookAngle = this.player.lookAngle
+        val leanAngle = this.player.xRot * Mth.DEG_TO_RAD
+        val lookHorLength = sqrt(lookAngle.x * lookAngle.x + lookAngle.z * lookAngle.z)
+        val moveHorLength = movement.horizontalDistance()
+        val liftForce = Mth.square(cos(leanAngle.toDouble())) * liftForceModifier
+
+        var result = movement.add(0.0, this.player.gravity * (-1.0 + liftForce * 0.75), 0.0)
+        if (result.y < 0.0 && lookHorLength > 0.0) {
+            val convert = result.y * -0.1 * liftForce
+            result = result.add(lookAngle.x * convert / lookHorLength, convert, lookAngle.z * convert / lookHorLength)
+        }
+        if (leanAngle < 0.0F && lookHorLength > 0.0) {
+            val convert = moveHorLength * -Mth.sin(leanAngle.toDouble()) * 0.04
+            result = result.add(-lookAngle.x * convert / lookHorLength, convert * 3.2, -lookAngle.z * convert / lookHorLength)
+        }
+        if (lookHorLength > 0.0) {
+            result = result.add(
+                (lookAngle.x / lookHorLength * moveHorLength - result.x) * 0.1,
+                0.0,
+                (lookAngle.z / lookHorLength * moveHorLength - result.z) * 0.1
+            )
+        }
+        return result.multiply(0.99F.toDouble(), 0.98F.toDouble(), 0.99F.toDouble())
     }
 
     fun checkForCollisions() {
@@ -173,7 +229,7 @@ class PlayerGlideExtension(
 
         val swept = this.calculateSweptHitbox()
         this.checkColliders(glide, swept)
-        this.checkAccelerators(glide, swept)
+        this.checkAccelerators(glide)
     }
 
     fun collideWithRing(ring: Ring): Boolean {
@@ -314,6 +370,7 @@ class PlayerGlideExtension(
         this.ringTypeTicks = 0
 
         this.accelerator = null
+        this.isInAccelerator = true
         this.pendingAcceleratorEntry = true
         this.isApplyingStaticLift = false
         this.isApplyingLift = false
@@ -326,6 +383,7 @@ class PlayerGlideExtension(
         this.additionalGlideVelocity = 0.0
         this.appliedLiftVelocity = 0.0
         this.liftForceModifier = 1.0
+        this.wasSyncingGlideVelocity = false
     }
 
     fun reset() {
@@ -426,14 +484,14 @@ class PlayerGlideExtension(
         }
     }
 
-    private fun checkAccelerators(minigame: GlideMinigame, swept: Collection<AABB>) {
+    private fun checkAccelerators(minigame: GlideMinigame) {
         this.liftForceModifier = 1.0
 
         var active: Accelerator? = null
         var entering = false
         val accelerators = minigame.level.getEntities(ACCELERATOR_TYPE_TEST) { true }
         for (accelerator in accelerators) {
-            if (accelerator.shouldAcceleratePlayer(this.player, swept)) {
+            if (accelerator.shouldAcceleratePlayer(this.player)) {
                 entering = true
                 if (!this.isInAccelerator) {
                     active = accelerator
@@ -509,7 +567,6 @@ class PlayerGlideExtension(
             }
         }
 
-        val previousAppliedLift = this.appliedLiftVelocity
         if (this.isApplyingLift) {
             if (this.appliedLiftVelocity == 0.0 && this.player.deltaMovement.y != 0.0) {
                 this.appliedLiftVelocity = this.player.deltaMovement.y
@@ -535,18 +592,11 @@ class PlayerGlideExtension(
                     this.liftDurationTimer = 0
                 }
             }
-            this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
         } else {
             if (this.isUpdraft) {
-                this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - 0.025 else 0.0
+                this.appliedLiftVelocity = if (this.appliedLiftVelocity > 0.0) this.appliedLiftVelocity - LIFT_DECAY else 0.0
             } else {
-                this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + 0.025 else 0.0
-            }
-
-            this.isAppliedLiftDirty = previousAppliedLift != this.appliedLiftVelocity
-
-            if (this.appliedLiftVelocity != 0.0 && !this.isSpeedBoosting) {
-                return
+                this.appliedLiftVelocity = if (this.appliedLiftVelocity < 0.0) this.appliedLiftVelocity + LIFT_DECAY else 0.0
             }
         }
 
@@ -705,6 +755,9 @@ class PlayerGlideExtension(
         private val ACCELERATOR_TYPE_TEST = EntityTypeTest.forClass<Entity, _>(Accelerator::class.java)
 
         private const val CHECKPOINT_TICKS = 12
+
+        private const val LIFT_DECAY = 0.025F.toDouble()
+        private const val CLIENTBOUND_INVERSION_ITERATIONS = 6
 
         @JvmStatic
         val ServerPlayer.glide: PlayerGlideExtension
