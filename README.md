@@ -47,8 +47,11 @@ Glide also relies on the following mods, which you must have installed separatel
 - [Fabric API](https://modrinth.com/mod/fabric-api)
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 
-<!-- ### Configuration -->
-<!-- TODO: Add this section once custom maps are supported  -->
+### Configuration
+
+Custom maps are supported, by default glide comes bundled with the Cavern map.
+Custom maps must be placed in the `./glide/maps` directory. The game must be restarted
+if maps are added after server boot.
 
 ### In-game
 

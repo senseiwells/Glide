@@ -12,17 +12,22 @@ import net.casual.arcade.minigame.data.MinigameDataProvider.Companion.register
 import net.casual.arcade.minigame.data.MinigameDataSet
 import net.casual.arcade.minigame.utils.MinigameRegistries
 import net.casual.arcade.utils.file.ReadableArchive
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.level.dimension.DimensionType
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
 object GlideModules {
     private val builtin = GlideMod.container.findPath("data/glide/maps").get()
     private val builtinLobby = GlideMod.container.findPath("data/glide/lobby").get()
+
+    private val custom = FabricLoader.getInstance().gameDir.resolve("glide/maps")
 
     private val modules = Object2ObjectOpenHashMap<Identifier, MinigameDataSet>()
 
@@ -75,8 +80,14 @@ object GlideModules {
     }
 
     private fun paths(): List<Path> {
-        // TODO: Allow custom paths
-        return this.builtin.listDirectoryEntries()
+        return (this.builtin.listDirectoryEntries() + this.customs())
             .filter { it.name != ".DS_Store" }
+    }
+
+    private fun customs(): List<Path> {
+        if (this.custom.isDirectory()) {
+            return this.custom.listDirectoryEntries()
+        }
+        return listOf()
     }
 }
