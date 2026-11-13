@@ -13,3 +13,6 @@ run/
 
 /src/main/resources/data/glide/maps/**/resource_pack/assets/minecraft_arr
 /mismatched-textures.txt
+
+/src/main/resources/data/glide/maps/*
+!/src/main/resources/data/glide/maps/cavern/
