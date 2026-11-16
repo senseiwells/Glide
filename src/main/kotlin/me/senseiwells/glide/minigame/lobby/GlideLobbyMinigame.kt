@@ -15,7 +15,6 @@ import me.senseiwells.glide.pack.GlidePacks
 import me.senseiwells.glide.utils.unboostHealth
 import net.casual.arcade.dimensions.utils.impl.VoidChunkGenerator
 import net.casual.arcade.events.server.ServerTickEvent
-import net.casual.arcade.events.server.player.PlayerLeaveEvent
 import net.casual.arcade.events.server.player.PlayerVoidDamageEvent
 import net.casual.arcade.events.utils.await
 import net.casual.arcade.minigame.Minigame

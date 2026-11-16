@@ -1,6 +1,5 @@
 package me.senseiwells.glide.minigame
 
-import com.mojang.authlib.GameProfile
 import com.mojang.serialization.Codec
 import me.senseiwells.glide.extension.PlayerGlideExtension.Companion.glide
 import me.senseiwells.glide.font.GlideFont

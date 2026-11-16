@@ -4,11 +4,7 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import me.senseiwells.glide.minigame.GlideMinigame
-import me.senseiwells.glide.minigame.GlideMode
-import me.senseiwells.glide.minigame.GlideRoundMode
-import me.senseiwells.glide.minigame.MultiGlideRoundMode
-import me.senseiwells.glide.minigame.SoloGlideRoundMode
+import me.senseiwells.glide.minigame.*
 import me.senseiwells.glide.minigame.lobby.GlideLobbyMinigame
 import me.senseiwells.glide.minigame.lobby.GlideLobbyPhase
 import me.senseiwells.glide.minigame.lobby.gui.GlideSettingsGui
@@ -16,13 +12,8 @@ import me.senseiwells.glide.minigame.lobby.gui.GlideVoteGui
 import me.senseiwells.glide.minigame.lobby.gui.GlideVoteOptionsGui
 import me.senseiwells.glide.minigame.lobby.vote.GlideVote
 import me.senseiwells.glide.module.GlideModules
-import net.casual.arcade.commands.CommandTree
-import net.casual.arcade.commands.argument
+import net.casual.arcade.commands.*
 import net.casual.arcade.commands.arguments.EnumArgument
-import net.casual.arcade.commands.fail
-import net.casual.arcade.commands.literal
-import net.casual.arcade.commands.success
-import net.casual.arcade.commands.suggests
 import net.casual.arcade.minigame.utils.MinigameUtils.requiresAdminOrPermission
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
@@ -30,7 +21,7 @@ import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.IdentifierArgument
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
-import java.util.UUID
+import java.util.*
 
 class GlideLobbyCommand(private val lobby: GlideLobbyMinigame): CommandTree<CommandSourceStack> {
     override fun create(buildContext: CommandBuildContext): LiteralArgumentBuilder<CommandSourceStack> {
